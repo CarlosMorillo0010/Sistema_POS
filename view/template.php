@@ -1,21 +1,22 @@
 <?php
-    session_start();
+session_start();
 
-    /**
-     * Función para "Cache Busting".
-     * Genera una URL para un asset (CSS/JS) con un número de versión
-     * basado en la fecha de última modificación del archivo.
-     * Esto fuerza al navegador a descargar la nueva versión si el archivo ha cambiado.
-     * @param string $path La ruta al archivo desde la raíz del proyecto.
-     * @return string La ruta completa con el parámetro de versión.
-     */
-    function versionAsset($path) {
-        if (!file_exists($path)) {
-            return $path; // Devuelve la ruta original si el archivo no se encuentra
-        }
-        $version = filemtime($path);
-        return $path . '?v=' . $version;
+/**
+ * Función para "Cache Busting".
+ * Genera una URL para un asset (CSS/JS) con un número de versión
+ * basado en la fecha de última modificación del archivo.
+ * Esto fuerza al navegador a descargar la nueva versión si el archivo ha cambiado.
+ * @param string $path La ruta al archivo desde la raíz del proyecto.
+ * @return string La ruta completa con el parámetro de versión.
+ */
+function versionAsset($path)
+{
+    if (!file_exists($path)) {
+        return $path; // Devuelve la ruta original si el archivo no se encuentra
     }
+    $version = filemtime($path);
+    return $path . '?v=' . $version;
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -37,10 +38,12 @@
         PLUGINS CSS CON VERSIONADO AUTOMÁTICO
     ======================================-->
     <!-- Bootstrap 3.3.7 -->
-    <link rel="stylesheet" href="<?php echo versionAsset('view/bower_components/bootstrap/dist/css/bootstrap.min.css'); ?>">
+    <link rel="stylesheet"
+        href="<?php echo versionAsset('view/bower_components/bootstrap/dist/css/bootstrap.min.css'); ?>">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="<?php echo versionAsset('view/bower_components/fontawesome-free/css/all.css'); ?>">
-    <link rel="stylesheet" href="<?php echo versionAsset('view/bower_components/font-awesome/css/font-awesome.css'); ?>">
+    <link rel="stylesheet"
+        href="<?php echo versionAsset('view/bower_components/font-awesome/css/font-awesome.css'); ?>">
     <!-- Ionicons -->
     <link rel="stylesheet" href="<?php echo versionAsset('view/bower_components/Ionicons/css/ionicons.min.css'); ?>">
     <!-- Main Theme style -->
@@ -50,11 +53,15 @@
     <!-- Caja -->
     <link rel="stylesheet" href="<?php echo versionAsset('view/dist/css/caja.css'); ?>">
     <!-- DataTables -->
-    <link rel="stylesheet" href="<?php echo versionAsset('view/bower_components/datatables-bs4/css/dataTables.bootstrap4.min.css'); ?>">
-    <link rel="stylesheet" href="<?php echo versionAsset('view/bower_components/datatables-responsive/css/responsive.bootstrap4.min.css'); ?>">
-    <link rel="stylesheet" href="<?php echo versionAsset('view/bower_components/datatables-buttons/css/buttons.bootstrap4.min.css'); ?>">
+    <link rel="stylesheet"
+        href="<?php echo versionAsset('view/bower_components/datatables-bs4/css/dataTables.bootstrap4.min.css'); ?>">
+    <link rel="stylesheet"
+        href="<?php echo versionAsset('view/bower_components/datatables-responsive/css/responsive.bootstrap4.min.css'); ?>">
+    <link rel="stylesheet"
+        href="<?php echo versionAsset('view/bower_components/datatables-buttons/css/buttons.bootstrap4.min.css'); ?>">
     <!-- bootstrap datepicker -->
-    <link rel="stylesheet" href="<?php echo versionAsset('view/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'); ?>">
+    <link rel="stylesheet"
+        href="<?php echo versionAsset('view/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'); ?>">
     <!-- iCheck for checkboxes and radio inputs -->
     <link rel="stylesheet" href="<?php echo versionAsset('view/bower_components/iCheck/all.css'); ?>">
     <!-- Select2 -->
@@ -62,13 +69,15 @@
     <!-- Morris chart -->
     <link rel="stylesheet" href="<?php echo versionAsset('view/bower_components/morris.js/morris.css'); ?>">
     <!-- Bootstrap Select -->
-    <link rel="stylesheet" href="<?php echo versionAsset('view/bower_components/bootstrap/dist/css/bootstrap-select.min.css'); ?>">
+    <link rel="stylesheet"
+        href="<?php echo versionAsset('view/bower_components/bootstrap/dist/css/bootstrap-select.min.css'); ?>">
     <!-- Theme style -->
     <link rel="stylesheet" href="<?php echo versionAsset('view/dist/css/AdminLTE.css'); ?>">
     <!-- AdminLTE Skins -->
     <link rel="stylesheet" href="<?php echo versionAsset('view/dist/css/skins/skin-blue.css'); ?>">
     <!-- Daterange picker -->
-    <link rel="stylesheet" href="<?php echo versionAsset('view/bower_components/bootstrap-daterangepicker/daterangepicker.css'); ?>">
+    <link rel="stylesheet"
+        href="<?php echo versionAsset('view/bower_components/bootstrap-daterangepicker/daterangepicker.css'); ?>">
 
     <!--=====================================
         PLUGINS JAVASCRIPT CON VERSIONADO AUTOMÁTICO
@@ -83,19 +92,28 @@
     <script src="<?php echo versionAsset('view/dist/js/adminlte.min.js'); ?>"></script>
     <!-- DataTables -->
     <script src="<?php echo versionAsset('view/bower_components/datatables/jquery.dataTables.min.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/bower_components/datatables-bs4/js/dataTables.bootstrap4.min.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/bower_components/datatables-responsive/js/dataTables.responsive.min.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/bower_components/datatables-responsive/js/responsive.bootstrap4.min.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/bower_components/datatables-buttons/js/dataTables.buttons.min.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/bower_components/datatables-buttons/js/buttons.bootstrap4.min.js'); ?>"></script>
+    <script
+        src="<?php echo versionAsset('view/bower_components/datatables-bs4/js/dataTables.bootstrap4.min.js'); ?>"></script>
+    <script
+        src="<?php echo versionAsset('view/bower_components/datatables-responsive/js/dataTables.responsive.min.js'); ?>"></script>
+    <script
+        src="<?php echo versionAsset('view/bower_components/datatables-responsive/js/responsive.bootstrap4.min.js'); ?>"></script>
+    <script
+        src="<?php echo versionAsset('view/bower_components/datatables-buttons/js/dataTables.buttons.min.js'); ?>"></script>
+    <script
+        src="<?php echo versionAsset('view/bower_components/datatables-buttons/js/buttons.bootstrap4.min.js'); ?>"></script>
     <script src="<?php echo versionAsset('view/bower_components/jszip/jszip.min.js'); ?>"></script>
     <script src="<?php echo versionAsset('view/bower_components/pdfmake/pdfmake.min.js'); ?>"></script>
     <script src="<?php echo versionAsset('view/bower_components/pdfmake/vfs_fonts.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/bower_components/datatables-buttons/js/buttons.html5.min.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/bower_components/datatables-buttons/js/buttons.print.min.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/bower_components/datatables-buttons/js/buttons.colVis.min.js'); ?>"></script>
+    <script
+        src="<?php echo versionAsset('view/bower_components/datatables-buttons/js/buttons.html5.min.js'); ?>"></script>
+    <script
+        src="<?php echo versionAsset('view/bower_components/datatables-buttons/js/buttons.print.min.js'); ?>"></script>
+    <script
+        src="<?php echo versionAsset('view/bower_components/datatables-buttons/js/buttons.colVis.min.js'); ?>"></script>
     <!-- bootstrap datepicker -->
-    <script src="<?php echo versionAsset('view/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'); ?>"></script>
+    <script
+        src="<?php echo versionAsset('view/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'); ?>"></script>
     <!-- SWEETALERT 2 -->
     <script src="<?php echo versionAsset('view/plugins/sweetalert2/sweetalert2.all.js'); ?>"></script>
     <!-- iCheck 1.0.1 -->
@@ -110,7 +128,8 @@
     <script src="<?php echo versionAsset('view/plugins/jqueryNumber/jquerynumber.min.js'); ?>"></script>
     <!-- daterangepicker http://www.daterangepicker.com/-->
     <script src="<?php echo versionAsset('view/bower_components/moment/min/moment.min.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/bower_components/bootstrap-daterangepicker/daterangepicker.js'); ?>"></script>
+    <script
+        src="<?php echo versionAsset('view/bower_components/bootstrap-daterangepicker/daterangepicker.js'); ?>"></script>
     <!-- Morris.js charts http://morrisjs.github.io/morris.js/-->
     <script src="<?php echo versionAsset('view/bower_components/raphael/raphael.min.js'); ?>"></script>
     <script src="<?php echo versionAsset('view/bower_components/morris.js/morris.min.js'); ?>"></script>
@@ -124,7 +143,7 @@
     BODY DOCUMENT
 ======================================-->
 
-<body class="hold-transition skin-blue sidebar-mini sidebar-collapse sidebar login-page">
+<body class="hold-transition skin-blue sidebar-mini sidebar-collapse del-sidebar-collapse">
 
     <?php
     // Solo mostramos este div si el usuario ha iniciado sesión,
@@ -134,19 +153,18 @@
         $tasaBCV = $_SESSION['config']['tasa_bcv'] ?? 0;
         $ivaPorcentaje = $_SESSION['config']['iva_porcentaje'] ?? 16.00;
         $monedaPrincipal = $_SESSION['config']['moneda_principal'] ?? 'USD';
-    ?>
+        ?>
         <!-- =============================================
             CONTENEDOR DE VARIABLES DE CONFIGURACIÓN GLOBALES
             Este div oculto pasa las variables de PHP a JavaScript.
             Nuestro script config-updater.js leerá estos datos al cargar la página.
             ============================================== -->
-        <div id="config-vars"
-            data-tasa-bcv="<?php echo htmlspecialchars($tasaBCV, ENT_QUOTES, 'UTF-8'); ?>"
+        <div id="config-vars" data-tasa-bcv="<?php echo htmlspecialchars($tasaBCV, ENT_QUOTES, 'UTF-8'); ?>"
             data-iva-porcentaje="<?php echo htmlspecialchars($ivaPorcentaje, ENT_QUOTES, 'UTF-8'); ?>"
             data-moneda-principal="<?php echo htmlspecialchars($monedaPrincipal, ENT_QUOTES, 'UTF-8'); ?>"
             style="display: none;">
         </div>
-    <?php
+        <?php
     }
     ?>
 
@@ -251,57 +269,91 @@
         include "modules/login.php";
     }
     ?>
-    <!-- =============================================
-    NUEVO SCRIPT DE ACTUALIZACIÓN GLOBAL
-    Este es el cerebro del sistema de actualización en tiempo real.
-    Debe cargarse ANTES que los demás scripts personalizados.
-    ============================================== -->
-    <script src="<?php echo versionAsset('view/js/config-updater.js'); ?>"></script>
+    <!--=====================================
+        SCRIPTS JS
+    ======================================-->
+    <?php
     
-    <!-- SCRIPTS PERSONALIZADOS CON VERSIONADO AUTOMÁTICO -->
-    <script src="<?php echo versionAsset('view/js/template.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/usuarios.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/categorias.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/clientes.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/productos.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/compuestos.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/impuestos.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/inventario.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/validaciones.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/unidades-medidas.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/divisas.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/bancos.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/pagos.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/marca.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/modelos.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/sucursales.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/almacenes.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/proveedores.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/caja.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/cuentas-pagar.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/cuentas-cobrar.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/libro-ventas.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/libro-compras.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/inventario.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/ajuste-inventario.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/servicios.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/anticipos.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/configuracion.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/nota-entrega.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/nota-entrega_venta.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/facturas-compras.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/facturas-gastos.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/orden-compra.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/devolucion-compra.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/pedidos-ventas.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/factura-venta.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/nota-credito.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/presupuesto.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/traslado-almacen.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/ventas.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/reportes.js'); ?>"></script>
-    <script src="<?php echo versionAsset('view/js/vehiculos.js'); ?>"></script>
-    
+        // Función para cargar scripts (definición movida aquí)
+        function loadModuleScripts($module, $versionAsset) {
+            $moduleScripts = [
+                'perfil' => 'perfiles.js',
+                'config-usuarios' => 'usuarios.js',
+                'config-perfil' => 'perfiles.js',
+                'categorias' => 'categorias.js',
+                'clientes' => 'clientes.js',
+                'productos' => 'productos.js',
+                'unidades-medida' => 'productos.js',
+                'impuestos' => 'impuestos.js',
+                'inventario' => 'inventario.js',
+                'ingresos' => 'inventario.js',
+                'divisas' => 'divisas.js',
+                'config-divisas' => 'divisas.js',
+                'bancos' => 'bancos.js',
+                'formas-pago' => 'pagos.js',
+                'pagos' => 'pagos.js',
+                'marcas' => 'marca.js',
+                'modelos' => 'modelos.js',
+                'proveedores' => 'proveedores.js',
+                'caja' => 'caja.js',
+                'cuentas-pagar' => 'cuentas-pagar.js',
+                'cuentas-cobrar' => 'cuentas-cobrar.js',
+                'libro-ventas' => 'libro-ventas.js',
+                'libro-compras' => 'libro-compras.js',
+                'configuracion' => 'configuracion.js',
+                'config-empresa' => 'configuracion.js',
+                'crear-nota-entrega' => 'nota-entrega.js',
+                'crear-nota-entrega_venta' => 'nota-entrega_venta.js',
+                'crear-factura-compra' => 'facturas-compras.js',
+                'crear-factura-gasto' => 'facturas-gastos.js',
+                'crear-orden-compra' => 'orden-compra.js',
+                'editar-orden-compra' => 'orden-compra.js',
+                'devolucion-compra' => 'devolucion-compra.js',
+                'pedidos-ventas' => 'pedidos-ventas.js',
+                'crear-factura-venta' => 'factura-venta.js',
+                'ventas' => 'ventas.js',
+                'crear-venta' => 'ventas.js',
+                'crear-nota-credito' => 'nota-credito.js',
+                'presupuesto' => 'presupuesto.js',
+                'reportes' => 'reportes.js',
+                'reportes-ventas' => 'reportes.js',
+                'vehiculos' => 'vehiculos.js'
+            ];
+
+            $globalScripts = [
+                'config-updater.js',
+                'template.js',
+                'validaciones.js'
+            ];
+
+            foreach ($globalScripts as $script) {
+                echo '<script src="' . $versionAsset('view/js/' . $script) . '"></script>' . "\n";
+            }
+
+            if (isset($moduleScripts[$module])) {
+                echo '<script src="' . versionAsset('view/js/' . $moduleScripts[$module]) . '"></script>' . "\n";
+            }
+
+            if ($module == 'inicio' || empty($module)) {
+                echo '<script src="' . versionAsset('view/js/inicio.js') . '"></script>' . "\n";
+            }
+        }
+        
+        if (isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") {
+            $currentModule = isset($_GET["ruta"]) ? $_GET["ruta"] : 'inicio';
+            loadModuleScripts($currentModule, 'versionAsset'); 
+        }
+    ?>
+
+    <!-- <script src="view/js/compuestos.js"></script>
+    <script src="view/js/unidades-medidas.js"></script> -->
+    <!-- <script src="view/js/sucursales.js"></script> -->
+    <!-- <script src="view/js/almacenes.js"></script> -->
+    <!-- <script src="view/js/ajuste-inventario.js"></script> -->
+    <!-- <script src="view/js/servicios.js"></script> -->
+    <!-- <script src="view/js/anticipos.js"></script> -->
+    <!-- <script src="view/js/traslado-almacen.js"></script> -->
+
 </body>
 
 </html>

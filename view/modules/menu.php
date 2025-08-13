@@ -6,12 +6,6 @@ $perfil = ControllerPerfiles::ctrMostrarPerfil($item, $valor);
 <aside class="main-sidebar">
     <section class="sidebar">
         <ul class="sidebar-menu">
-            <li>
-                <a href="inicio">
-                    <i class="fas fa-home"></i>
-                    <span>INICIO</span>
-                </a>
-            </li>
             <!--    MANTENIMIENTO   -->
             <li class="treeview">
                 <?php
@@ -26,7 +20,7 @@ $perfil = ControllerPerfiles::ctrMostrarPerfil($item, $valor);
                         </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>
+                        <!--<li>
                             <a href="formas-pago">
                                 <i class="far fa-circle"></i>
                                 <span>Formas de pago</span>
@@ -38,7 +32,7 @@ $perfil = ControllerPerfiles::ctrMostrarPerfil($item, $valor);
                                 <span>Impuestos</span>
                             </a>
                         </li>
-                        <!-- <li>
+                        <li>
                             <a href="almacenes">
                                 <i class="far fa-circle"></i>
                                 <span>Almacenes</span>
