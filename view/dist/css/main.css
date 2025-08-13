@@ -223,3 +223,9 @@ textarea {
 .m-0 {
   margin: 0 !important;
 }
+
+@media (max-width: 767px) {
+  .content-wrapper {
+    width: 100% !important;
+  }
+}
