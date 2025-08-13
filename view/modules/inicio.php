@@ -33,10 +33,12 @@
                 }
                 ?>
             </div>
+
             <div class="col-lg-6">
                 <?php
                 if($_SESSION["perfil"] == "ADMINISTRADOR") {
-                    include "reportes/productos-mas-vendidos.php";
+                    include "reportes/compradores.php";
+
                 }
                 ?>
             </div>
@@ -45,7 +47,6 @@
                 <?php
                 if($_SESSION["perfil"] == "ADMINISTRADOR") {
                     include "reportes/vendedores.php";
-                    include "reportes/compradores.php";
                 }
                 ?>
             </div>

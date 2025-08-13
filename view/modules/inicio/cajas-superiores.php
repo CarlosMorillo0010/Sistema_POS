@@ -10,7 +10,7 @@ $proveedores = ControllerProveedores::ctrMostrarProveedores($item, $valor);
 $totalProveedores = count($proveedores);
 $productos = ControllerProducts::ctrMostrarProductos($item, $valor, $orden);
 $totalProductos = count($productos);
-//$divisa = ControllerConfiguracionesDivisas::ctrMostrarConfiguracionDivisa($item, $valor);
+$tasaUSD = ControllerDivisas::ctrObtenerTasaActual("USD");
 $categoria = ControllerCategories::ctrMostrarCategoria($item, $valor);
 $totalCategorias = count($categoria);
 $ventas = ControllerVentas::ctrMostrarVenta($item, $valor);
@@ -21,7 +21,7 @@ $ventas = ControllerVentas::ctrMostrarVenta($item, $valor);
         <div class="inner">
             <h3>
                 <?php
-                    echo number_format($totalUsuarios);
+                echo number_format($totalUsuarios);
                 ?>
             </h3>
 
@@ -90,13 +90,17 @@ $ventas = ControllerVentas::ctrMostrarVenta($item, $valor);
 <!-- DIVISA -->
 <div class="col-lg-3 col-xs-6">
     <div class="small-box bg-teal">
-
         <div class="inner">
-          
-            <h3>
-              
-                1$ = <span id="precio-dolar-bcv"></span>
 
+            <h3>
+                <?php
+                if ($tasaUSD) {
+
+                    echo number_format($tasaUSD, 2, ',', '.');
+                } else {
+                    echo "0,00";
+                }
+                ?>Bs.S
             </h3>
 
             <p>Valor divisa</p>
