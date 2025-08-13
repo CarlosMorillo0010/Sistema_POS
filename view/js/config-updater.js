@@ -32,9 +32,9 @@
                     iva_porcentaje: parseFloat(configElement.dataset.ivaPorcentaje) || 16,
                     moneda_principal: configElement.dataset.monedaPrincipal || 'USD'
                 };
-                console.log('APP_CONFIG inicializado:', this.config);
+                //console.log('APP_CONFIG inicializado:', this.config);
             } else {
-                console.error('El div #config-vars no fue encontrado. La configuración no se pudo cargar.');
+                //console.error('El div #config-vars no fue encontrado. La configuración no se pudo cargar.');
             }
         },
 
@@ -48,7 +48,7 @@
             // Fusiona la nueva configuración con la existente
             this.config = Object.assign({}, this.config, newConfig);
             
-            console.log('APP_CONFIG actualizado:', this.config);
+            //console.log('APP_CONFIG actualizado:', this.config);
 
             // Dispara un evento global para que otros scripts se enteren
             const event = new CustomEvent('configUpdated', {

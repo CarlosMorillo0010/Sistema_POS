@@ -8,17 +8,17 @@ $(document).ready(function () {
   const TASA_BCV = parseFloat(configDiv.data("tasa-bcv")) || 0;
   const IVA_PORCENTAJE = parseFloat(configDiv.data("iva-porcentaje")) || 16;
 
-  if (TASA_BCV === 0) {
-    console.error(
-      "¡Atención! La Tasa BCV es cero. Los cálculos no serán correctos."
-    );
-    swal({
-      title: "Error de Configuración",
-      text: "La tasa de cambio (BCV) no está disponible o es cero. Por favor, verifique la configuración del sistema.",
-      type: "error",
-      confirmButtonText: "Entendido",
-    });
-  }
+  // if (TASA_BCV === 0) {
+  //   // console.error(
+  //   //   "¡Atención! La Tasa BCV es cero. Los cálculos no serán correctos."
+  //   // );
+  //   swal({
+  //     title: "Error de Configuración",
+  //     text: "La tasa de cambio (BCV) no está disponible o es cero. Por favor, verifique la configuración del sistema.",
+  //     type: "error",
+  //     confirmButtonText: "Entendido",
+  //   });
+  // }
 
   var listaProductosOculta = [];
   var granTotalUsdModal = 0;
