@@ -62,7 +62,7 @@ $(".select2").select2();
 function removeClassOnMobile() {
     if (window.matchMedia("(max-width: 767px)").matches) {
         // Elimina la clase en móvil
-        document.querySelector('.sidebar').classList.remove('sidebar-collapse');
+        document.querySelector('.del-sidebar-collapse').classList.remove('sidebar-collapse');
     }
 }
 
