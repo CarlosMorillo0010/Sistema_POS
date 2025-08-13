@@ -1,0 +1,15 @@
+# Archivo de configuración
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/itechsol/public_html/SistemaPOS
+    - /bin/cp -r ajax $DEPLOYPATH
+    - /bin/cp -r config $DEPLOYPATH
+    - /bin/cp -r controller $DEPLOYPATH
+    - /bin/cp -r extensions $DEPLOYPATH
+    - /bin/cp -r model $DEPLOYPATH
+    - /bin/cp -r lib $DEPLOYPATH
+    - /bin/cp -r view $DEPLOYPATH
+    - /bin/cp -r .cpanel.yml $DEPLOYPATH
+    - /bin/cp -r index.php $DEPLOYPATH
+    - /bin/cp -r .htaccess $DEPLOYPATH
