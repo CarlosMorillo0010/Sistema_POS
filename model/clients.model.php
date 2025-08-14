@@ -106,4 +106,22 @@ class ModelClients{
         $stmt = null;
     }
 
+    /*=============================================
+    ACTUALIZAR CLIENTE DENTRO DE UNA TRANSACCIÓN
+    =============================================*/
+    static public function mdlActualizarClienteConexion($pdo, $tabla, $item1, $valor1, $valor)
+    {
+        // Prepara la consulta usando el objeto PDO de la transacción
+        $stmt = $pdo->prepare("UPDATE $tabla SET $item1 = :item1 WHERE id = :id");
+
+        $stmt->bindParam(":item1", $valor1, PDO::PARAM_STR);
+        $stmt->bindParam(":id", $valor, PDO::PARAM_INT);
+
+        // Si la ejecución falla, lanza una excepción para que la transacción haga rollback
+        if (!$stmt->execute()) {
+            throw new Exception("Falló la actualización del cliente: " . implode(" - ", $stmt->errorInfo()));
+        }
+
+        return true;
+    }
 }

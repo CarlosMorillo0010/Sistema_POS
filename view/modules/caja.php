@@ -193,7 +193,7 @@ $monedaPrincipal = $_SESSION['config']['moneda_principal'] ?? 'USD';
                             <input type="hidden" name="listaMetodoPago" id="listaMetodoPago" required>
                             <input type="hidden" name="listaProductosCaja" id="listaProductosCaja" required>
                             <!-- Este input sigue siendo clave para el backend, aunque ya no sea visible -->
-                            <input type="hidden" name="nuevoTotalVenta" id="nuevoTotalVenta" required>
+                            <!-- <input type="hidden" name="nuevoTotalVenta" id="nuevoTotalVenta" required> -->
                             <input type="hidden" name="totalVenta" id="totalVenta" required>
                         </div>
                     </form>

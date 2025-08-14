@@ -7,26 +7,29 @@ $(document).ready(function () {
   const configDiv = $("#config-vars");
   const TASA_BCV = parseFloat(configDiv.data("tasa-bcv")) || 0;
   const IVA_PORCENTAJE = parseFloat(configDiv.data("iva-porcentaje")) || 16;
-
-  // if (TASA_BCV === 0) {
-  //   // console.error(
-  //   //   "¡Atención! La Tasa BCV es cero. Los cálculos no serán correctos."
-  //   // );
-  //   swal({
-  //     title: "Error de Configuración",
-  //     text: "La tasa de cambio (BCV) no está disponible o es cero. Por favor, verifique la configuración del sistema.",
-  //     type: "error",
-  //     confirmButtonText: "Entendido",
-  //   });
-  // }
-
   var listaProductosOculta = [];
   var granTotalUsdModal = 0;
+
+  // VALIDACIÓN CRÍTICA PARA PRODUCCIÓN
+  if (TASA_BCV === 0) {
+    swal({
+      title: "Error de Configuración",
+      text: "La tasa de cambio (BCV) no está disponible o es cero. No se pueden procesar ventas. Por favor, contacte al administrador.",
+      type: "error",
+      confirmButtonText: "Entendido",
+      allowOutsideClick: false,
+    });
+    // Deshabilitamos la interacción para prevenir errores de cálculo.
+    $(".pos-container")
+      .find("button, .product-card")
+      .prop("disabled", true)
+      .css("cursor", "not-allowed");
+    return; // Detiene la ejecución del resto del script.
+  }
 
   //======================================================================
   // == 1. LÓGICA DE CARGA DE PRODUCTOS Y CATEGORÍAS
   //======================================================================
-
   function cargarProductos(idCategoria) {
     $.ajax({
       url: "ajax/productos.ajax.php",
@@ -101,19 +104,15 @@ $(document).ready(function () {
   //======================================================================
   // == 2. LÓGICA DEL CARRITO DE COMPRAS (AÑADIR, MODIFICAR, QUITAR)
   //======================================================================
-
   $(".pos-container").on("click", ".agregarProducto", function () {
     const idProducto = $(this).attr("idProducto");
     const itemExistente = $(`.order-item[idProducto="${idProducto}"]`);
-
     if (itemExistente.length > 0) {
       itemExistente.find(".btn-agregar-uno").trigger("click");
       return;
     }
-
     const datos = new FormData();
     datos.append("idProducto", idProducto);
-
     $.ajax({
       url: "ajax/productos.ajax.php",
       method: "POST",
@@ -196,7 +195,6 @@ $(document).ready(function () {
   //======================================================================
   // == 3. CÁLCULO DE TOTALES Y ACTUALIZACIÓN DE LA VISTA
   //======================================================================
-
   function actualizarTotales() {
     let subtotalUsd = 0;
     $(".order-item").each(function () {
@@ -206,13 +204,11 @@ $(document).ready(function () {
       );
       subtotalUsd += cantidad * precioUnitario;
     });
-
     const montoIvaUsd = subtotalUsd * (IVA_PORCENTAJE / 100);
     const granTotalUsd = subtotalUsd + montoIvaUsd;
     const subtotalBs = subtotalUsd * TASA_BCV;
     const ivaBs = montoIvaUsd * TASA_BCV;
     const granTotalBs = granTotalUsd * TASA_BCV;
-
     const formatoVeLocale = {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -230,10 +226,7 @@ $(document).ready(function () {
       granTotalBs.toLocaleString("es-VE", formatoVeLocale) + " Bs"
     );
     $("#displayTotalVenta").text("$" + granTotalUsd.toFixed(2));
-
-    $("#nuevoTotalVenta").val(granTotalUsd.toFixed(2));
-    $("#totalVenta").val(granTotalUsd.toFixed(2));
-
+    $("#totalVenta").val(granTotalUsd.toFixed(2)); // Solo usamos un input para el total.
     listarProductosParaBackend();
   }
 
@@ -258,7 +251,6 @@ $(document).ready(function () {
   //======================================================================
   // == 4. FLUJO DE PAGO Y FORMATO DE MONEDA
   //======================================================================
-
   $("#modalMetodoPago").on("show.bs.modal", function (e) {
     if ($(".order-items .order-item").length === 0) {
       swal(
@@ -268,13 +260,12 @@ $(document).ready(function () {
       );
       return e.preventDefault();
     }
-    const granTotalUsd = parseFloat($("#nuevoTotalVenta").val()) || 0;
+    const granTotalUsd = parseFloat($("#totalVenta").val()) || 0;
     const granTotalBs = granTotalUsd * TASA_BCV;
     const formatoVeLocale = {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     };
-
     $("#totalPagarUsd").text("$" + granTotalUsd.toFixed(2));
     $("#totalPagarBs").text(
       granTotalBs.toLocaleString("es-VE", formatoVeLocale) + " Bs"
@@ -287,68 +278,53 @@ $(document).ready(function () {
   });
 
   $("#modalConfirmacionPago").on("show.bs.modal", function () {
-    granTotalUsdModal = parseFloat($("#nuevoTotalVenta").val()) || 0;
+    granTotalUsdModal = parseFloat($("#totalVenta").val()) || 0;
     const granTotalBsModal = granTotalUsdModal * TASA_BCV;
     const formatoVeLocale = {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     };
-
     $("#totalPagarModalUsd").text("$" + granTotalUsdModal.toFixed(2));
     $("#totalPagarModalBs").text(
       granTotalBsModal.toLocaleString("es-VE", formatoVeLocale) + " Bs"
     );
-
     $("#montoRecibidoUsd, #montoRecibidoBs").val("");
     $(".conversion-display").removeClass("visible");
     $(".vuelto-container").hide();
     $("#alertaMontoInsuficiente").hide();
     $("#btnConfirmarYCrearVenta").prop("disabled", true);
-
     calcularPagosYVuelto();
-
     setTimeout(() => $("#montoRecibidoUsd").focus(), 500);
   });
 
-  // -- 4.1 FUNCIONES Y EVENTOS PARA FORMATEAR MONEDA EN TIEMPO REAL --
-
+  // -- Funciones de formato de moneda --
   function getNumericValueUsd(formattedValue) {
     return parseFloat(String(formattedValue)) || 0;
   }
-
   function getNumericValueBs(formattedValue) {
     if (!formattedValue) return 0;
-    const cleanValue = String(formattedValue)
-      .replace(/\./g, "")
-      .replace(",", ".");
-    return parseFloat(cleanValue) || 0;
+    return (
+      parseFloat(String(formattedValue).replace(/\./g, "").replace(",", ".")) ||
+      0
+    );
   }
 
-  $("#montoRecibidoUsd").on("input", function (e) {
-    let value = $(this).val();
-    value = value.replace(/[^0-9.]/g, "");
+  $("#montoRecibidoUsd").on("input", function () {
+    let value = $(this)
+      .val()
+      .replace(/[^0-9.]/g, "");
     const parts = value.split(".");
-    if (parts.length > 2) {
-      value = parts[0] + "." + parts.slice(1).join("");
-    }
-    if (parts.length > 1 && parts[1].length > 2) {
+    if (parts.length > 2) value = parts[0] + "." + parts.slice(1).join("");
+    if (parts.length > 1 && parts[1].length > 2)
       value = parts[0] + "." + parts[1].substring(0, 2);
-    }
     $(this).val(value);
   });
 
-  // =========================================================================
-  // == FUNCIÓN CORREGIDA Y REFINADA PARA EL FORMATO DE BOLÍVARES (Bs) ==
-  // =========================================================================
   $("#montoRecibidoBs").on("input", function (e) {
     const input = e.target;
     let value = input.value;
-
-    // Guardar la posición original del cursor
     const originalCursorPos = input.selectionStart;
     const originalLength = value.length;
-
-    // 1. Limpiar el valor: quitar todo excepto números y UNA coma.
     let cleanValue = value.replace(/[^0-9,]/g, "");
     const firstCommaIndex = cleanValue.indexOf(",");
     if (firstCommaIndex !== -1) {
@@ -356,43 +332,20 @@ $(document).ready(function () {
         cleanValue.substring(0, firstCommaIndex + 1) +
         cleanValue.substring(firstCommaIndex + 1).replace(/,/g, "");
     }
-
-    // 2. Separar parte entera y decimal
     let [integerPart, decimalPart] = cleanValue.split(",");
-
-    // 3. Formatear la parte entera con puntos como separadores de miles
-    // Quitar puntos existentes para reformatear correctamente
     integerPart = integerPart.replace(/\./g, "");
     const formattedIntegerPart = integerPart
       ? new Intl.NumberFormat("de-DE").format(integerPart)
       : "";
-
-    // 4. Limitar los decimales a 2 dígitos
-    if (decimalPart !== undefined) {
-      decimalPart = decimalPart.substring(0, 2);
-    }
-
-    // 5. Reconstruir el valor final
+    if (decimalPart !== undefined) decimalPart = decimalPart.substring(0, 2);
     let finalValue = formattedIntegerPart;
-    if (decimalPart !== undefined) {
-      finalValue += "," + decimalPart;
-    }
-
-    // Si el valor original era solo una coma, mostrar "0,"
-    if (value === ",") {
-      finalValue = "0,";
-    }
-
-    // 6. Actualizar el valor y restaurar la posición del cursor de forma inteligente
+    if (decimalPart !== undefined) finalValue += "," + decimalPart;
+    if (value === ",") finalValue = "0,";
     input.value = finalValue;
     const newLength = finalValue.length;
     const newCursorPos = originalCursorPos + (newLength - originalLength);
-
-    // Asegurarse de que el cursor no se posicione en un lugar inválido
     input.setSelectionRange(newCursorPos, newCursorPos);
   });
-
-  // -- 4.2 CÁLCULO DE PAGOS Y VUELTOS CON LOS VALORES FORMATEADOS --
 
   $("#montoRecibidoUsd, #montoRecibidoBs").on(
     "input keyup",
@@ -402,7 +355,6 @@ $(document).ready(function () {
   function calcularPagosYVuelto() {
     const recibidoUsd = getNumericValueUsd($("#montoRecibidoUsd").val());
     const recibidoBs = getNumericValueBs($("#montoRecibidoBs").val());
-
     const formatoVeLocale = {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -424,11 +376,9 @@ $(document).ready(function () {
     } else {
       $("#conversionDisplayUsd").removeClass("visible");
     }
-
     const totalRecibidoEnUsd =
       recibidoUsd + (TASA_BCV > 0 ? recibidoBs / TASA_BCV : 0);
     const diferencia = totalRecibidoEnUsd - granTotalUsdModal;
-
     if (diferencia >= -0.009) {
       const vueltoEnUsd = diferencia > 0 ? diferencia : 0;
       const vueltoEnBs = vueltoEnUsd * TASA_BCV;
@@ -449,16 +399,19 @@ $(document).ready(function () {
   //======================================================================
   // == 5. ACCIONES FINALES DEL FORMULARIO DE VENTA
   //======================================================================
-
   $("#btnVolverMetodos").on("click", function () {
     $("#modalConfirmacionPago").modal("hide");
     $("#modalMetodoPago").modal("show");
   });
 
   $("#btnConfirmarYCrearVenta").on("click", function () {
+    const boton = $(this);
+    boton
+      .prop("disabled", true)
+      .html('<i class="fa fa-spinner fa-spin"></i> CREANDO VENTA...');
+
     const recibidoUsd = getNumericValueUsd($("#montoRecibidoUsd").val());
     const recibidoBs = getNumericValueBs($("#montoRecibidoBs").val());
-
     let metodoPagoDesc = "";
     if (recibidoUsd > 0 && recibidoBs > 0) {
       metodoPagoDesc = "Pago Mixto";
@@ -483,7 +436,7 @@ $(document).ready(function () {
       $("#modalConfirmacionPago").modal("hide");
       swal({
         title: "Cliente no seleccionado",
-        text: "Por favor, selecciona un cliente para continuar con la venta.",
+        text: "Por favor, selecciona un cliente para continuar.",
         type: "warning",
         confirmButtonText: "Entendido",
       }).then((result) => {
@@ -491,6 +444,9 @@ $(document).ready(function () {
           $("#modalConfirmacionPago").modal("show");
         }
       });
+      boton
+        .prop("disabled", false)
+        .html('<i class="fa fa-check-circle"></i> CREAR VENTA');
       return;
     }
 
