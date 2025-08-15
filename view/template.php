@@ -78,7 +78,8 @@ function versionAsset($path)
     <!-- Daterange picker -->
     <link rel="stylesheet"
         href="<?php echo versionAsset('view/bower_components/bootstrap-daterangepicker/daterangepicker.css'); ?>">
-
+    <link rel="stylesheet"
+         href="<?php echo versionAsset('https://cdn.jsdelivr.net/npm/sweetalert2@11.22.4/dist/sweetalert2.min.css'); ?>">
     <!--=====================================
         PLUGINS JAVASCRIPT CON VERSIONADO AUTOMÁTICO
     ======================================-->
@@ -112,10 +113,9 @@ function versionAsset($path)
     <script
         src="<?php echo versionAsset('view/bower_components/datatables-buttons/js/buttons.colVis.min.js'); ?>"></script>
     <!-- bootstrap datepicker -->
-    <script
-        src="<?php echo versionAsset('view/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'); ?>"></script>
+    <script src="<?php echo versionAsset('view/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'); ?>"></script>
     <!-- SWEETALERT 2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="<?php echo versionAsset('https://cdn.jsdelivr.net/npm/sweetalert2@11.22.4/dist/sweetalert2.all.min.js'); ?>"></script>
     <!-- iCheck 1.0.1 -->
     <script src="<?php echo versionAsset('view/bower_components/iCheck/icheck.min.js'); ?>"></script>
     <!-- InputMask -->
