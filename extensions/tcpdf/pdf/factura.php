@@ -27,8 +27,8 @@ $respuestaVenta = ControllerVentas::ctrMostrarVenta($itemVenta, $valorVenta);
 
 $fecha = substr($respuestaVenta["fecha"],0,-8);
 $productos = json_decode($respuestaVenta["productos"], true);
-$subtotal_usd = number_format($respuestaVenta["subtotal_usd"], 2);
-$total_usd = number_format($respuestaVenta["total_usd"], 2);
+$precio_neto = number_format($respuestaVenta["subtotal_usd"],2);
+$total = number_format($respuestaVenta["total_usd"],2);
 
 //TRAEMOS LA INFORMACION DEL CLIENTE
 
@@ -41,7 +41,6 @@ $respuestaCliente = ControllerClients::ctrMostrarClientes($itemCliente, $valorCl
 //TRAEMOS LA INFORMACION DEL VENDEDOR
 
 $itemVendedor = "id_usuario";
-
 $valorVendedor = $respuestaVenta["id_vendedor"];
 
 $respuestaVendedor = ControllerUsers::ctrMostrarUsuario($itemVendedor, $valorVendedor);
@@ -209,9 +208,9 @@ $orden = null;
 
 $respuestaProducto = ControllerProducts::ctrMostrarProductos($itemProducto, $valorProducto, $orden);
 
-$valorUnitario = number_format($respuestaProducto["subtotal_usd"], 2);
+$valorUnitario = number_format($respuestaProducto["pvp_referencia"], 2);
 
-$precioTotal = number_format($item["total_usd"], 2);
+$precioTotal = number_format($item["total"], 2);
 
 $bloque4 = <<<EOF
 
@@ -270,7 +269,7 @@ $bloque5 = <<<EOF
 			</td>
 
 			<td style="border: 1px solid #666; color:#333; background-color:white; width:100px; text-align:center">
-				$subtotal_usd
+				$ $precio_neto
 			</td>
 
 		</tr>
