@@ -9,7 +9,7 @@ class ControllerConfiguraciones {
         if (isset($_POST["nombreEmpresa"])) {
             if (!preg_match('/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ .,&()-]+$/', $_POST["nombreEmpresa"]) || 
                 !preg_match('/^[JVEGjvge]-[0-9]{8,9}-[0-9]$/', $_POST["rifEmpresa"])) {
-                echo '<script>swal({type: "error", title: "¡Error en los datos!", text: "El nombre o RIF contienen caracteres no válidos."});</script>';
+                echo '<script>Swal.fire({icon: "error", title: "¡Error en los datos!", text: "El nombre o RIF contienen caracteres no válidos."});</script>';
                 return;
             }
 
@@ -41,7 +41,7 @@ class ControllerConfiguraciones {
                     imagecopyresized($destino, $origen, 0, 0, 0, 0, $nuevoAncho, $nuevoAlto, $ancho, $alto);
                     imagepng($destino, $rutaLogo);
                 } else {
-                     echo '<script>swal({type: "error", title: "¡Error de formato!", text: "La imagen debe ser JPG o PNG."});</script>';
+                     echo '<script>Swal.fire({icon: "error", title: "¡Error de formato!", text: "La imagen debe ser JPG o PNG."});</script>';
                      return;
                 }
             }
@@ -65,8 +65,8 @@ class ControllerConfiguraciones {
             $respuesta = ModelConfiguraciones::mdlGuardarConfiguracion("configuracion", $datos);
             if ($respuesta == "ok") {
                 echo '<script>
-                swal({
-                    type: "success", title: "¡Configuración guardada!", text: "Los datos se han guardado correctamente.", showConfirmButton: true, confirmButtonText: "Cerrar"
+                Swal.fire({
+                    icon: "success", title: "¡Configuración guardada!", text: "Los datos se han guardado correctamente.", showConfirmButton: true, confirmButtonText: "Cerrar"
                 }).then(result => { if(result.value){ window.location = "config-empresa"; } });
                 </script>';
             }

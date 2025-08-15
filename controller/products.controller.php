@@ -21,7 +21,7 @@ class ControllerProducts
         if (isset($_POST["nuevoCodigo"])) {
 
             if (empty(trim($_POST["nuevoCodigo"])) || empty(trim($_POST["nuevaDescripcion"])) || !isset($_POST["nuevoPrecioCosto"]) || !isset($_POST["nuevoPorcentajeGanancia"])) {
-                echo '<script> swal({ type: "error", title: "¡Error!", text: "Los campos con (*) son obligatorios."}); </script>';
+                echo '<script> Swal.fire({ icon: "error", title: "¡Error!", text: "Los campos con (*) son obligatorios."}); </script>';
                 return;
             }
 
@@ -94,9 +94,9 @@ class ControllerProducts
             $respuesta = ModelProducts::mdlIngresarProducto($tabla, $datos);
 
             if ($respuesta == "ok") {
-                echo '<script> swal({ type: "success", title: "¡Producto guardado!", showConfirmButton: true, confirmButtonText: "Cerrar" }).then(r => { if(r.value){ window.location = "productos"; } }); </script>';
+                echo '<script> Swal.fire({ icon: "success", title: "¡Producto guardado!", showConfirmButton: true, confirmButtonText: "Cerrar" }).then(r => { if(r.value){ window.location = "productos"; } }); </script>';
             } else {
-                 echo '<script> swal({ type: "error", title: "¡Error al guardar!", text: "' . addslashes($respuesta) . '" }); </script>';
+                 echo '<script> Swal.fire({ icon: "error", title: "¡Error al guardar!", text: "' . addslashes($respuesta) . '" }); </script>';
             }
         }
     }
@@ -116,7 +116,7 @@ class ControllerProducts
                 !isset($_POST["editarPrecioCosto"]) ||
                 !isset($_POST["editarPorcentajeGanancia"])) {
                 
-                echo '<script> swal({ type: "error", title: "¡Error!", text: "Los campos de descripción y precios son obligatorios."}); </script>';
+                echo '<script> Swal.fire({ icon: "error", title: "¡Error!", text: "Los campos de descripción y precios son obligatorios."}); </script>';
                 return;
             }
 
@@ -201,9 +201,9 @@ class ControllerProducts
             $respuesta = ModelProducts::mdlEditarProducto($tabla, $datos);
 
             if ($respuesta == "ok") {
-                echo '<script> swal({ type: "success", title: "¡Producto modificado!", showConfirmButton: true, confirmButtonText: "Cerrar" }).then(r => { if(r.value){ window.location = "productos"; } }); </script>';
+                echo '<script> Swal.fire({ icon: "success", title: "¡Producto modificado!", showConfirmButton: true, confirmButtonText: "Cerrar" }).then(r => { if(r.value){ window.location = "productos"; } }); </script>';
             } else {
-                echo '<script> swal({ type: "error", title: "¡Error al actualizar!", text: "No se pudo modificar el producto. Detalles: ' . addslashes($respuesta) . '" }); </script>';
+                echo '<script> Swal.fire({ icon: "error", title: "¡Error al actualizar!", text: "No se pudo modificar el producto. Detalles: ' . addslashes($respuesta) . '" }); </script>';
             }
         }
     }
@@ -223,7 +223,7 @@ class ControllerProducts
 
             $respuesta = ModelProducts::mdlEliminarProducto($tabla, $datos);
             if ($respuesta == "ok") {
-                echo '<script> swal({ type: "success", title: "¡Producto borrado!", showConfirmButton: true, confirmButtonText: "Cerrar" }).then(r => { if (r.value) { window.location = "productos"; } }); </script>';
+                echo '<script> Swal.fire({ icon: "success", title: "¡Producto borrado!", showConfirmButton: true, confirmButtonText: "Cerrar" }).then(r => { if (r.value) { window.location = "productos"; } }); </script>';
             }
         }
     }

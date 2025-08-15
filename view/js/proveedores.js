@@ -71,10 +71,10 @@ $(document).on("click", ".btnEditarProveedor", function(){
 ======================================**/
 $(document).on("click", ".btnEliminarProveedor", function(){
     var idProveedor = $(this).attr("idProveedor");
-    swal({
+    Swal.fire({
         title: '¿Está seguro de borrar el proveedor?',
         text: "¡Si no lo está puede cancelar la acción!",
-        type: 'warning',
+        icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',

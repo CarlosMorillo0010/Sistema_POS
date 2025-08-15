@@ -22,8 +22,8 @@ class ControllerDivisas
                 $respuesta = ModelDivisas::mdlIngresarDivisa($tabla, $datos);
                 if ($respuesta == "ok") {
                     echo '<script>
-					swal({
-						  type: "success",
+					Swal.fire({
+						  icon: "success",
 						  title: "La divisa ha sido guardado correctamente",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -36,8 +36,8 @@ class ControllerDivisas
                 }
             } else {
                 echo '<script>
-					swal({
-						  type: "error",
+					Swal.fire({
+						  icon: "error",
 						  title: "¡La divisa no puede ir vacía o llevar caracteres especiales!",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -68,8 +68,8 @@ class ControllerDivisas
                 $respuesta = ModelDivisas::mdlEditarDivisa($tabla, $datos);
                 if ($respuesta == "ok") {
                     echo '<script>
-					swal({
-						  type: "success",
+					Swal.fire({
+						  icon: "success",
 						  title: "La divisa ha sido cambiada correctamente",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -82,8 +82,8 @@ class ControllerDivisas
                 }
             } else {
                 echo '<script>
-					swal({
-						  type: "error",
+					Swal.fire({
+						  icon: "error",
 						  title: "¡La divisa no puede ir vacía o llevar caracteres especiales!",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -108,8 +108,8 @@ class ControllerDivisas
             $respuesta = ModelDivisas::mdlBorrarDivisa($tabla, $datos);
             if ($respuesta == "ok") {
                 echo '<script>
-						swal({
-							  type: "success",
+						Swal.fire({
+							  icon: "success",
 							  title: "La divisa ha sido borrada correctamente",
 							  showConfirmButton: true,
 							  confirmButtonText: "Cerrar"

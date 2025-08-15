@@ -71,10 +71,10 @@ $(document).on("click", ".btnEditarLibroCompra", function(){
 $(document).on("click", ".btnEliminarLibroCompra", function(){
   let idLibroCompra = $(this).attr("idLibroCompra");
 
-  swal({
+  Swal.fire({
     title: "¿Está seguro de borrar el registro?",
     text: "¡Si no lo está puede cancelar la acción!",
-    type: "warning",
+    icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#3085d6",
     cancelButtonColor: "#d33",

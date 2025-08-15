@@ -12,10 +12,10 @@ $(document).ready(function () {
 
   // VALIDACIÓN CRÍTICA PARA PRODUCCIÓN
   if (TASA_BCV === 0) {
-    swal({
+    Swal.fire({
       title: "Error de Configuración Crítico",
       text: "La tasa de cambio (BCV) no está disponible o es cero. No se pueden procesar ventas para evitar errores de cálculo. Por favor, contacte al administrador del sistema.",
-      type: "error",
+      icon: "error",
       confirmButtonText: "Entendido",
       allowOutsideClick: false,
     });
@@ -128,7 +128,7 @@ $(document).ready(function () {
       dataType: "json",
       success: function (respuesta) {
         if (parseInt(respuesta.stock) <= 0) {
-          swal(
+          Swal.fire(
             "Sin Stock",
             "No hay unidades disponibles de este producto.",
             "error"
@@ -168,7 +168,7 @@ $(document).ready(function () {
       if (nuevaCantidad <= stock) {
         input.val(nuevaCantidad).trigger("change");
       } else {
-        swal("Stock máximo", "No hay más unidades disponibles.", "warning");
+        Swal.fire("Stock máximo", "No hay más unidades disponibles.", "warning");
       }
     })
     .on("click", ".btn-quitar-uno", function () {
@@ -184,7 +184,7 @@ $(document).ready(function () {
       if (isNaN(cantidad) || cantidad < 1) {
         $(this).val(1);
       } else if (cantidad > stock) {
-        swal(
+        Swal.fire(
           "Stock máximo",
           `Solo hay ${stock} unidades disponibles.`,
           "error"
@@ -273,7 +273,7 @@ $(document).ready(function () {
   // -- Modal 1: Selección de Método de Pago --
   $("#modalMetodoPago").on("show.bs.modal", function (e) {
     if ($(".order-items .order-item").length === 0) {
-      swal(
+      Swal.fire(
         "Carrito vacío",
         "¡Debes agregar productos antes de proceder al pago!",
         "error"
@@ -421,10 +421,10 @@ $(document).ready(function () {
     // Validación final: Cliente seleccionado
     if ($("#seleccionarCliente").val() === "") {
       $("#modalConfirmacionPago").modal("hide");
-      swal({
+      Swal.fire({
         title: "Cliente no seleccionado",
         text: "Por favor, selecciona un cliente para continuar.",
-        type: "warning",
+        icon: "warning",
         confirmButtonText: "Entendido",
       }).then(() => {
         // Al cerrar la alerta, se vuelve a mostrar el modal de pago

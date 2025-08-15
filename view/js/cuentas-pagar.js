@@ -45,10 +45,10 @@ $(".table").on("click", ".btnPagarDeuda", function(){
 $(".btnEliminarCuentaPagar").click(function () {
   var idCuentaPagar = $(this).attr("idCuentaPagar");
 
-  swal({
+  Swal.fire({
     title: "¿Está seguro de borrar la cuenta?",
     text: "¡Si no lo está puede cancelar la acción!",
-    type: "warning",
+    icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#3085d6",
     cancelButtonColor: "#d33",

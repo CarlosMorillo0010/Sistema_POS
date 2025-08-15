@@ -67,8 +67,8 @@ class ControllerCategories{
 				$respuesta = ModelCategories::mdlIngresarCategoria($tabla, $datos);
 				if($respuesta == "ok"){
 					echo'<script>
-					swal({
-						  type: "success",
+					Swal.fire({
+						  icon: "success",
 						  title: "La categoría ha sido guardada correctamente",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -81,8 +81,8 @@ class ControllerCategories{
 				}
 			}else{
 				echo'<script>
-					swal({
-						  type: "error",
+					Swal.fire({
+						  icon: "error",
 						  title: "¡La categoría no puede ir vacía o llevar caracteres especiales!",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -121,8 +121,8 @@ class ControllerCategories{
 				$respuesta = ModelCategories::mdlEditarCategoria($tabla, $datos);
 				if($respuesta == "ok"){
 					echo'<script>
-					swal({
-						  type: "success",
+					Swal.fire({
+						  icon: "success",
 						  title: "La categoría ha sido cambiada correctamente",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -135,8 +135,8 @@ class ControllerCategories{
 				}
 			}else{
 				echo'<script>
-					swal({
-						  type: "error",
+					Swal.fire({
+						  icon: "error",
 						  title: "¡La categoría no puede ir vacía o llevar caracteres especiales!",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -162,8 +162,8 @@ class ControllerCategories{
 	  		$respuesta = ModelCategories::mdlBorrarCategoria($tabla, $datos);
 	  		if($respuesta == "ok"){
 	  			echo'<script>
-						swal({
-							  type: "success",
+						Swal.fire({
+							  icon: "success",
 							  title: "La categoría ha sido borrada correctamente",
 							  showConfirmButton: true,
 							  confirmButtonText: "Cerrar"

@@ -24,10 +24,10 @@ $(document).on("click", ".btnEditarPerfil", function(){
 /** ELIMINAR PERFIL **/
 $(document).on("click", ".btnEliminarPerfil", function(){
     var idPerfil = $(this).attr("idPerfil");
-    swal({
+    Swal.fire({
         title: '¿Está seguro de borrar el perfil?',
         text: "¡Si no lo está puede cancelar la acción!",
-        type: 'warning',
+        icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',

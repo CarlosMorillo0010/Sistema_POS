@@ -174,10 +174,10 @@ $("#documento").keyup(function () {
 $(document).on("click", ".btnEliminarUsuario", function(){
 
   var idUsuario = $(this).attr("idUsuario");
-  swal({
+  Swal.fire({
     title: "¿Esta Seguro de Borrar el Usuario?",
     text: "¡Si no lo está puede cancelar la acción!",
-    type: "warning",
+    icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#3085d6",
     cancelButtonColor: "#d33",

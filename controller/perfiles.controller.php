@@ -19,8 +19,8 @@ class ControllerPerfiles{
                 $respuesta = ModelPerfiles::mdlIngresarPerfil($tabla, $datos);
                 if($respuesta == "ok"){
                     echo'<script>
-					swal({
-						  type: "success",
+					Swal.fire({
+						  icon: "success",
 						  title: "El perfil ha sido guardado correctamente",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -33,8 +33,8 @@ class ControllerPerfiles{
                 }
             }else{
                 echo'<script>
-					swal({
-						  type: "error",
+					Swal.fire({
+						  icon: "error",
 						  title: "¡El perfil no puede ir vacío o llevar caracteres especiales!",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -72,8 +72,8 @@ class ControllerPerfiles{
 
                 if ($respuesta == "ok"){
                     echo'<script>
-					swal({
-						  type: "success",
+					Swal.fire({
+						  icon: "success",
 						  title: "El perfil ha sido cambiado correctamente",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -86,8 +86,8 @@ class ControllerPerfiles{
                 }
             }else{
                 echo'<script>
-					swal({
-						  type: "error",
+					Swal.fire({
+						  icon: "error",
 						  title: "¡El perfil no puede ir vacío o llevar caracteres especiales!",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -113,8 +113,8 @@ class ControllerPerfiles{
 
             if ($respuesta == "ok"){
                 echo'<script>
-					swal({
-						  type: "success",
+					Swal.fire({
+						  icon: "success",
 						  title: "El perfil ha sido borrado correctamente",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"

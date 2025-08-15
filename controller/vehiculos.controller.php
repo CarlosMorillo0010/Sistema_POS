@@ -49,8 +49,8 @@ class ControllerVehiculos{
 
                 if ($respuesta == "ok") {
                     echo '<script>
-                    swal({
-                          type: "success",
+                    Swal.fire({
+                          icon: "success",
                           title: "El vehiculo ha sido guardado correctamente",
                           showConfirmButton: true,
                           confirmButtonText: "Cerrar"
@@ -63,8 +63,8 @@ class ControllerVehiculos{
                 }
             } else {
                 echo '<script>
-                    swal({
-                          type: "error",
+                    Swal.fire({
+                          icon: "error",
                           title: "¡El vehiculo no puede ir vacío o llevar caracteres especiales!",
                           showConfirmButton: true,
                           confirmButtonText: "Cerrar"
@@ -110,8 +110,8 @@ class ControllerVehiculos{
                 $respuesta = ModelVehiculos::mdlEditarVehiculo($tabla, $datos);
                 if ($respuesta == "ok") {
                     echo '<script>
-                    swal({
-                          type: "success",
+                    Swal.fire({
+                          icon: "success",
                           title: "El vehiculo ha sido editado correctamente",
                           showConfirmButton: true,
                           confirmButtonText: "Cerrar"
@@ -124,8 +124,8 @@ class ControllerVehiculos{
                 }
             } else {
                 echo '<script>
-                    swal({
-                          type: "error",
+                    Swal.fire({
+                          icon: "error",
                           title: "¡El vehiculo no puede ir vacío o llevar caracteres especiales!",
                           showConfirmButton: true,
                           confirmButtonText: "Cerrar"
@@ -150,8 +150,8 @@ class ControllerVehiculos{
             $respuesta = ModelVehiculos::mdlBorrarVehiculo($tabla, $datos);
             if ($respuesta == "ok"){
                 echo'<script>
-                    swal({
-                          type: "success",
+                    Swal.fire({
+                          icon: "success",
                           title: "El vehiculo ha sido borrado correctamente",
                           showConfirmButton: true,
                           confirmButtonText: "Cerrar"
