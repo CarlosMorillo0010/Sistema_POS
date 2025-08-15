@@ -27,8 +27,8 @@ $respuestaVenta = ControllerVentas::ctrMostrarVenta($itemVenta, $valorVenta);
 
 $fecha = substr($respuestaVenta["fecha"],0,-8);
 $productos = json_decode($respuestaVenta["productos"], true);
-$precio_neto = number_format($respuestaVenta["total"],2);
-$total = number_format($respuestaVenta["total"],2);
+$precio_neto = number_format($respuestaVenta["subtotal_usd"],2);
+$total = number_format($respuestaVenta["total_usd"],2);
 
 //TRAEMOS LA INFORMACION DEL CLIENTE
 
@@ -208,7 +208,7 @@ $orden = null;
 
 $respuestaProducto = ControllerProducts::ctrMostrarProductos($itemProducto, $valorProducto, $orden);
 
-$valorUnitario = number_format($respuestaProducto["precio_unitario_total"], 2);
+$valorUnitario = number_format($respuestaProducto["pvp_referencia"], 2);
 
 $precioTotal = number_format($item["total"], 2);
 
