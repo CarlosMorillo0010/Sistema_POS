@@ -195,9 +195,6 @@ body { font-family: var(--font-family); background-color: var(--background-light
 .d-block {
   display: block !important;
 }
-.d-flex {
-  display: flex !important;
-}
 .d-grid {
   display: grid !important;
 }

@@ -9,98 +9,117 @@ class ControllerVentas
     static public function ctrMostrarVenta($item, $valor)
     {
         $tabla = "ventas";
-        $respuesta = ModelVentas::mdlMostrarVenta($tabla, $item, $valor);
-        return $respuesta;
+        return ModelVentas::mdlMostrarVenta($tabla, $item, $valor);
     }
 
     /*=============================================
-     CREAR VENTA
+     CREAR VENTA (VERSIÓN ROBUSTA Y ADAPTADA)
     =============================================*/
     static public function ctrCrearVenta()
     {
-        if (isset($_POST["codigoVenta"])) {
+        // Se activa cuando el formulario envía los datos necesarios
+        if (isset($_POST["codigoVenta"], $_POST["listaProductosCaja"])) {
 
-            // Obtener la conexión PDO para manejar la transacción manualmente
+            // Obtener la conexión PDO para manejar la transacción
             $pdo = Connection::connect();
 
             try {
-                // 1. INICIAR LA TRANSACCIÓN
+                // 1. --- INICIAR LA TRANSACCIÓN ---
                 $pdo->beginTransaction();
 
-                /*=============================================
-                 PROCESAR PRODUCTOS: ACTUALIZAR STOCK Y VENTAS
-                =============================================*/
+                // 2. --- VALIDACIÓN DE DATOS ESENCIALES ---
+                if (empty($_POST["seleccionarCliente"])) {
+                    throw new Exception("Debe seleccionar un cliente.");
+                }
+                
                 $listaProductos = json_decode($_POST["listaProductosCaja"], true);
-
                 if (empty($listaProductos)) {
                     throw new Exception("La lista de productos no puede estar vacía.");
                 }
 
-                $totalProductosComprados = array();
+                // 3. --- VALIDACIÓN DE TOTALES Y STOCK EN EL SERVIDOR (CRÍTICO) ---
+                $subtotalCalculadoServidor = 0;
                 foreach ($listaProductos as $key => $value) {
-                    array_push($totalProductosComprados, $value["cantidad"]);
+                    // Consultamos el producto en la BD para obtener el precio y stock reales
+                    $productoDB = ModelProducts::mdlMostrarProductos("productos", "id_producto", $value["id"], "id_producto");
                     
+                    if (!$productoDB) {
+                         throw new Exception("Producto no encontrado con ID: " . $value["id"]);
+                    }
+                    
+                    // Verificamos si hay stock suficiente
+                    if ($productoDB["stock"] < $value["cantidad"]) {
+                        throw new Exception('Stock insuficiente para "' . $productoDB["descripcion"] . '". Disponibles: ' . $productoDB["stock"]);
+                    }
+                    
+                    // Acumulamos el subtotal usando el precio de la BD para evitar manipulaciones
+                    $subtotalCalculadoServidor += $value["cantidad"] * $productoDB["pvp_referencia"];
+                }
+                
+                // Comparamos el subtotal enviado por el cliente con el calculado en el servidor
+                $subtotalCliente = (float)($_POST["subtotalUsd"] ?? 0);
+                if (abs($subtotalCalculadoServidor - $subtotalCliente) > 0.01) { // Pequeño margen de tolerancia
+                    throw new Exception("Inconsistencia en los totales. La operación fue cancelada por seguridad.");
+                }
+
+                // 4. --- PROCESAR PRODUCTOS: ACTUALIZAR STOCK Y VENTAS ---
+                foreach ($listaProductos as $key => $value) {
                     $tablaProductos = "productos";
-                    // Búsqueda por ID para máxima fiabilidad
                     $itemProducto = "id_producto";
                     $valorProducto = $value["id"];
-
-                    // Usamos un método del modelo que usa la conexión existente
+                    
+                    // Re-obtenemos el producto para usar sus datos actualizados
                     $traerProducto = ModelProducts::mdlMostrarProductos($tablaProductos, $itemProducto, $valorProducto, null);
-
-                    if (!$traerProducto) {
-                        throw new Exception("Producto no encontrado con ID: " . $valorProducto);
-                    }
-
+                    
                     // A. Actualizar las ventas del producto
                     $item1aVenta = "productos_vendidos";
                     $valor1aVenta = $value["cantidad"] + $traerProducto["productos_vendidos"];
                     ModelProducts::mdlActualizarProductoConexion($pdo, $tablaProductos, $item1aVenta, $valor1aVenta, $itemProducto, $valorProducto);
-
-                    // B. Actualizar (reducir) el stock del producto (LÓGICA CORREGIDA)
+                    
+                    // B. Actualizar (reducir) el stock
                     $item1bVenta = "stock";
                     $valor1bVenta = $traerProducto["stock"] - $value["cantidad"];
-
-                    if ($valor1bVenta < 0) {
-                         throw new Exception("Stock insuficiente para el producto: " . $traerProducto['descripcion']);
-                    }
                     ModelProducts::mdlActualizarProductoConexion($pdo, $tablaProductos, $item1bVenta, $valor1bVenta, $itemProducto, $valorProducto);
                 }
 
-                /*=============================================
-                 ACTUALIZAR COMPRAS DEL CLIENTE
-                =============================================*/
+                // 5. --- ACTUALIZAR COMPRAS DEL CLIENTE ---
                 $tablaClientes = "clientes";
                 $itemCliente = "id";
                 $valorCliente = $_POST["seleccionarCliente"];
                 $traerCliente = ModelClients::mdlMostrarClientes($tablaClientes, $itemCliente, $valorCliente);
+                
+                $cantidadTotalItems = array_reduce($listaProductos, function($carry, $item) {
+                    return $carry + $item['cantidad'];
+                }, 0);
 
                 $item1Cliente = "compras";
-                $valor1Cliente = array_sum($totalProductosComprados) + $traerCliente["compras"];
+                $valor1Cliente = $cantidadTotalItems + $traerCliente["compras"];
                 ModelClients::mdlActualizarClienteConexion($pdo, $tablaClientes, $item1Cliente, $valor1Cliente, $valorCliente);
-
-                /*=============================================
-                 GUARDAR LA VENTA
-                =============================================*/
-                date_default_timezone_set('America/Caracas');
-                $tablaVentas = "ventas";
-                $fecha = date('Y-m-d H:i:s');
                 
-                $datos = array(
+                // 6. --- GUARDAR LA VENTA Y SU DETALLE ---
+                date_default_timezone_set('America/Caracas');
+                
+                $datosVenta = array(
                     "id_usuario" => $_SESSION['id_usuario'],
                     "id_cliente" => $_POST["seleccionarCliente"],
                     "id_vendedor" => $_POST["idVendedor"],
                     "codigo_venta" => $_POST["codigoVenta"],
                     "vendedor" => $_POST["nombreVendedor"],
-                    "productos" => $_POST["listaProductosCaja"],
-                    "total" => $_POST["totalVenta"],
+                    "productos" => $_POST["listaProductosCaja"], // El JSON original por compatibilidad
                     "metodo_pago" => $_POST["listaMetodoPago"],
-                    "fecha" => $fecha
+                    "tasa_dia" => $_POST["tasaDelDia"],
+                    "subtotal_usd" => $_POST["subtotalUsd"],
+                    "subtotal_bs" => $_POST["subtotalBs"],
+                    "iva_usd" => $_POST["ivaUsd"],
+                    "iva_bs" => $_POST["ivaBs"],
+                    "total_usd" => $_POST["totalUsd"],
+                    "total_bs" => $_POST["totalBs"],
+                    "fecha" => date('Y-m-d H:i:s')
                 );
                 
-                ModelVentas::mdlIngresarVentaConexion($pdo, $tablaVentas, $datos);
+                ModelVentas::mdlIngresarVentaConexion($pdo, "ventas", "detalle_ventas", $datosVenta);
 
-                // 2. SI TODO FUE BIEN, CONFIRMAR LA TRANSACCIÓN
+                // 7. --- SI TODO FUE BIEN, CONFIRMAR LA TRANSACCIÓN ---
                 $pdo->commit();
 
                 echo '<script>
@@ -109,30 +128,27 @@ class ControllerVentas
                           title: "La venta ha sido guardada correctamente",
                           showConfirmButton: true,
                           confirmButtonText: "Cerrar"
-                          }).then(function(result){
-                                    if (result.value) {
-                                    window.location = "caja";
-                                    }
-                                })
-                    </script>';
+                    }).then(function(result){
+                        if (result.value) {
+                            window.location = "caja";
+                        }
+                    });
+                </script>';
 
             } catch (Exception $e) {
-                // 3. SI ALGO FALLÓ, REVERTIR LA TRANSACCIÓN
+                // 8. --- SI ALGO FALLÓ, REVERTIR LA TRANSACCIÓN ---
                 $pdo->rollBack();
-
-                // Mostrar un mensaje de error detallado para el desarrollador (en un log en producción)
-                // y uno genérico para el usuario.
                 error_log("Error al crear venta: " . $e->getMessage());
 
                 echo '<script>
                     swal({
                           type: "error",
                           title: "¡Error al procesar la venta!",
-                          text: "Ocurrió un problema y la operación fue cancelada para proteger los datos. Por favor, intente de nuevo.",
+                          text: "' . addslashes($e->getMessage()) . '",
                           showConfirmButton: true,
                           confirmButtonText: "Entendido"
-                          });
-                    </script>';
+                    });
+                </script>';
             }
         }
     }

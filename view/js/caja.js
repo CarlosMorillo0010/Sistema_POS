@@ -13,17 +13,17 @@ $(document).ready(function () {
   // VALIDACIÓN CRÍTICA PARA PRODUCCIÓN
   if (TASA_BCV === 0) {
     swal({
-      title: "Error de Configuración",
-      text: "La tasa de cambio (BCV) no está disponible o es cero. No se pueden procesar ventas. Por favor, contacte al administrador.",
+      title: "Error de Configuración Crítico",
+      text: "La tasa de cambio (BCV) no está disponible o es cero. No se pueden procesar ventas para evitar errores de cálculo. Por favor, contacte al administrador del sistema.",
       type: "error",
       confirmButtonText: "Entendido",
       allowOutsideClick: false,
     });
-    // Deshabilitamos la interacción para prevenir errores de cálculo.
+    // Deshabilitamos toda la interacción para prevenir cualquier operación.
     $(".pos-container")
-      .find("button, .product-card")
+      .find("button, .product-card, input, select")
       .prop("disabled", true)
-      .css("cursor", "not-allowed");
+      .css({ cursor: "not-allowed", opacity: 0.5 });
     return; // Detiene la ejecución del resto del script.
   }
 
@@ -54,9 +54,7 @@ $(document).ready(function () {
             2
           );
           const imagenSrc =
-            producto.imagen &&
-            producto.imagen !== "" &&
-            producto.imagen !== "view/img/products/default/anonymous.png"
+            producto.imagen && producto.imagen !== ""
               ? producto.imagen
               : "view/img/products/default/anonymous.png";
           const productCardHtml = `
@@ -72,7 +70,9 @@ $(document).ready(function () {
                     <span class="meta-item"> ${
                       producto.categoria || "Sin Cat."
                     }</span>
-                    <span class="meta-item"> Marca: ${producto.marca}</span>
+                    <span class="meta-item"> Marca: ${
+                      producto.marca || "N/A"
+                    }</span>
                     <span class="meta-item"> Código: ${
                       producto.codigo || "S/C"
                     }</span>
@@ -86,7 +86,7 @@ $(document).ready(function () {
       },
       error: function (xhr) {
         $("#productosCategoria").html(
-          '<div class="col-xs-12 alert alert-danger">Error al cargar los productos.</div>'
+          '<div class="col-xs-12 alert alert-danger">Error al cargar los productos. Por favor, recargue la página.</div>'
         );
         console.error("Error en AJAX al cargar productos:", xhr.responseText);
       },
@@ -99,18 +99,23 @@ $(document).ready(function () {
     cargarProductos($(this).data("id-categoria"));
   });
 
+  // Carga inicial de todos los productos
   cargarProductos("todos");
 
   //======================================================================
   // == 2. LÓGICA DEL CARRITO DE COMPRAS (AÑADIR, MODIFICAR, QUITAR)
   //======================================================================
-  $(".pos-container").on("click", ".agregarProducto", function () {
+  $(".product-grid").on("click", ".agregarProducto", function () {
     const idProducto = $(this).attr("idProducto");
     const itemExistente = $(`.order-item[idProducto="${idProducto}"]`);
+
+    // Si el producto ya está en el carrito, simplemente incrementa la cantidad.
     if (itemExistente.length > 0) {
       itemExistente.find(".btn-agregar-uno").trigger("click");
       return;
     }
+
+    // Si es un producto nuevo, lo busca por AJAX.
     const datos = new FormData();
     datos.append("idProducto", idProducto);
     $.ajax({
@@ -154,6 +159,7 @@ $(document).ready(function () {
     });
   });
 
+  // Delegación de eventos para los controles de cantidad y eliminación en el carrito.
   $(".order-items")
     .on("click", ".btn-agregar-uno", function () {
       const input = $(this).siblings(".cantidad-producto");
@@ -193,7 +199,7 @@ $(document).ready(function () {
     });
 
   //======================================================================
-  // == 3. CÁLCULO DE TOTALES Y ACTUALIZACIÓN DE LA VISTA
+  // == 3. CÁLCULO DE TOTALES Y ACTUALIZACIÓN DE DATOS
   //======================================================================
   function actualizarTotales() {
     let subtotalUsd = 0;
@@ -204,6 +210,7 @@ $(document).ready(function () {
       );
       subtotalUsd += cantidad * precioUnitario;
     });
+
     const montoIvaUsd = subtotalUsd * (IVA_PORCENTAJE / 100);
     const granTotalUsd = subtotalUsd + montoIvaUsd;
     const subtotalBs = subtotalUsd * TASA_BCV;
@@ -214,6 +221,7 @@ $(document).ready(function () {
       maximumFractionDigits: 2,
     };
 
+    // Actualizar la interfaz de usuario (lo que ve el cajero)
     $("#subtotalUsdDisplay").text("$" + subtotalUsd.toFixed(2));
     $("#subtotalBsDisplay").text(
       "(" + subtotalBs.toLocaleString("es-VE", formatoVeLocale) + " Bs)"
@@ -226,7 +234,17 @@ $(document).ready(function () {
       granTotalBs.toLocaleString("es-VE", formatoVeLocale) + " Bs"
     );
     $("#displayTotalVenta").text("$" + granTotalUsd.toFixed(2));
-    $("#totalVenta").val(granTotalUsd.toFixed(2)); // Solo usamos un input para el total.
+
+    // Actualizar los inputs ocultos que se enviarán al servidor
+    $("#tasaDelDia").val(TASA_BCV);
+    $("#subtotalUsd").val(subtotalUsd.toFixed(2));
+    $("#subtotalBs").val(subtotalBs.toFixed(2));
+    $("#ivaUsd").val(montoIvaUsd.toFixed(2));
+    $("#ivaBs").val(ivaBs.toFixed(2));
+    $("#totalUsd").val(granTotalUsd.toFixed(2));
+    $("#totalBs").val(granTotalBs.toFixed(2));
+
+    // Preparar el JSON de productos para el backend
     listarProductosParaBackend();
   }
 
@@ -249,8 +267,10 @@ $(document).ready(function () {
   }
 
   //======================================================================
-  // == 4. FLUJO DE PAGO Y FORMATO DE MONEDA
+  // == 4. FLUJO DE PAGO Y MODALES
   //======================================================================
+
+  // -- Modal 1: Selección de Método de Pago --
   $("#modalMetodoPago").on("show.bs.modal", function (e) {
     if ($(".order-items .order-item").length === 0) {
       swal(
@@ -260,106 +280,76 @@ $(document).ready(function () {
       );
       return e.preventDefault();
     }
-    const granTotalUsd = parseFloat($("#totalVenta").val()) || 0;
+    // **AQUÍ LA CORRECCIÓN CLAVE**: Se lee desde el input oculto #totalUsd
+    const granTotalUsd = parseFloat($("#totalUsd").val()) || 0;
     const granTotalBs = granTotalUsd * TASA_BCV;
     const formatoVeLocale = {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     };
+
     $("#totalPagarUsd").text("$" + granTotalUsd.toFixed(2));
     $("#totalPagarBs").text(
       granTotalBs.toLocaleString("es-VE", formatoVeLocale) + " Bs"
     );
   });
 
+  // Al seleccionar un método, pasamos al siguiente modal
   $("#modalMetodoPago").on("click", ".payment-option", function () {
     $("#modalMetodoPago").modal("hide");
     $("#modalConfirmacionPago").modal("show");
   });
 
+  // -- Modal 2: Confirmación de Pago y Vuelto --
   $("#modalConfirmacionPago").on("show.bs.modal", function () {
-    granTotalUsdModal = parseFloat($("#totalVenta").val()) || 0;
+    // **AQUÍ LA CORRECCIÓN CLAVE**: Se lee desde el input oculto #totalUsd
+    granTotalUsdModal = parseFloat($("#totalUsd").val()) || 0;
     const granTotalBsModal = granTotalUsdModal * TASA_BCV;
     const formatoVeLocale = {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     };
+
+    // Actualizar totales en este modal
     $("#totalPagarModalUsd").text("$" + granTotalUsdModal.toFixed(2));
     $("#totalPagarModalBs").text(
       granTotalBsModal.toLocaleString("es-VE", formatoVeLocale) + " Bs"
     );
+
+    // Resetear el estado del modal para una nueva operación
     $("#montoRecibidoUsd, #montoRecibidoBs").val("");
-    $(".conversion-display").removeClass("visible");
+    $(".conversion-display").removeClass("visible").val("");
     $(".vuelto-container").hide();
     $("#alertaMontoInsuficiente").hide();
     $("#btnConfirmarYCrearVenta").prop("disabled", true);
+
     calcularPagosYVuelto();
-    setTimeout(() => $("#montoRecibidoUsd").focus(), 500);
+    setTimeout(() => $("#montoRecibidoUsd").focus(), 500); // Foco para agilizar
   });
 
-  // -- Funciones de formato de moneda --
-  function getNumericValueUsd(formattedValue) {
-    return parseFloat(String(formattedValue)) || 0;
-  }
-  function getNumericValueBs(formattedValue) {
-    if (!formattedValue) return 0;
-    return (
-      parseFloat(String(formattedValue).replace(/\./g, "").replace(",", ".")) ||
-      0
-    );
-  }
-
-  $("#montoRecibidoUsd").on("input", function () {
-    let value = $(this)
-      .val()
-      .replace(/[^0-9.]/g, "");
-    const parts = value.split(".");
-    if (parts.length > 2) value = parts[0] + "." + parts.slice(1).join("");
-    if (parts.length > 1 && parts[1].length > 2)
-      value = parts[0] + "." + parts[1].substring(0, 2);
-    $(this).val(value);
-  });
-
-  $("#montoRecibidoBs").on("input", function (e) {
-    const input = e.target;
-    let value = input.value;
-    const originalCursorPos = input.selectionStart;
-    const originalLength = value.length;
-    let cleanValue = value.replace(/[^0-9,]/g, "");
-    const firstCommaIndex = cleanValue.indexOf(",");
-    if (firstCommaIndex !== -1) {
-      cleanValue =
-        cleanValue.substring(0, firstCommaIndex + 1) +
-        cleanValue.substring(firstCommaIndex + 1).replace(/,/g, "");
-    }
-    let [integerPart, decimalPart] = cleanValue.split(",");
-    integerPart = integerPart.replace(/\./g, "");
-    const formattedIntegerPart = integerPart
-      ? new Intl.NumberFormat("de-DE").format(integerPart)
-      : "";
-    if (decimalPart !== undefined) decimalPart = decimalPart.substring(0, 2);
-    let finalValue = formattedIntegerPart;
-    if (decimalPart !== undefined) finalValue += "," + decimalPart;
-    if (value === ",") finalValue = "0,";
-    input.value = finalValue;
-    const newLength = finalValue.length;
-    const newCursorPos = originalCursorPos + (newLength - originalLength);
-    input.setSelectionRange(newCursorPos, newCursorPos);
-  });
-
+  // Formato y cálculo de pagos
   $("#montoRecibidoUsd, #montoRecibidoBs").on(
     "input keyup",
     calcularPagosYVuelto
   );
 
   function calcularPagosYVuelto() {
-    const recibidoUsd = getNumericValueUsd($("#montoRecibidoUsd").val());
-    const recibidoBs = getNumericValueBs($("#montoRecibidoBs").val());
+    const recibidoUsd =
+      parseFloat(
+        $("#montoRecibidoUsd")
+          .val()
+          .replace(/[^0-9.]/g, "")
+      ) || 0;
+    const recibidoBs =
+      parseFloat(
+        $("#montoRecibidoBs").val().replace(/\./g, "").replace(",", ".")
+      ) || 0;
     const formatoVeLocale = {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     };
 
+    // Mostrar conversiones en tiempo real
     if (recibidoUsd > 0) {
       const conversionBs = recibidoUsd * TASA_BCV;
       $("#conversionDisplayBs")
@@ -376,10 +366,14 @@ $(document).ready(function () {
     } else {
       $("#conversionDisplayUsd").removeClass("visible");
     }
+
+    // Calcular el total recibido y el vuelto
     const totalRecibidoEnUsd =
       recibidoUsd + (TASA_BCV > 0 ? recibidoBs / TASA_BCV : 0);
     const diferencia = totalRecibidoEnUsd - granTotalUsdModal;
+
     if (diferencia >= -0.009) {
+      // Tolerancia para errores de redondeo
       const vueltoEnUsd = diferencia > 0 ? diferencia : 0;
       const vueltoEnBs = vueltoEnUsd * TASA_BCV;
       $("#alertaMontoInsuficiente").hide();
@@ -406,32 +400,25 @@ $(document).ready(function () {
 
   $("#btnConfirmarYCrearVenta").on("click", function () {
     const boton = $(this);
+    // Deshabilitar botón para prevenir doble envío
     boton
       .prop("disabled", true)
       .html('<i class="fa fa-spinner fa-spin"></i> CREANDO VENTA...');
 
-    const recibidoUsd = getNumericValueUsd($("#montoRecibidoUsd").val());
-    const recibidoBs = getNumericValueBs($("#montoRecibidoBs").val());
-    let metodoPagoDesc = "";
+    // Determinar el método de pago para el backend
+    const recibidoUsd = parseFloat($("#montoRecibidoUsd").val()) || 0;
+    const recibidoBs = parseFloat($("#montoRecibidoBs").val()) || 0;
+    let metodoPagoDesc = "Pago Exacto"; // Valor por defecto
     if (recibidoUsd > 0 && recibidoBs > 0) {
       metodoPagoDesc = "Pago Mixto";
     } else if (recibidoUsd > 0) {
       metodoPagoDesc = "Pago en Dólares";
     } else if (recibidoBs > 0) {
       metodoPagoDesc = "Pago en Bolívares";
-    } else {
-      const diferencia =
-        recibidoUsd +
-        (TASA_BCV > 0 ? recibidoBs / TASA_BCV : 0) -
-        granTotalUsdModal;
-      if (Math.abs(diferencia) < 0.01) {
-        metodoPagoDesc = "Pago Exacto";
-      } else {
-        metodoPagoDesc = "Venta a Crédito";
-      }
     }
     $("#listaMetodoPago").val(metodoPagoDesc);
 
+    // Validación final: Cliente seleccionado
     if ($("#seleccionarCliente").val() === "") {
       $("#modalConfirmacionPago").modal("hide");
       swal({
@@ -439,17 +426,18 @@ $(document).ready(function () {
         text: "Por favor, selecciona un cliente para continuar.",
         type: "warning",
         confirmButtonText: "Entendido",
-      }).then((result) => {
-        if (result.value) {
-          $("#modalConfirmacionPago").modal("show");
-        }
+      }).then(() => {
+        // Al cerrar la alerta, se vuelve a mostrar el modal de pago
+        $("#modalConfirmacionPago").modal("show");
       });
+      // Reactivar el botón si la validación falla
       boton
         .prop("disabled", false)
         .html('<i class="fa fa-check-circle"></i> CREAR VENTA');
       return;
     }
 
+    // Si todo está bien, enviar el formulario
     $("#formularioVentas").submit();
   });
 });

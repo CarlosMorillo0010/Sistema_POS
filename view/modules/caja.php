@@ -188,13 +188,21 @@ $monedaPrincipal = $_SESSION['config']['moneda_principal'] ?? 'USD';
                                 PROCEDER AL PAGO
                             </button>
 
-                            <!-- Inputs Ocultos del Formulario (sin cambios, pero importante que sigan aquí) -->
+                            <!-- Inputs Ocultos del Formulario (ACTUALIZADOS) -->
                             <input type="hidden" name="idVendedor" value="<?php echo $_SESSION['id_usuario']; ?>">
                             <input type="hidden" name="listaMetodoPago" id="listaMetodoPago" required>
                             <input type="hidden" name="listaProductosCaja" id="listaProductosCaja" required>
-                            <!-- Este input sigue siendo clave para el backend, aunque ya no sea visible -->
-                            <!-- <input type="hidden" name="nuevoTotalVenta" id="nuevoTotalVenta" required> -->
-                            <input type="hidden" name="totalVenta" id="totalVenta" required>
+                            
+                            <!-- ===================================================== -->
+                            <!-- ==== NUEVOS INPUTS OCULTOS PARA GUARDAR TOTALES ==== -->
+                            <!-- ===================================================== -->
+                            <input type="hidden" name="tasaDelDia" id="tasaDelDia">
+                            <input type="hidden" name="subtotalUsd" id="subtotalUsd">
+                            <input type="hidden" name="subtotalBs" id="subtotalBs">
+                            <input type="hidden" name="ivaUsd" id="ivaUsd">
+                            <input type="hidden" name="ivaBs" id="ivaBs">
+                            <input type="hidden" name="totalUsd" id="totalUsd">
+                            <input type="hidden" name="totalBs" id="totalBs">
                         </div>
                     </form>
                     <?php
