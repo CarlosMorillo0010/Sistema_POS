@@ -122,9 +122,9 @@ body { font-family: var(--font-family); background-color: var(--background-light
 .totals-box .total-row span:last-child { font-weight: 600; color: var(--white); }
 .totals-box .total-row .monto-bs { font-size: 15px; color: #a0aec0; }
 .totals-box .divider { height: 2px; background: linear-gradient( to right, transparent, rgba(255, 255, 255, 0.2), transparent ); margin: 10px 0; }
-.totals-box .grand-total { padding: 12px 10px; background-color: rgba(0, 0, 0, 0.2); border-radius: 6px; margin-top: 5px; }
+.totals-box .grand-total { background-color: rgba(0, 0, 0, 0.2); border-radius: 6px; }
 .totals-box .grand-total span:first-child { font-size: var(--font-size-xl); font-weight: 600; color: var(--white); }
-.totals-box .total-display-usd, .totals-box .total-display-bs { font-size: 26px !important; font-weight: 700 !important; text-align: right; border: none !important; background: transparent !important; outline: none !important; padding: 0; height: auto; width: auto; display: inline-block; }
+.totals-box .total-display-usd, .totals-box .total-display-bs { font-size: 20px !important; font-weight: 700 !important; text-align: right; border: none !important; background: transparent !important; outline: none !important; padding: 0; height: auto; width: auto; display: inline-block; }
 .totals-box .total-display-usd { color: var(--success-color) !important; min-width: 160px; }
 .totals-box .total-display-bs { font-size: 20px !important; color: var(--info-color) !important; min-width: 200px; }
 @media (max-width: 1200px) { .product-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -194,9 +194,6 @@ body { font-family: var(--font-family); background-color: var(--background-light
 }
 .d-block {
   display: block !important;
-}
-.d-flex {
-  display: flex !important;
 }
 .d-grid {
   display: grid !important;

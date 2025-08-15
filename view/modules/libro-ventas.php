@@ -51,24 +51,31 @@
 
                         foreach ($respuesta as $key => $value) {
                             
+                            // 1. Decodificar el JSON de productos para obtener las descripciones
                             $productos = json_decode($value["productos"], true);
                         
-                            $descripciones = array();
-                            foreach ($productos as $producto) {
-                                $descripciones[] = $producto["descripcion"];
+                            // Verificamos si la decodificación fue exitosa
+                            if (is_array($productos)) {
+                                $descripciones = array();
+                                foreach ($productos as $producto) {
+                                    // Añadimos la cantidad y la descripción para más detalle
+                                    $descripciones[] = htmlspecialchars($producto["cantidad"] . "x " . $producto["descripcion"]);
+                                }
+                                $descripcionProductos = implode("<br>", $descripciones); // Usamos <br> para saltos de línea
+                            } else {
+                                $descripcionProductos = "Error al leer productos";
                             }
-
-                            $descripcionProductos = implode(", ", $descripciones);
-
+                            
+                            // 2. Imprimir la fila con los nuevos campos de la base de datos
                             echo '<tr>
-                                <td  class="dt-center" style="width: 5%;">' . ($key + 1) . '</td>
-                                <td  class="dt-center">' . $value["codigo_venta"] . '</td>
-                                <td  class="dt-center">' . $descripcionProductos . '</td>
-                                <td  class="dt-center">' . $value["metodo_pago"] . '</td>
-                                <td  class="dt-center">' . number_format($value["precio_neto"], 2) . '</td>
-                                <td  class="dt-center">' . number_format($value["impuesto"], 2) . '</td>
-                                <td  class="dt-center">' . number_format($value["total"], 2) . '</td>
-                                <td  class="dt-center">' . $value["fecha"] . '</td>
+                                <td class="dt-center" style="width: 5%;">' . ($key + 1) . '</td>
+                                <td class="dt-center">' . htmlspecialchars($value["codigo_venta"]) . '</td>
+                                <td class="dt-left">' . $descripcionProductos . '</td>
+                                <td class="dt-center">' . htmlspecialchars($value["metodo_pago"]) . '</td>
+                                <td class="dt-right">' . number_format($value["subtotal_usd"], 2, ',', '.') . '</td>
+                                <td class="dt-right">' . number_format($value["iva_usd"], 2, ',', '.') . '</td>
+                                <td class="dt-right" style="font-weight:bold;">' . number_format($value["total_usd"], 2, ',', '.') . '</td>
+                                <td class="dt-center">' . date("d/m/Y H:i", strtotime($value["fecha"])) . '</td>
                             </tr>';
                         }
                         ?>

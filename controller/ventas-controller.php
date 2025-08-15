@@ -9,80 +9,146 @@ class ControllerVentas
     static public function ctrMostrarVenta($item, $valor)
     {
         $tabla = "ventas";
-        $respuesta = ModelVentas::mdlMostrarVenta($tabla, $item, $valor);
-        return $respuesta;
+        return ModelVentas::mdlMostrarVenta($tabla, $item, $valor);
     }
 
     /*=============================================
-     CREAR VENTA
+     CREAR VENTA (VERSIÓN ROBUSTA Y ADAPTADA)
     =============================================*/
     static public function ctrCrearVenta()
     {
-        if (isset($_POST["codigoVenta"])) {
-            /*=============================================
-             ACTUALIZAR LAS COMPRAS DEL CLIENTE |
-             REDUCIR EL STOCK Y AUMENTAR LAS VENTAS DE LOS
-             PRODUCTOS
-            =============================================*/
-            $listaProductos = json_decode($_POST["listaProductosCaja"], true);
+        // Se activa cuando el formulario envía los datos necesarios
+        if (isset($_POST["codigoVenta"], $_POST["listaProductosCaja"])) {
 
-            $totalProductosComprados = array();
-            foreach ($listaProductos as $key => $value) {
-                array_push($totalProductosComprados, $value["cantidad"]);
-                $tablaProductos = "productos";
-                $item = "descripcion";
-                $valor = $value["descripcion"];
-                $orden = "codigo";
-                $traerProducto = ModelProducts::mdlMostrarProductos($tablaProductos, $item, $valor, $orden);
+            // Obtener la conexión PDO para manejar la transacción
+            $pdo = Connection::connect();
 
-                $item1aVenta = "productos_vendidos";
-                $valor1aVenta = $value["cantidad"] + $traerProducto["productos_vendidos"];
-                $nuevasVentas = ModelProducts::mdlActualizarProducto($tablaProductos, $item1aVenta, $valor1aVenta, $valor);
-                $item1bVenta = "stock";
-                $valor1bVenta = $value["stock"];
-                $nuevoStock = ModelProducts::mdlActualizarProducto($tablaProductos, $item1bVenta, $valor1bVenta, $valor);
-            }
-            $tablaClientes = "clientes";
-            $item = "id";
-            $valor = $_POST["seleccionarCliente"];
-            $traerCliente = ModelClients::mdlMostrarClientes($tablaClientes, $item, $valor);
+            try {
+                // 1. --- INICIAR LA TRANSACCIÓN ---
+                $pdo->beginTransaction();
 
-            $item1 = "compras";
-            $valor1 = array_sum($totalProductosComprados) + $traerCliente["compras"];
-            $comprasCliente = ModelClients::mdlActualizarCliente($tablaClientes, $item1, $valor1, $valor);
+                // 2. --- VALIDACIÓN DE DATOS ESENCIALES ---
+                if (empty($_POST["seleccionarCliente"])) {
+                    throw new Exception("Debe seleccionar un cliente.");
+                }
+                
+                $listaProductos = json_decode($_POST["listaProductosCaja"], true);
+                if (empty($listaProductos)) {
+                    throw new Exception("La lista de productos no puede estar vacía.");
+                }
 
-            /*=============================================
-             GUARDAR LA COMPRA
-            =============================================*/
-            date_default_timezone_set('America/Caracas');
-            $tabla = " ventas";
-            $fecha = date('Y-m-d h:i:s');
-            $datos = array(
-                "id_usuario" => $_SESSION['id_usuario'],
-                "id_cliente" => $_POST["seleccionarCliente"],
-                "id_vendedor" => $_POST["idVendedor"],
-                "codigo_venta" => $_POST["codigoVenta"],
-                "vendedor" => $_POST["nombreVendedor"],
-                "productos" => $_POST["listaProductosCaja"],
-                "precio_neto" => $_POST["nuevoPrecioUnitario"],
-                "total" => $_POST["totalVenta"],
-                "metodo_pago" => $_POST["listaMetodoPago"],
-                "fecha" => $fecha
-            );
-            $respuesta = ModelVentas::mdlIngresarVenta($tabla, $datos);
-            if ($respuesta == "ok") {
+                // 3. --- VALIDACIÓN DE TOTALES Y STOCK EN EL SERVIDOR (CRÍTICO) ---
+                $subtotalCalculadoServidor = 0;
+                foreach ($listaProductos as $key => $value) {
+                    // Consultamos el producto en la BD para obtener el precio y stock reales
+                    $productoDB = ModelProducts::mdlMostrarProductos("productos", "id_producto", $value["id"], "id_producto");
+                    
+                    if (!$productoDB) {
+                         throw new Exception("Producto no encontrado con ID: " . $value["id"]);
+                    }
+                    
+                    // Verificamos si hay stock suficiente
+                    if ($productoDB["stock"] < $value["cantidad"]) {
+                        throw new Exception('Stock insuficiente para "' . $productoDB["descripcion"] . '". Disponibles: ' . $productoDB["stock"]);
+                    }
+                    
+                    // Acumulamos el subtotal usando el precio de la BD para evitar manipulaciones
+                    $subtotalCalculadoServidor += $value["cantidad"] * $productoDB["pvp_referencia"];
+                }
+                
+                // Comparamos el subtotal enviado por el cliente con el calculado en el servidor
+                $subtotalCliente = (float)($_POST["subtotalUsd"] ?? 0);
+                if (abs($subtotalCalculadoServidor - $subtotalCliente) > 0.01) { // Pequeño margen de tolerancia
+                    throw new Exception("Inconsistencia en los totales. La operación fue cancelada por seguridad.");
+                }
+
+                // 4. --- PROCESAR PRODUCTOS: ACTUALIZAR STOCK Y VENTAS ---
+                foreach ($listaProductos as $key => $value) {
+                    $tablaProductos = "productos";
+                    $itemProducto = "id_producto";
+                    $valorProducto = $value["id"];
+                    
+                    // Re-obtenemos el producto para usar sus datos actualizados
+                    $traerProducto = ModelProducts::mdlMostrarProductos($tablaProductos, $itemProducto, $valorProducto, null);
+                    
+                    // A. Actualizar las ventas del producto
+                    $item1aVenta = "productos_vendidos";
+                    $valor1aVenta = $value["cantidad"] + $traerProducto["productos_vendidos"];
+                    ModelProducts::mdlActualizarProductoConexion($pdo, $tablaProductos, $item1aVenta, $valor1aVenta, $itemProducto, $valorProducto);
+                    
+                    // B. Actualizar (reducir) el stock
+                    $item1bVenta = "stock";
+                    $valor1bVenta = $traerProducto["stock"] - $value["cantidad"];
+                    ModelProducts::mdlActualizarProductoConexion($pdo, $tablaProductos, $item1bVenta, $valor1bVenta, $itemProducto, $valorProducto);
+                }
+
+                // 5. --- ACTUALIZAR COMPRAS DEL CLIENTE ---
+                $tablaClientes = "clientes";
+                $itemCliente = "id";
+                $valorCliente = $_POST["seleccionarCliente"];
+                $traerCliente = ModelClients::mdlMostrarClientes($tablaClientes, $itemCliente, $valorCliente);
+                
+                $cantidadTotalItems = array_reduce($listaProductos, function($carry, $item) {
+                    return $carry + $item['cantidad'];
+                }, 0);
+
+                $item1Cliente = "compras";
+                $valor1Cliente = $cantidadTotalItems + $traerCliente["compras"];
+                ModelClients::mdlActualizarClienteConexion($pdo, $tablaClientes, $item1Cliente, $valor1Cliente, $valorCliente);
+                
+                // 6. --- GUARDAR LA VENTA Y SU DETALLE ---
+                date_default_timezone_set('America/Caracas');
+                
+                $datosVenta = array(
+                    "id_usuario" => $_SESSION['id_usuario'],
+                    "id_cliente" => $_POST["seleccionarCliente"],
+                    "id_vendedor" => $_POST["idVendedor"],
+                    "codigo_venta" => $_POST["codigoVenta"],
+                    "vendedor" => $_POST["nombreVendedor"],
+                    "productos" => $_POST["listaProductosCaja"], // El JSON original por compatibilidad
+                    "metodo_pago" => $_POST["listaMetodoPago"],
+                    "tasa_dia" => $_POST["tasaDelDia"],
+                    "subtotal_usd" => $_POST["subtotalUsd"],
+                    "subtotal_bs" => $_POST["subtotalBs"],
+                    "iva_usd" => $_POST["ivaUsd"],
+                    "iva_bs" => $_POST["ivaBs"],
+                    "total_usd" => $_POST["totalUsd"],
+                    "total_bs" => $_POST["totalBs"],
+                    "fecha" => date('Y-m-d H:i:s')
+                );
+                
+                ModelVentas::mdlIngresarVentaConexion($pdo, "ventas", "detalle_ventas", $datosVenta);
+
+                // 7. --- SI TODO FUE BIEN, CONFIRMAR LA TRANSACCIÓN ---
+                $pdo->commit();
+
                 echo '<script>
-					swal({
-						  type: "success",
-						  title: "La venta ha sido guardada correctamente",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-									if (result.value) {
-									window.location = "caja";
-									}
-								})
-					</script>';
+                    swal({
+                          type: "success",
+                          title: "La venta ha sido guardada correctamente",
+                          showConfirmButton: true,
+                          confirmButtonText: "Cerrar"
+                    }).then(function(result){
+                        if (result.value) {
+                            window.location = "caja";
+                        }
+                    });
+                </script>';
+
+            } catch (Exception $e) {
+                // 8. --- SI ALGO FALLÓ, REVERTIR LA TRANSACCIÓN ---
+                $pdo->rollBack();
+                error_log("Error al crear venta: " . $e->getMessage());
+
+                echo '<script>
+                    swal({
+                          type: "error",
+                          title: "¡Error al procesar la venta!",
+                          text: "' . addslashes($e->getMessage()) . '",
+                          showConfirmButton: true,
+                          confirmButtonText: "Entendido"
+                    });
+                </script>';
             }
         }
     }

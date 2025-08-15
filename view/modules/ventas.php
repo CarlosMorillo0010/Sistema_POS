@@ -48,8 +48,13 @@ endforeach;
                         <th>Código</th>
                         <th>Cliente</th>
                         <th>Vendedor</th>
-                        <th>Forma de Pago</th>
-                        <th>Total a Pagar</th>
+                        <th>Tasa del Día</th>
+                        <th>Sub Total $</th>
+                        <th>IVA $</th>
+                        <th>Total $</th>
+                        <th>Sub Total Bs</th>
+                        <th>IVA Bs</th>
+                        <th>Total Bs</th>
                         <th>Fecha</th>
                         <th>Acciones</th>
                     </tr>
@@ -67,24 +72,36 @@ endforeach;
                     $respuesta = ControllerVentas::ctrRangoFechasVentas($fechaInicial, $fechaFinal);
 
                     foreach ($respuesta as $key => $value) {
-                        $length = 10;
+                        
                         echo '<tr>
                                 <td>' . ($key + 1) . '</td>
-                                <td>' . $value["codigo_venta"] . '</td>';
+                                <td>' . htmlspecialchars($value["codigo_venta"]) . '</td>';
 
+                                // 1. OBTENER Y VERIFICAR EL CLIENTE
+                                // **CORRECCIÓN**: El ID del cliente está en $value["id_cliente"], no en id_usuario.
                                 $itemCliente = "id";
                                 $valorCliente = $value["id_cliente"];
                                 $respuestaCliente = ControllerClients::ctrMostrarClientes($itemCliente, $valorCliente);
-                                echo '<td>' . $respuestaCliente["nombre"] . '</td>';
-
+                                
+                                echo '<td>' . ($respuestaCliente ? htmlspecialchars($respuestaCliente["nombre"]) : 'Cliente no encontrado') . '</td>';
+                        
+                                // 2. OBTENER Y VERIFICAR EL VENDEDOR
                                 $itemUsuario = "id_usuario";
                                 $valorUsuario = $value["id_vendedor"];
                                 $respuestaUsuario = ControllerUsers::ctrMostrarUsuario($itemUsuario, $valorUsuario);
-                                echo '<td>' . $respuestaUsuario["nombre"] . '</td>
+                        
+                                echo '<td>' . ($respuestaUsuario ? htmlspecialchars($respuestaUsuario["nombre"]) : 'Vendedor no encontrado') . '</td>';
                                 
-                                <td>' . $value["metodo_pago"] . '</td>
-                                <td>' . number_format($value["total"], 2) . '</td>
-                                <td>' . $value["fecha"] . '</td>
+                                // 3. MOSTRAR LOS NUEVOS CAMPOS MONETARIOS
+                                // Se usa number_format para que los números se vean bien (ej: 1,234.56)
+                                echo '<td>' . number_format($value["tasa_dia"], 2, ',', '.') . '</td>
+                                      <td>' . number_format($value["subtotal_usd"], 2, ',', '.') . '</td>
+                                      <td>' . number_format($value["iva_usd"], 2, ',', '.') . '</td>
+                                      <td style="font-weight:bold;">' . number_format($value["total_usd"], 2, ',', '.') . '</td>
+                                      <td>' . number_format($value["subtotal_bs"], 2, ',', '.') . '</td>
+                                      <td>' . number_format($value["iva_bs"], 2, ',', '.') . '</td>
+                                      <td style="font-weight:bold;">' . number_format($value["total_bs"], 2, ',', '.') . '</td>
+                                      <td>' . date("d/m/Y H:i", strtotime($value["fecha"])) . '</td>
 
                                 <td>
 
