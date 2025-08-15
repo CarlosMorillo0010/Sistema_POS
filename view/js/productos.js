@@ -142,7 +142,7 @@ $(document).ready(function() {
             dataType: "json",
             success: function(respuesta) {
                 if (!respuesta) {
-                    swal({ title: "Error", text: "No se pudo encontrar la información del producto.", type: "error" });
+                    Swal.fire({ title: "Error", text: "No se pudo encontrar la información del producto.", icon: "error" });
                     return;
                 }
                 
@@ -180,7 +180,7 @@ $(document).ready(function() {
                 modal.modal('show');
             },
             error: function() {
-                swal({ title: "Error de comunicación", text: "No se pudieron cargar los datos del producto. Revise la conexión.", type: "error" });
+                Swal.fire({ title: "Error de comunicación", text: "No se pudieron cargar los datos del producto. Revise la conexión.", icon: "error" });
             }
         });
     });
@@ -190,10 +190,10 @@ $(document).ready(function() {
         const codigo = $(this).attr("codigo");
         const imagen = $(this).attr("imagen");
 
-        swal({
+        Swal.fire({
             title: '¿Está seguro de borrar el producto?', 
             text: "¡Si no lo está, puede cancelar la acción!", 
-            type: 'warning',
+            icon: 'warning',
             showCancelButton: true, 
             confirmButtonColor: '#3085d6', 
             cancelButtonColor: '#d33',
@@ -214,10 +214,10 @@ $(document).ready(function() {
         
         if (imagen.type !== "image/jpeg" && imagen.type !== "image/png") {
             $(this).val("");
-            swal({ title: "Error de formato", text: "La imagen debe estar en formato JPG o PNG", type: "error", confirmButtonText: "Cerrar" });
+            Swal.fire({ title: "Error de formato", text: "La imagen debe estar en formato JPG o PNG", type: "error", confirmButtonText: "Cerrar" });
         } else if (imagen.size > 2000000) {
             $(this).val("");
-            swal({ title: "Error de tamaño", text: "La imagen no debe pesar más de 2MB", type: "error", confirmButtonText: "Cerrar" });
+            Swal.fire({ title: "Error de tamaño", text: "La imagen no debe pesar más de 2MB", type: "error", confirmButtonText: "Cerrar" });
         } else {
             const datosImagen = new FileReader();
             datosImagen.readAsDataURL(imagen);
@@ -242,10 +242,10 @@ $(document).ready(function() {
             calcularTodosLosPrecios('editar');
         }
         
-        swal({
+        Swal.fire({
             title: 'Tasa de Cambio Actualizada',
             text: `La nueva tasa del BCV es ${tasaFormateada}. Los cálculos se han ajustado automáticamente.`,
-            type: 'info',
+            icon: 'info',
             timer: 4000,
             showConfirmButton: false
         });

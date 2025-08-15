@@ -44,18 +44,18 @@ $(".nuevaImagen").change(function () {
       =============================================*/
   if (imagen["type"] != "image/jpeg" && imagen["type"] != "image/png") {
     $(".nuevaImagen").val("");
-    swal({
+    Swal.fire({
       title: "Error al subir la imagen",
       text: "¡La imagen debe estar en formato JPG o PNG!",
-      type: "error",
+      icon: "error",
       confirmButtonText: "¡Cerrar!",
     });
   } else if (imagen["size"] > 2000000) {
     $(".nuevaImagen").val("");
-    swal({
+    Swal.fire({
       title: "Error al subir la imagen",
       text: "¡La imagen no debe pesar más de 2MB!",
-      type: "error",
+      icon: "error",
       confirmButtonText: "¡Cerrar!",
     });
   } else {
@@ -95,10 +95,10 @@ $(document).on("click", ".btnEditarCategoria", function(){
   ======================================**/
 $(document).on("click", ".btnEliminarCategoria", function(){
   var idCategoria = $(this).attr("idCategoria");
-  swal({
+  Swal.fire({
     title: "¿Está seguro de borrar la categoría?",
     text: "¡Si no lo está puede cancelar la acción!",
-    type: "warning",
+    icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#3085d6",
     cancelButtonColor: "#d33",

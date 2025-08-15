@@ -56,8 +56,8 @@ class ControllerCuentasPagar
                 $respuesta = ModelCuentasPagar::mdlIngresarCuentaPagar($tabla, $datos);
                 if ($respuesta == "ok") {
                     echo '<script>
-					swal({
-						  type: "success",
+					Swal.fire({
+						  icon: "success",
 						  title: "La cuenta ha sido guardado correctamente",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -70,8 +70,8 @@ class ControllerCuentasPagar
                 }
             } else {
                 echo '<script>
-					swal({
-						  type: "error",
+					Swal.fire({
+						  icon: "error",
 						  title: "¡La cuenta no puede ir vacía o llevar caracteres especiales!",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -135,8 +135,8 @@ class ControllerCuentasPagar
                 $respuesta = ModelCuentasPagar::mdlEditarCuentaPagar($tabla, $datos);
                 if ($respuesta == "ok") {
                     echo '<script>
-					swal({
-						  type: "success",
+					Swal.fire({
+						  icon: "success",
 						  title: "La cuenta ha sido guardado correctamente",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -149,8 +149,8 @@ class ControllerCuentasPagar
                 }
             } else {
                 echo '<script>
-					swal({
-						  type: "error",
+					Swal.fire({
+						  icon: "error",
 						  title: "¡La cuenta no puede ir vací o llevar caracteres especiales!",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -182,8 +182,8 @@ class ControllerCuentasPagar
 
             if ($respuesta == "ok") {
                 echo '<script>
-                    swal({
-                          type: "success",
+                    Swal.fire({
+                          icon: "success",
                           title: "¡El pago se registró correctamente!",
                           showConfirmButton: true,
                           confirmButtonText: "Cerrar"
@@ -195,8 +195,8 @@ class ControllerCuentasPagar
                 </script>';
             } else {
                  echo '<script>
-                    swal({
-                          type: "error",
+                    Swal.fire({
+                          icon: "error",
                           title: "¡Error al procesar el pago!",
                           text: "Ocurrió un problema en la base de datos. Los cambios fueron revertidos.",
                           showConfirmButton: true,

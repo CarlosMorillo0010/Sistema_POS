@@ -117,13 +117,13 @@ $perfil = ControllerPerfiles::ctrMostrarPerfil($item, $valor);
                                     <i class="far fa-circle"></i>
                                     <span>Productos Compuestos</span>
                                 </a>
-                            </li> -->
+                            </li> 
                             <li>
                                 <a href="vehiculos">
                                     <i class="far fa-circle"></i>
                                     <span>Vehiculos</span>
                                 </a>
-                            </li>
+                            </li> -->
                             <li>
                                 <a href="productos">
                                     <i class="far fa-circle"></i>

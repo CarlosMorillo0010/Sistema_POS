@@ -84,8 +84,8 @@ class ControllerLibroCompras
 
                 if ($respuesta == "ok") {
                     echo '<script>
-                    swal({
-                          type: "success",
+                    Swal.fire({
+                          icon: "success",
                           title: "El registro ha sido guardado correctamente",
                           showConfirmButton: true,
                           confirmButtonText: "Cerrar"
@@ -98,8 +98,8 @@ class ControllerLibroCompras
                 }
             } else {
                 echo '<script>
-                    swal({
-                          type: "error",
+                    Swal.fire({
+                          icon: "error",
                           title: "¡El registro no puede ir vacía o llevar caracteres especiales!",
                           showConfirmButton: true,
                           confirmButtonText: "Cerrar"
@@ -200,8 +200,8 @@ class ControllerLibroCompras
 
                 if ($respuesta == "ok") {
                     echo '<script>
-                    swal({
-                          type: "success",
+                    Swal.fire({
+                          icon: "success",
                           title: "El registro ha sido editado correctamente",
                           showConfirmButton: true,
                           confirmButtonText: "Cerrar"
@@ -214,8 +214,8 @@ class ControllerLibroCompras
                 }
             } else {
                 echo '<script>
-                    swal({
-                          type: "error",
+                    Swal.fire({
+                          icon: "error",
                           title: "¡El registro no puede ir vacía o llevar caracteres especiales!",
                           showConfirmButton: true,
                           confirmButtonText: "Cerrar"
@@ -243,8 +243,8 @@ class ControllerLibroCompras
 
             if ($respuesta == "ok") {
                 echo '<script>
-                        swal({
-                              type: "success",
+                        Swal.fire({
+                              icon: "success",
                               title: "El registro y su cuenta por pagar asociada han sido borrados correctamente",
                               showConfirmButton: true,
                               confirmButtonText: "Cerrar"
@@ -256,8 +256,8 @@ class ControllerLibroCompras
                         </script>';
             } else {
                  echo '<script>
-                        swal({
-                              type: "error",
+                        Swal.fire({
+                              icon: "error",
                               title: "Ocurrió un error al intentar borrar el registro",
                               text: "Por favor, inténtelo de nuevo. Si el problema persiste, contacte al administrador.",
                               showConfirmButton: true,

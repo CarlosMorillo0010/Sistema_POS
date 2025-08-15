@@ -69,10 +69,10 @@ $(document).on("click", ".btnEditarVehiculo", function(){
  ======================================**/
 $(document).on("click", ".btnEliminarVehiculo", function(){
   var idVehiculo = $(this).attr("idVehiculo");
-  swal({
+  Swal.fire({
     title: "¿Está seguro de borrar el vehiculo?",
     text: "¡Si no lo está puede cancelar la acción!",
-    type: "warning",
+    icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#3085d6",
     cancelButtonColor: "#d33",

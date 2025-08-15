@@ -61,10 +61,10 @@ $(".btnEditarModelo").click(function () {
  ======================================**/
 $(".btnEliminarModelo").click(function () {
   var idModelo = $(this).attr("idModelo");
-  swal({
+  Swal.fire({
     title: "¿Está seguro de borrar el modelo?",
     text: "¡Si no lo está puede cancelar la acción!",
-    type: "warning",
+    icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#3085d6",
     cancelButtonColor: "#d33",

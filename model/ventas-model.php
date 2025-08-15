@@ -2,8 +2,29 @@
 
 require_once "connection.php";
 
-class ModelVentas
-{
+class ModelVentas{
+
+     /*=============================================
+    ACTUALIZAR ESTADO EN LA BD
+    =============================================*/
+    static public function mdlActualizarEstadoVenta($tabla, $datos) {
+
+        $stmt = Connection::connect()->prepare("UPDATE $tabla SET estado = :estado WHERE id_venta = :id_venta");
+
+        $stmt->bindParam(":estado", $datos["estado"], PDO::PARAM_STR);
+        $stmt->bindParam(":id_venta", $datos["id_venta"], PDO::PARAM_INT);
+
+        if ($stmt->execute()) {
+            return "ok";
+        } else {
+            return "error";
+        }
+
+        $stmt->close();
+        $stmt = null;
+
+    }
+
     /*=============================================
      MOSTRAR VENTAS
     =============================================*/

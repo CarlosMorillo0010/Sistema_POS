@@ -16,8 +16,8 @@ $(document).on("click", "#btnActualizarTasaBCV", function() {
                 window.APP_CONFIG.update(response.config);
 
                 // Mostramos una notificación de éxito
-                swal({
-                    type: 'success',
+                Swal.fire({
+                    icon: 'success',
                     title: '¡Actualizado!',
                     text: response.mensaje,
                     timer: 3000,
@@ -31,8 +31,8 @@ $(document).on("click", "#btnActualizarTasaBCV", function() {
 
             } else {
                 // Si la API falla, mostramos el error
-                swal({
-                    type: 'error',
+                Swal.fire({
+                    icon: 'error',
                     title: 'Error',
                     text: response.mensaje
                 });
@@ -40,8 +40,8 @@ $(document).on("click", "#btnActualizarTasaBCV", function() {
         },
         error: function() {
             // Si la llamada AJAX falla
-            swal({
-                type: 'error',
+            Swal.fire({
+                icon: 'error',
                 title: 'Error de Conexión',
                 text: 'No se pudo comunicar con el servidor. Intente de nuevo.'
             });

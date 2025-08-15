@@ -115,11 +115,9 @@ function versionAsset($path)
     <script
         src="<?php echo versionAsset('view/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'); ?>"></script>
     <!-- SWEETALERT 2 -->
-    <script src="<?php echo versionAsset('view/plugins/sweetalert2/sweetalert2.all.js'); ?>"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- iCheck 1.0.1 -->
     <script src="<?php echo versionAsset('view/bower_components/iCheck/icheck.min.js'); ?>"></script>
-    <!-- By default SweetAlert2 doesn't support IE. To enable IE 11 support, include Promise polyfill:-->
-    <script src="<?php echo versionAsset('view/plugins/core.js'); ?>"></script>
     <!-- InputMask -->
     <script src="<?php echo versionAsset('view/plugins/input-mask/jquery.inputmask.js'); ?>"></script>
     <script src="<?php echo versionAsset('view/plugins/input-mask/jquery.inputmask.date.extensions.js'); ?>"></script>

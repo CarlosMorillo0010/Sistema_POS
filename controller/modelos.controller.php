@@ -19,8 +19,8 @@ class ControllerModelos{
                 $respuesta = ModelModelos::mdlIngresarModelo($tabla, $datos);
                 if($respuesta == "ok"){
                     echo'<script>
-					swal({
-						  type: "success",
+					Swal.fire({
+						  icon: "success",
 						  title: "El modelo ha sido guardada correctamente",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -33,8 +33,8 @@ class ControllerModelos{
                 }
             }else{
                 echo'<script>
-					swal({
-						  type: "error",
+					Swal.fire({
+						  icon: "error",
 						  title: "¡El modelo no puede ir vacía o llevar caracteres especiales!",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -73,8 +73,8 @@ class ControllerModelos{
                 $respuesta = ModelModelos::mdlEditarModelo($tabla, $datos);
                 if($respuesta == "ok"){
                     echo'<script>
-					swal({
-						  type: "success",
+					Swal.fire({
+						  icon: "success",
 						  title: "El modelo ha sido cambiada correctamente",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -87,8 +87,8 @@ class ControllerModelos{
                 }
             }else{
                 echo'<script>
-					swal({
-						  type: "error",
+					Swal.fire({
+						  icon: "error",
 						  title: "¡El modelo no puede ir vacía o llevar caracteres especiales!",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -114,8 +114,8 @@ class ControllerModelos{
             $respuesta = ModelModelos::mdlBorrarModelo($tabla, $datos);
             if($respuesta == "ok"){
                 echo'<script>
-						swal({
-							  type: "success",
+						Swal.fire({
+							  icon: "success",
 							  title: "El modelo ha sido borrada correctamente",
 							  showConfirmButton: true,
 							  confirmButtonText: "Cerrar"

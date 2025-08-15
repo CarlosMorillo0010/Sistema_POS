@@ -75,8 +75,8 @@ class ControllerUsers
                     } else {
                         echo '
                             <script>
-                                swal({
-                                    type: "error",
+                                Swal.fire({
+                                    icon: "error",
                                     title: "¡El usuario aún no está activado!",
                                     showConfirmButton: true,
                                     confirmButtonText: "Cerrar",
@@ -92,8 +92,8 @@ class ControllerUsers
                 } else {
                     echo '
                             <script>
-                                swal({
-                                    type: "error",
+                                Swal.fire({
+                                    icon: "error",
                                     title: "¡Error al ingresar, vuelve a intentarlo!",
                                     showConfirmButton: true,
                                     confirmButtonText: "Cerrar",
@@ -146,8 +146,8 @@ class ControllerUsers
                 $respuesta = ModelUsers::mdlIngresarUsuario($tabla, $datos);
                 if ($respuesta == "ok") {
                     echo '<script>
-                    swal({
-                        type: "success",
+                    Swal.fire({
+                        icon: "success",
                         title: "¡El Usuario ha sido guardado Correctamente!",
                         showConfirmButton: true,
                         confirmButtonText: "Cerrar",
@@ -161,8 +161,8 @@ class ControllerUsers
                 }
             } else {
                 echo '<script>
-                    swal({
-                        type: "error",
+                    Swal.fire({
+                        icon: "error",
                         title: "¡El Usuario no puede ir vacio o llevar caracteres especiales!",
                         showConfirmButton: true,
                         confirmButtonText: "Cerrar",
@@ -201,8 +201,8 @@ class ControllerUsers
                     } else {
                         echo '
                             <script>
-                                swal({
-                                    type: "error",
+                                Swal.fire({
+                                    icon: "error",
                                     title: "¡La contraseña no puede ir vacia!",
                                     showConfirmButton: true,
                                     confirmButtonText: "Cerrar",
@@ -232,8 +232,8 @@ class ControllerUsers
                 if ($respuesta == "ok") {
                     echo '
                             <script>
-                                swal({
-                                    type: "success",
+                                Swal.fire({
+                                    icon: "success",
                                     title: "¡El Usuario ha sido editado correctamete!",
                                     showConfirmButton: true,
                                     confirmButtonText: "Cerrar",
@@ -248,8 +248,8 @@ class ControllerUsers
             } else {
                 echo '
                 <script>
-                    swal({
-                        type: "error",
+                    Swal.fire({
+                        icon: "error",
                         title: "¡El nombre no puede ir vacio o llevar caracteres especiales!",
                         showConfirmButton: true,
                         confirmButtonText: "Cerrar",
@@ -277,8 +277,8 @@ class ControllerUsers
 
             if ($respuesta == "ok") {
                 echo '<script>
-                    swal({
-                        type: "success",
+                    Swal.fire({
+                        icon: "success",
                         title: "¡El Usuario ha sido borrado correctamente!",
                         showConfirmButton: true,
                         confirmButtonText: "Cerrar",

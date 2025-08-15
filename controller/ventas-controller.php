@@ -1,7 +1,28 @@
 <?php
 
-class ControllerVentas
-{
+class ControllerVentas{
+
+     /*=============================================
+    ACTUALIZAR ESTADO DE LA VENTA
+    =============================================*/
+    public static function ctrActualizarEstadoVenta() {
+
+        if (isset($_POST["idVenta"])) {
+
+            $tabla = "ventas";
+
+            $datos = array(
+                "id_venta" => $_POST["idVenta"],
+                "estado" => $_POST["nuevoEstado"]
+            );
+
+            $respuesta = ModelVentas::mdlActualizarEstadoVenta($tabla, $datos);
+
+            echo $respuesta; // Imprime 'ok' o 'error'
+            exit(); // Detiene TODO. Nada más se puede añadir a la respuesta.
+        }
+
+    }
 
     /*=============================================
      MOSTRAR VENTAS
@@ -123,8 +144,8 @@ class ControllerVentas
                 $pdo->commit();
 
                 echo '<script>
-                    swal({
-                          type: "success",
+                    Swal.fire({
+                          icon: "success",
                           title: "La venta ha sido guardada correctamente",
                           showConfirmButton: true,
                           confirmButtonText: "Cerrar"
@@ -141,8 +162,8 @@ class ControllerVentas
                 error_log("Error al crear venta: " . $e->getMessage());
 
                 echo '<script>
-                    swal({
-                          type: "error",
+                    Swal.fire({
+                          icon: "error",
                           title: "¡Error al procesar la venta!",
                           text: "' . addslashes($e->getMessage()) . '",
                           showConfirmButton: true,

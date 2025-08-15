@@ -48,8 +48,8 @@ class ControllerClients
 
                 if ($respuesta == "ok") {
                     echo '<script>
-					swal({
-						  type: "success",
+					Swal.fire({
+						  icon: "success",
 						  title: "El cliente ha sido guardado correctamente",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -62,8 +62,8 @@ class ControllerClients
                 }
             } else {
                 echo '<script>
-					swal({
-						  type: "error",
+					Swal.fire({
+						  icon: "error",
 						  title: "¡El cliente no puede ir vacío o llevar caracteres especiales!",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -106,8 +106,8 @@ class ControllerClients
                 $respuesta = ModelClients::mdlEditarCliente($tabla, $datos);
                 if ($respuesta == "ok") {
                     echo '<script>
-					swal({
-						  type: "success",
+					Swal.fire({
+						  icon: "success",
 						  title: "El cliente ha sido editado correctamente",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -120,8 +120,8 @@ class ControllerClients
                 }
             } else {
                 echo '<script>
-					swal({
-						  type: "error",
+					Swal.fire({
+						  icon: "error",
 						  title: "¡El cliente no puede ir vacío o llevar caracteres especiales!",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -146,8 +146,8 @@ class ControllerClients
             $respuesta = ModelClients::mdlEliminarCliente($tabla, $datos);
             if ($respuesta == "ok") {
                 echo '<script>
-						swal({
-							  type: "success",
+						Swal.fire({
+							  icon: "success",
 							  title: "El cliente ha sido borrado correctamente",
 							  showConfirmButton: true,
 							  confirmButtonText: "Cerrar",

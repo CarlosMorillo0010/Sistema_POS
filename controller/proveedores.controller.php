@@ -49,8 +49,8 @@ class ControllerProveedores
                 if ($respuesta == "ok") {
                     echo '<script>
 
-					swal({
-						  type: "success",
+					Swal.fire({
+						  icon: "success",
 						  title: "El proveedor ha sido guardado correctamente",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -65,8 +65,8 @@ class ControllerProveedores
                 }
             } else {
                 echo '<script>
-					swal({
-						  type: "error",
+					Swal.fire({
+						  icon: "error",
 						  title: "¡El proveedor no puede ir vacío o llevar caracteres especiales!",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -111,8 +111,8 @@ class ControllerProveedores
                 $respuesta = ModelProveedores::mdlEditarProveedor($tabla, $datos);
                 if ($respuesta == "ok") {
                     echo '<script>
-					swal({
-						  type: "success",
+					Swal.fire({
+						  icon: "success",
 						  title: "El proveedor ha sido guardado correctamente",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -125,8 +125,8 @@ class ControllerProveedores
                 }
             } else {
                 echo '<script>
-					swal({
-						  type: "error",
+					Swal.fire({
+						  icon: "error",
 						  title: "¡El proveedor no puede ir vacío o llevar caracteres especiales!",
 						  showConfirmButton: true,
 						  confirmButtonText: "Cerrar"
@@ -151,8 +151,8 @@ class ControllerProveedores
             $respuesta = ModelProveedores::mdlEliminarProveedor($tabla, $datos);
             if ($respuesta == "ok") {
                 echo '<script>
-						swal({
-							  type: "success",
+						Swal.fire({
+							  icon: "success",
 							  title: "El proveedor ha sido borrado correctamente",
 							  showConfirmButton: true,
 							  confirmButtonText: "Cerrar",
