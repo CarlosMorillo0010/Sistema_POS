@@ -30,10 +30,10 @@ $monedaPrincipal = $_SESSION['config']['moneda_principal'] ?? 'USD';
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 <div id="config-vars"
-     data-tasa-bcv="<?php echo htmlspecialchars($tasaBCV, ENT_QUOTES, 'UTF-8'); ?>"
-     data-iva-porcentaje="<?php echo htmlspecialchars($ivaPorcentaje, ENT_QUOTES, 'UTF-8'); ?>"
-     data-moneda-principal="<?php echo htmlspecialchars($monedaPrincipal, ENT_QUOTES, 'UTF-8'); ?>"
-     style="display: none;">
+    data-tasa-bcv="<?php echo htmlspecialchars($tasaBCV, ENT_QUOTES, 'UTF-8'); ?>"
+    data-iva-porcentaje="<?php echo htmlspecialchars($ivaPorcentaje, ENT_QUOTES, 'UTF-8'); ?>"
+    data-moneda-principal="<?php echo htmlspecialchars($monedaPrincipal, ENT_QUOTES, 'UTF-8'); ?>"
+    style="display: none;">
 </div>
 
 <div class="content-wrapper">
@@ -46,19 +46,19 @@ $monedaPrincipal = $_SESSION['config']['moneda_principal'] ?? 'USD';
             <div class="col-md-7">
                 <!-- CATEGORIAS -->
                 <?php
-                
+
                 $categorias = ControllerCategories::ctrMostrarCategoriasConProductos();
 
                 if (!empty($categorias)) {
-                    
+
                     echo '<div class="category-tabs">';
-                    
+
                     echo '
                         <button type="button" class="category-card btn-categoria active" data-id-categoria="todos">
                             <div class="title">TODOS</div>
                         </button>
                     ';
-                    
+
                     foreach ($categorias as $key => $value) {
                         echo '
                             <button type="button" class="category-card btn-categoria" data-id-categoria="' . $value["id_categoria"] . '">
@@ -66,9 +66,8 @@ $monedaPrincipal = $_SESSION['config']['moneda_principal'] ?? 'USD';
                             </button>
                             ';
                     }
-                    
-                    echo '</div>';
 
+                    echo '</div>';
                 } else {
                     // Este mensaje ahora solo aparecerá si NINGUNA categoría tiene productos.
                     echo '
@@ -117,103 +116,110 @@ $monedaPrincipal = $_SESSION['config']['moneda_principal'] ?? 'USD';
                                     id="nombreVendedor">
                             </div>
                         </div>
+
+                        <!-- ===================================================== -->
+                        <!-- ==== BUSCADOR DE CLIENTE CORREGIDO Y ALINEADO ==== -->
+                        <!-- ===================================================== -->
                         <div class="form-group">
-                            <div class="input-group" style="display: flex;">
-                                <select class="form-control select2" id="seleccionarCliente" name="seleccionarCliente" required="required">
-                                    <option value="">Seleccionar cliente</option>
-                                    <?php
-                                    $item = null;
-                                    $valor = null;
-                                    $clientes = ControllerClients::ctrMostrarClientes($item, $valor);
-                                    foreach ($clientes as $key => $value) {
-                                        echo '<option value="' . $value["id"] . '">' . $value["nombre"] . '</option>';
-                                    }
-                                    ?>
-                                </select>
-                                <button type="button" class="btn btn-default " data-toggle="modal"
-                                    data-target="#modalAgregarCliente" data-dismiss="modal" style="width: 15%; margin-left: 10px;">
-                                    <i class="fa fa-plus-square" aria-hidden="true"></i>
-                                </button>
-                            </div>
-                        </div>
+                            <label for="buscadorClienteCedula">Buscar Cliente:</label>
+                            <div class="input-group">
 
-                        <!-- LISTA DE ITEMS EN LA ORDEN -->
-                        <div class="order-items nuevoProducto">
-                            <!-- Los productos se añadirán aquí dinámicamente -->
-                        </div>
+                                <!-- Input para la Cédula/RIF. Ocupa un 35% del espacio -->
+                                <input type="text" class="form-control" id="buscadorClienteCedula" name="buscadorClienteCedula" placeholder="Cédula/RIF" style="width: 25%;">
 
-                        <!-- PIE DE PAGINA DE LA ORDEN (TOTALES Y BOTÓN DE PAGO) -->
-                        <div class="order-footer">
-                            <!-- El div de totals-box ahora usará los nuevos estilos -->
-                            <div class="totals-box">
+                                <!-- Input para mostrar el nombre del cliente. Ocupa el 65% restante. Usamos 'readonly' en lugar de 'disabled' para una mejor apariencia y funcionalidad. -->
+                                <input type="text" class="form-control" id="nombreClienteDisplay" name="nombreClienteDisplay" placeholder="Nombre del Cliente" readonly style="width: 65%;">
 
-                                <!-- Fila para Subtotal (USD y Bs) -->
-                                <div class="total-row">
-                                    <span>Subtotal:</span>
-                                    <div>
-                                        <span id="subtotalUsdDisplay">$0.00</span>
-                                        <span id="subtotalBsDisplay" class="monto-bs">(0.00 Bs)</span>
-                                    </div>
-                                </div>
-
-                                <!-- Fila para IVA (USD y Bs) -->
-                                <div class="total-row">
-                                    <span>IVA (<?php echo $ivaPorcentaje; ?>%):</span>
-                                    <div>
-                                        <span id="ivaUsdDisplay">$0.00</span>
-                                        <span id="ivaBsDisplay" class="monto-bs">(0.00 Bs)</span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Línea separadora decorativa -->
-                                <div class="divider"></div>
-
-                                <!-- Fila para Gran Total en Bs (moneda secundaria) -->
-                                <div class="total-row grand-total grand-total-bs">
-                                    <span>Total a Pagar (Bs):</span>
-                                    <span id="displayTotalBs" class="total-display-bs">0.00 Bs</span>
-                                </div>
-                                
-                                <!-- Fila para Gran Total en USD (moneda principal) -->
-                                <div class="total-row grand-total">
-                                    <span>Total a Pagar ($):</span>
-                                    <!-- Se cambió el input por un span para consistencia y se le añadió una clase -->
-                                    <span id="displayTotalVenta" class="total-display-usd">$0.00</span>
+                                <!-- Botón para añadir cliente, se anexa al final del grupo -->
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalAgregarCliente" title="Añadir Nuevo Cliente">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
                                 </div>
 
                             </div>
-
-                            <!-- BOTON PARA INICIAR EL PROCESO DE PAGO -->
-                            <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#modalMetodoPago" style="margin-top:20px; padding: 15px; font-size: 16px; font-weight: 600;">
-                                PROCEDER AL PAGO
-                            </button>
-
-                            <!-- Inputs Ocultos del Formulario (ACTUALIZADOS) -->
-                            <input type="hidden" name="idVendedor" value="<?php echo $_SESSION['id_usuario']; ?>">
-                            <input type="hidden" name="listaMetodoPago" id="listaMetodoPago" required>
-                            <input type="hidden" name="listaProductosCaja" id="listaProductosCaja" required>
-                            
-                            <!-- ===================================================== -->
-                            <!-- ==== NUEVOS INPUTS OCULTOS PARA GUARDAR TOTALES ==== -->
-                            <!-- ===================================================== -->
-                            <input type="hidden" name="tasaDelDia" id="tasaDelDia">
-                            <input type="hidden" name="subtotalUsd" id="subtotalUsd">
-                            <input type="hidden" name="subtotalBs" id="subtotalBs">
-                            <input type="hidden" name="ivaUsd" id="ivaUsd">
-                            <input type="hidden" name="ivaBs" id="ivaBs">
-                            <input type="hidden" name="totalUsd" id="totalUsd">
-                            <input type="hidden" name="totalBs" id="totalBs">
+                            <!-- Campo oculto que almacenará el ID del cliente para el formulario. Se mantiene igual. -->
+                            <input type="hidden" name="seleccionarCliente" id="seleccionarCliente" required>
                         </div>
-                    </form>
-                    <?php
-                    // Instancia del controlador para procesar la creación de la venta
-                    $crearVenta = new ControllerVentas();
-                    $crearVenta->ctrCrearVenta();
-                    ?>
                 </div>
+
+                <!-- LISTA DE ITEMS EN LA ORDEN -->
+                <div class="order-items nuevoProducto">
+                    <!-- Los productos se añadirán aquí dinámicamente -->
+                </div>
+
+                <!-- PIE DE PAGINA DE LA ORDEN (TOTALES Y BOTÓN DE PAGO) -->
+                <div class="order-footer">
+                    <!-- El div de totals-box ahora usará los nuevos estilos -->
+                    <div class="totals-box">
+
+                        <!-- Fila para Subtotal (USD y Bs) -->
+                        <div class="total-row">
+                            <span>Subtotal:</span>
+                            <div>
+                                <span id="subtotalUsdDisplay">$0.00</span>
+                                <span id="subtotalBsDisplay" class="monto-bs">(0.00 Bs)</span>
+                            </div>
+                        </div>
+
+                        <!-- Fila para IVA (USD y Bs) -->
+                        <div class="total-row">
+                            <span>IVA (<?php echo $ivaPorcentaje; ?>%):</span>
+                            <div>
+                                <span id="ivaUsdDisplay">$0.00</span>
+                                <span id="ivaBsDisplay" class="monto-bs">(0.00 Bs)</span>
+                            </div>
+                        </div>
+
+                        <!-- Línea separadora decorativa -->
+                        <div class="divider"></div>
+
+                        <!-- Fila para Gran Total en Bs (moneda secundaria) -->
+                        <div class="total-row grand-total grand-total-bs">
+                            <span>Total a Pagar (Bs):</span>
+                            <span id="displayTotalBs" class="total-display-bs">0.00 Bs</span>
+                        </div>
+
+                        <!-- Fila para Gran Total en USD (moneda principal) -->
+                        <div class="total-row grand-total">
+                            <span>Total a Pagar ($):</span>
+                            <!-- Se cambió el input por un span para consistencia y se le añadió una clase -->
+                            <span id="displayTotalVenta" class="total-display-usd">$0.00</span>
+                        </div>
+
+                    </div>
+
+                    <!-- BOTON PARA INICIAR EL PROCESO DE PAGO -->
+                    <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#modalMetodoPago" style="margin-top:20px; padding: 15px; font-size: 16px; font-weight: 600;">
+                        PROCEDER AL PAGO
+                    </button>
+
+                    <!-- Inputs Ocultos del Formulario (ACTUALIZADOS) -->
+                    <input type="hidden" name="idVendedor" value="<?php echo $_SESSION['id_usuario']; ?>">
+                    <input type="hidden" name="listaMetodoPago" id="listaMetodoPago" required>
+                    <input type="hidden" name="listaProductosCaja" id="listaProductosCaja" required>
+
+                    <!-- ===================================================== -->
+                    <!-- ==== NUEVOS INPUTS OCULTOS PARA GUARDAR TOTALES ==== -->
+                    <!-- ===================================================== -->
+                    <input type="hidden" name="tasaDelDia" id="tasaDelDia">
+                    <input type="hidden" name="subtotalUsd" id="subtotalUsd">
+                    <input type="hidden" name="subtotalBs" id="subtotalBs">
+                    <input type="hidden" name="ivaUsd" id="ivaUsd">
+                    <input type="hidden" name="ivaBs" id="ivaBs">
+                    <input type="hidden" name="totalUsd" id="totalUsd">
+                    <input type="hidden" name="totalBs" id="totalBs">
+                </div>
+                </form>
+                <?php
+                // Instancia del controlador para procesar la creación de la venta
+                $crearVenta = new ControllerVentas();
+                $crearVenta->ctrCrearVenta();
+                ?>
             </div>
         </div>
-    </section>
+</div>
+</section>
 </div>
 
 <!-- ====================================================================== -->
@@ -244,7 +250,7 @@ $monedaPrincipal = $_SESSION['config']['moneda_principal'] ?? 'USD';
                             <button class="payment-option" data-value="Punto-Venta" data-text="Punto de Venta">
                                 <span>Punto de Venta</span>
                             </button>
-                             <button class="payment-option" data-value="Transferencia" data-text="Transferencia">
+                            <button class="payment-option" data-value="Transferencia" data-text="Transferencia">
                                 <span>Transferencia</span>
                             </button>
                         </div>
