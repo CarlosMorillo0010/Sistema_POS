@@ -11,63 +11,57 @@
 
     <!-- Main content -->
     <section class="content">
+
         <div class="row">
+
             <!-- Total Base Imponible (VES) -->
             <div class="col-md-3 col-sm-6 col-xs-12">
                 <div class="small-box bg-aqua">
                     <div class="inner">
                         <h3 id="totalBaseImponible">0.00 Bs.</h3>
-                        <p>Total Base Imponible (VES)</p>
-                    </div>
-                    <div class="icon">
-                        <i class="ion ion-cash"></i>
+                        <p>Total Base Imponible VES</p>
                     </div>
                 </div>
             </div>
 
             <!-- Total IVA (VES) -->
             <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="small-box bg-red">
+                <div class="small-box bg-yellow">
                     <div class="inner">
                         <h3 id="totalIva">0.00 Bs.</h3>
-                        <p>Total Débito Fiscal (VES)</p>
-                    </div>
-                    <div class="icon">
-                        <i class="ion ion-pie-graph"></i>
+                        <p>Total Débito Fiscal VES</p>
                     </div>
                 </div>
             </div>
 
             <!-- Total General (VES) -->
             <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="small-box bg-green">
+                <div class="small-box bg-red">
                     <div class="inner">
                         <h3 id="totalGeneral">0.00 Bs.</h3>
-                        <p>Total General (VES)</p>
-                    </div>
-                    <div class="icon">
-                        <i class="ion ion-stats-bars"></i>
+                        <p>Total General VES</p>
                     </div>
                 </div>
             </div>
 
             <!-- NUEVO: Total General (USD) -->
             <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="small-box bg-yellow">
+                <div class="small-box bg-green">
                     <div class="inner">
                         <h3 id="totalGeneralUsd">0.00 $</h3>
-                        <p>Total General (USD)</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fa fa-dollar"></i>
+                        <p>Total General USD</p>
                     </div>
                 </div>
             </div>
+
         </div>
+
         <!-- Default box -->
         <div class="box">
-            <div class="box-header with-border">
-                <div class="box-header with-border">
+            <div class="box-header">
+                <div id="customButtons" class="hidden">
+                    <a id="btnGenerarTxtSeniat" title="Exportar TXT SENIAT" class="btn btn-primary ml-2 pull-right" target="_blank"><i
+                            class="fa fa-file-text-o"></i></a>
                     <button type="button" class="btn btn-default pull-right" id="daterange-btn-ventas">
                         <span>
                             <i class="fa fa-calendar"></i> Rango de fecha
@@ -86,8 +80,8 @@
                             <!-- <th class="dt-center">Nº Control</th> -->
                             <th class="dt-center">Cliente</th>
                             <th class="dt-center">Documento</th>
-                            <th class="dt-center">Base imponible</th>
-                            <th class="dt-center">Impuesto</th>
+                            <th class="dt-center">Base Imponible VES</th>
+                            <th class="dt-center">Débito Fiscal VES</th>
                             <th class="dt-center">Total VES</th>
                             <th class="dt-center">Total USD</th>
                             <th class="dt-center">Estado</th>
@@ -127,7 +121,7 @@
 
                             echo '<tr>
 
-                                <td class="dt-center" style="width: 5%;">' . ($key + 1) . '</td>
+                                <td class="dt-center">' . ($key + 1) . '</td>
                                 <td class="dt-center">' . date("d/m/Y", strtotime($value["fecha"])) . '</td>
                                 <td class="dt-center">' . htmlspecialchars($value["codigo_venta"]) . '</td>';
 
@@ -136,13 +130,15 @@
                             $valorCliente = $value["id_cliente"];
                             $respuestaCliente = ControllerClients::ctrMostrarClientes($itemCliente, $valorCliente);
 
-                            echo '<td>' . ($respuestaCliente ? htmlspecialchars($respuestaCliente["nombre"]) : 'Cliente no encontrado') . '</td>';
-                            echo '<td>' . ($respuestaCliente ? htmlspecialchars($respuestaCliente["documento"]) : 'Cliente no encontrado') . '</td>';
+                            // Mostrar el nombre del cliente con un ancho fijo
+                            echo '<td class="dt-center" style="width: 15%;">' . ($respuestaCliente ? htmlspecialchars($respuestaCliente["nombre"]) : 'Cliente no encontrado') . '</td>';
+                            // Mostrar el documento del cliente
+                            echo '<td class="dt-center">' . ($respuestaCliente ? htmlspecialchars($respuestaCliente["tipo_documento"]) . ' ' . htmlspecialchars($respuestaCliente["documento"]) : 'Cliente no encontrado') . '</td>';
 
-                            echo '<td class="dt-right">' . number_format($value["subtotal_bs"], 2, ',', '.') . '</td>
-                                <td class="dt-right">' . number_format($value["iva_bs"], 2, ',', '.') . '</td>
-                                <td class="dt-right">' . number_format($value["total_bs"], 2, ',', '.') . '</td>
-                                <td class="dt-right">' . number_format($value["total_usd"], 2, ',', '.') . '</td>';
+                            echo '<td class="dt-center">' . number_format($value["subtotal_bs"], 2, ',', '.') . '</td>
+                                <td class="dt-center">' . number_format($value["iva_bs"], 2, ',', '.') . '</td>
+                                <td class="dt-center">' . number_format($value["total_bs"], 2, ',', '.') . '</td>
+                                <td class="dt-center">' . number_format($value["total_usd"], 2, ',', '.') . '</td>';
 
                             // Mostrar el estado de la venta con un select para cambiar el estado
                             $estado = $value["estado"];
@@ -156,14 +152,8 @@
                             }
 
                             echo '<td>
-                                        <span 
-                                            class="label btnCambiarEstado ' . $claseBadge . '" 
-                                            style="cursor: pointer;"
-                                            data-id-venta="' . $value["id_venta"] . '"
-                                            data-estado-actual="' . $estado . '">'
-                                . $estado .
-                                '</span>
-                                    </td>';
+                                    <button class="label btn btn-block p-2 btn-sm btnCambiarEstado ' . $claseBadge . '"  style="cursor: pointer; font-size: 16px;" data-id-venta="' . $value["id_venta"] . '" data-estado-actual="' . $estado . '">' . $estado . '</button>
+                                </td>';
                             echo '</tr>';
                         }
                         ?>
@@ -179,12 +169,12 @@
 <!-- /.content-wrapper -->
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         // Obtenemos los valores calculados por PHP
         var baseImponible = <?php echo $totalBaseImponible; ?>;
         var iva = <?php echo $totalIva; ?>;
         var total = <?php echo $totalGeneral; ?>;
-        var totalUsd = <?php echo $totalGeneralUsd; ?>; // <-- Obtenemos la nueva variable
+        var totalUsd = <?php echo $totalGeneralUsd; ?>;
 
         // Opciones de formato para USD
         const formatoUsd = { style: 'currency', currency: 'USD' };
@@ -193,10 +183,13 @@
         $('#totalBaseImponible').html(baseImponible.toLocaleString('es-VE', { minimumFractionDigits: 2 }) + ' Bs.');
         $('#totalIva').html(iva.toLocaleString('es-VE', { minimumFractionDigits: 2 }) + ' Bs.');
         $('#totalGeneral').html(total.toLocaleString('es-VE', { minimumFractionDigits: 2 }) + ' Bs.');
-        
+
         // Actualizamos la nueva caja de USD
-        $('#totalGeneralUsd').html(totalUsd.toLocaleString('en-US', formatoUsd));
-        
+        $('#totalGeneralUsd').html(totalUsd.toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }));
+
         actualizarCajasDeTotales();
     });
 </script>
