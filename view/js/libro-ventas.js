@@ -2,10 +2,11 @@ $(".tablaLibro").DataTable({
   order: [[0, "desc"]],
   responsive: true,      // Soporte para dispositivos móviles
   scrollX: true,         // Scroll horizontal
-  dom:  "<'row mb-2'<'col-sm-12'B>>" +
-        "<'row mb-2'<'col-sm-6'l><'col-sm-6'f>>" +
+  dom:  '<"row mb-2"<"col-sm-12"B<"custom-buttons-container pull-right">>>"' + 
+        '<"row"<"col-sm-4"l><"col-sm-8"f>>' +
+        't' +
         "<'row'<'col-sm-12'tr>>" +
-        "<'row mt-2'<'col-sm-7 align-self-center text-start'i><'col-sm-5 d-flex justify-content-end'p>>",
+        '<"row"<"col-sm-5"i><"col-sm-7"p>>',
   buttons: [
     {
       extend: 'excelHtml5',
@@ -17,9 +18,14 @@ $(".tablaLibro").DataTable({
       extend: 'print',
       text: '<i class="fa fa-print"></i>',
       titleAttr: 'Imprimir',
-      className: 'btn btn-primary'
+      className: 'btn btn-warning'
     },
   ],
+    "fnDrawCallback": function( oSettings ) {
+            // Movemos nuestros botones personalizados al contenedor que creamos con 'dom'
+        $("#customButtons").appendTo(".custom-buttons-container");
+        $("#customButtons").removeClass("hidden"); // Los hacemos visibles
+    },
    language: {
     sProcessing: "Procesando...",
     sLengthMenu: "Mostrar _MENU_ registros",
@@ -151,9 +157,26 @@ $('#daterange-btn-ventas').daterangepicker(
     var fechaInicial = start.format('YYYY-MM-DD');
     var fechaFinal = end.format('YYYY-MM-DD');
 
+    var urlTxt = "view/modules/generar-txt-ventas.php?fechaInicial=" + fechaInicial + "&fechaFinal=" + fechaFinal;
+    
+    // Asignamos la URL al botón y lo mostramos
+    $("#btnGenerarTxtSeniat").attr("href", urlTxt).show();
+
     window.location = "index.php?ruta=libro-ventas&fechaInicial=" + fechaInicial + "&fechaFinal=" + fechaFinal;
   }
 )
+
+$(document).ready(function() {
+    // Si la página ya cargó con fechas en la URL, también configuramos el botón
+    var urlParams = new URLSearchParams(window.location.search);
+    var fechaInicial = urlParams.get('fechaInicial');
+    var fechaFinal = urlParams.get('fechaFinal');
+
+    if (fechaInicial && fechaFinal) {
+        var urlTxt = "view/modules/generar-txt-ventas.php?fechaInicial=" + fechaInicial + "&fechaFinal=" + fechaFinal;
+        $("#btnGenerarTxtSeniat").attr("href", urlTxt).show();
+    }
+});
 
 function actualizarCajasDeTotales() {
 
