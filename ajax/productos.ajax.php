@@ -5,6 +5,45 @@ require_once "../model/products.model.php";
 require_once "../controller/categories.controller.php";
 require_once "../model/categories.model.php";
 
+// =====================================================================
+// NUEVO: PROCESAR BÚSQUEDA DE PRODUCTOS
+// =====================================================================
+if (isset($_POST["terminoBusqueda"])) {
+
+    $termino = $_POST["terminoBusqueda"];
+    $respuesta = ControllerProducts::ctrBuscarProductos($termino);
+    echo json_encode($respuesta);
+    return; // Detenemos la ejecución aquí
+
+}
+
+
+// =====================================================================
+// PROCESAR FILTRO POR CATEGORÍA (CÓDIGO EXISTENTE)
+// =====================================================================
+if (isset($_POST["idCategoriaFiltro"])) {
+    
+    $idCategoria = $_POST["idCategoriaFiltro"];
+
+    if ($idCategoria == "todos") {
+        $item = null;
+        $valor = null;
+    } else {
+        $item = "p.id_categoria";
+        $valor = $idCategoria;
+    }
+    
+    $orden = "id_producto DESC";
+    
+    $respuesta = ControllerProducts::ctrMostrarProductosCaja($item, $valor, $orden);
+    echo json_encode($respuesta);
+    return; // Detenemos la ejecución aquí
+}
+
+
+// =====================================================================
+// OTROS MÉTODOS AJAX (CÓDIGO EXISTENTE)
+// =====================================================================
 class AjaxProductos{
 
     public $idProducto;
@@ -75,24 +114,4 @@ if(isset($_POST["traerArticulos"]) || isset($_POST["nombreProducto"])){
     $traerProductos->traerArticulos = $_POST["traerArticulos"] ?? null;
     $traerProductos->nombreProducto = $_POST["nombreProducto"] ?? null;
     $traerProductos->ajaxTraerProductos();
-}
-
-if (isset($_POST["idCategoriaFiltro"])) {
-    
-    $idCategoria = $_POST["idCategoriaFiltro"];
-
-    if ($idCategoria == "todos") {
-        $item = null;
-        $valor = null;
-    } else {
-        $item = "p.id_categoria";
-        $valor = $idCategoria;
-    }
-    
-    $orden = "id_producto DESC";
-    
-    $respuesta = ControllerProducts::ctrMostrarProductosCaja($item, $valor, $orden);
-    
-    // La única línea que debe quedar es esta:
-    echo json_encode($respuesta);
 }

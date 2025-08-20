@@ -227,4 +227,16 @@ class ControllerProducts
             }
         }
     }
+
+    /**
+     * ===================================================================
+     * NUEVO: MOSTRAR PRODUCTOS POR BÚSQUEDA
+     * ===================================================================
+     */
+    static public function ctrBuscarProductos($termino)
+    {
+        $tabla = "productos";
+        $respuesta = ModelProducts::mdlBuscarProductos($tabla, $termino);
+        return $respuesta;
+    }
 }

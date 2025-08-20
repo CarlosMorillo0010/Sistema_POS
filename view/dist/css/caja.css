@@ -98,7 +98,7 @@ body { font-family: var(--font-family); background-color: var(--background-light
 .category-card.active { border-color: var(--primary-color); background-color: var(--primary-color); box-shadow: var(--card-hover-shadow); }
 .category-card.active .title { color: var(--white); }
 .category-card .title { padding: 12px 8px; font-size: var(--font-size-base); font-weight: 600; color: var(--text-primary); flex-grow: 1; display: flex; align-items: center; justify-content: center; }
-#productosCategoria { max-height: 675px; overflow-y: auto; padding: var(--spacing-sm); }
+#productosCategoria { max-height: 630px; overflow-y: auto; padding: var(--spacing-sm); }
 .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-md); }
 .product-card { background: var(--white); border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: var(--card-shadow); transition: var(--transition-fast); display: flex; flex-direction: column; cursor: pointer; }
 .product-card:hover { transform: translateY(-5px); box-shadow: var(--card-hover-shadow); }
