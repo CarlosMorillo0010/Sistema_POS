@@ -78,6 +78,16 @@ $monedaPrincipal = $_SESSION['config']['moneda_principal'] ?? 'USD';
                 }
                 ?>
 
+                <!-- ===================================== -->
+                <!-- ==== NUEVO: BUSCADOR DE PRODUCTOS ==== -->
+                <!-- ===================================== -->
+                <div class="form-group" style="margin-top: 15px; margin-bottom: 15px;">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="buscadorProductos" placeholder="Buscar producto por nombre o código...">
+                    </div>
+                </div>
+                <!-- FIN DEL BUSCADOR DE PRODUCTOS -->
+
 
                 <!-- CUADRICULA DE PRODUCTOS (AHORA SE LLENARÁ CON JAVASCRIPT) -->
                 <div class="product-grid" id="productosCategoria">
