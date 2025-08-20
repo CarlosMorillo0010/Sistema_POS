@@ -17,7 +17,7 @@ foreach ($ventas as $key => $valueVentas):
             /*=====================================
              CAPTURAMOS NOMBRE Y VALORES NETO EN UN ARRAY
             ======================================*/
-            $arrayListaClientes = array($valueClientes["nombre"] => $valueVentas["precio_neto"]);
+            $arrayListaClientes = array($valueClientes["nombre"] => $valueVentas["subtotal_bs"]);
         }
         /*=====================================
          SUMAR LOS NETO DE CADA CLIENTE

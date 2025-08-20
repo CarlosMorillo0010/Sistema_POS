@@ -32,6 +32,20 @@ class ControllerVentas{
         $tabla = "ventas";
         return ModelVentas::mdlMostrarVenta($tabla, $item, $valor);
     }
+    
+    /*=============================================
+    MOSTRAR VENTA DETALLADA
+    =============================================*/
+    public static function ctrMostrarVentaDetallada($item, $valor) {
+        $tablaVentas = "ventas";
+        $tablaClientes = "clientes";
+        
+        // Llamamos a un nuevo método en el modelo
+        $respuesta = ModelVentas::mdlMostrarVentaDetallada($tablaVentas, $tablaClientes, $item, $valor);
+        
+        return $respuesta;
+    }
+    
 
     /*=============================================
      CREAR VENTA (VERSIÓN ROBUSTA Y ADAPTADA)
