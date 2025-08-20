@@ -125,16 +125,39 @@ class ModelProducts
     }
 
     static public function mdlActualizarProductoConexion($pdo, $tabla, $item1, $valor1, $item2, $valor2)
-{
-    // Esta consulta usa la conexión PDO que ya está en una transacción
-    $stmt = $pdo->prepare("UPDATE $tabla SET $item1 = :valor1 WHERE $item2 = :valor2");
-    $stmt->bindParam(":valor1", $valor1, PDO::PARAM_STR);
-    $stmt->bindParam(":valor2", $valor2, PDO::PARAM_STR);
-    
-    if (!$stmt->execute()) {
-        // Lanza una excepción si la actualización falla
-        throw new Exception("Falló la actualización del producto: " . implode(" - ", $stmt->errorInfo()));
+    {
+        // Esta consulta usa la conexión PDO que ya está en una transacción
+        $stmt = $pdo->prepare("UPDATE $tabla SET $item1 = :valor1 WHERE $item2 = :valor2");
+        $stmt->bindParam(":valor1", $valor1, PDO::PARAM_STR);
+        $stmt->bindParam(":valor2", $valor2, PDO::PARAM_STR);
+        
+        if (!$stmt->execute()) {
+            // Lanza una excepción si la actualización falla
+            throw new Exception("Falló la actualización del producto: " . implode(" - ", $stmt->errorInfo()));
+        }
+        return true;
     }
-    return true;
-}
+
+    /**
+     * ===================================================================
+     * NUEVO: BUSCAR PRODUCTOS POR TÉRMINO (CÓDIGO O DESCRIPCIÓN)
+     * ===================================================================
+     */
+    static public function mdlBuscarProductos($tabla, $termino)
+    {
+        // Preparamos el término de búsqueda para usarlo con LIKE
+        $terminoBusqueda = "%" . $termino . "%";
+
+        $stmt = Connection::connect()->prepare(
+            "SELECT p.*, c.categoria 
+             FROM $tabla p 
+             LEFT JOIN categorias c ON p.id_categoria = c.id_categoria 
+             WHERE p.descripcion LIKE :termino OR p.codigo LIKE :termino
+             ORDER BY p.descripcion ASC"
+        );
+
+        $stmt->bindParam(":termino", $terminoBusqueda, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
