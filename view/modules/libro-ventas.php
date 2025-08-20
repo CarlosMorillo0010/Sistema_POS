@@ -1,18 +1,22 @@
 <div class="content-wrapper">
+    
     <section class="content-header">
+        
         <h1>
             Libro de ventas
         </h1>
+        
         <ol class="breadcrumb">
             <li><a href="inicio"><i class="fa fa-dashboard"></i> Inicio</a></li>
             <li class="active">Libro de ventas</li>
         </ol>
+
     </section>
 
     <!-- Main content -->
     <section class="content">
 
-        <div class="row">
+        <div class="row text-center">
 
             <!-- Total Base Imponible (VES) -->
             <div class="col-md-3 col-sm-6 col-xs-12">
@@ -59,16 +63,27 @@
         <!-- Default box -->
         <div class="box">
             <div class="box-header">
-                <div id="customButtons" class="hidden">
-                    <a id="btnGenerarTxtSeniat" title="Exportar TXT SENIAT" class="btn btn-primary ml-2 pull-right" target="_blank"><i
-                            class="fa fa-file-text-o"></i></a>
+
+                <div id="customButtons2" class="hidden">
+
                     <button type="button" class="btn btn-default pull-right" id="daterange-btn-ventas">
                         <span>
                             <i class="fa fa-calendar"></i> Rango de fecha
                         </span>
                         <i class="fa fa-caret-down"></i>
                     </button>
+                    <button class="btn btn-default mr-1" data-toggle="modal" data-target="#modalInstruccionesVentas" title="Ver instrucciones de uso">
+                        <i class="fa fa-question-circle"></i>
+                    </button>
+
                 </div>
+                
+                <div id="customButtons" class="hidden">
+
+                    <a id="btnGenerarTxtSeniat" title="Exportar TXT SENIAT" class="btn btn-primary pull-left" target="_blank"><i
+                        class="fa fa-file-text-o"></i> TXT</a>  
+                </div>
+
             </div>
             <div class="box-body">
                 <table class="table table-bordered table-striped dt-responsive tablaLibro" width="100%">
@@ -116,14 +131,22 @@
                                 $totalBaseImponible += $value["subtotal_bs"];
                                 $totalIva += $value["iva_bs"];
                                 $totalGeneral += $value["total_bs"];
-                                $totalGeneralUsd += $value["total_usd"]; // <-- Sumamos el total en USD
+                                $totalGeneralUsd += $value["total_usd"];
                             }
 
                             echo '<tr>
 
                                 <td class="dt-center">' . ($key + 1) . '</td>
-                                <td class="dt-center">' . date("d/m/Y", strtotime($value["fecha"])) . '</td>
-                                <td class="dt-center">' . htmlspecialchars($value["codigo_venta"]) . '</td>';
+                                <td class="dt-center">' . date("d/m/Y", strtotime($value["fecha"])) . '</td>';
+                                
+                            echo '<td class="dt-center">
+                                <button class="btn btn-default btnVerDetalleVenta" style="color:#000; font-size: 16px;" 
+                                        data-id-venta="' . $value["id_venta"] . '" 
+                                        data-toggle="modal" 
+                                        data-target="#modalDetalleVenta">
+                                    ' . htmlspecialchars($value["codigo_venta"]) . '
+                                </button>
+                            </td>';
 
                             // Obtener datos del cliente
                             $itemCliente = "id";
@@ -167,6 +190,85 @@
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+
+<!-- =============================================
+MODAL DETALLE DE VENTA
+============================================== -->
+<div id="modalDetalleVenta" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg"> <!-- modal-lg para más espacio -->
+        <div class="modal-content">
+            <div class="modal-header" style="background:#3c8dbc; color:white">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Detalle de la Venta</h4>
+            </div>
+            
+            <div class="modal-body">
+                <div class="box-body" id="contenidoModalVenta">
+                    <!-- Aquí se cargará dinámicamente el contenido de la factura -->
+                    <div class="text-center">
+                        <i class="fa fa-spinner fa-spin fa-3x"></i>
+                        <p>Cargando detalles...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cerrar</button>
+                <!-- Podrías añadir un botón de impresión aquí en el futuro -->
+                <!-- <button type="button" class="btn btn-primary"><i class="fa fa-print"></i> Imprimir Factura</button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============================================
+MODAL DE INSTRUCCIONES - LIBRO DE VENTAS
+============================================== -->
+<div id="modalInstruccionesVentas" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#555; color:white">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"><i class="fa fa-info-circle"></i> Instrucciones de Uso - Libro de Ventas</h4>
+            </div>
+            
+            <div class="modal-body">
+                <div class="box-body">
+                    
+                    <h4><i class="fa fa-calendar"></i> 1. Filtrar por Rango de Fechas</h4>
+                    <p>
+                        Utilice el botón <strong>"Rango de fecha"</strong> para seleccionar un período específico. Puede elegir rangos predefinidos como "Este mes" o seleccionar fechas personalizadas en el calendario. La tabla y los totales se actualizarán automáticamente.
+                    </p>
+                    <hr>
+                    
+                    <h4><i class="fa fa-cogs"></i> 2. Gestionar Facturas</h4>
+                    <ul>
+                        <li><strong>Ver Detalle:</strong> Haga clic en el <strong>número de factura</strong> para abrir una ventana con todos los detalles de la venta, incluyendo los productos.</li>
+                        <li><strong>Cambiar Estado:</strong> Haga clic en la insignia de estado (ej. <span class="btn btn-success btn-xs">Pagada</span>) para cambiar cíclicamente el estado de una factura (Pagada → Anulada → Pendiente). Los totales se recalcularán al instante.</li>
+                    </ul>
+                    <hr>
+
+                    <h4><i class="fa fa-file-text-o"></i> 3. Generar Reportes</h4>
+                    <ul>
+                        <li><strong>Exportar a TXT (SENIAT):</strong> Después de seleccionar un rango de fechas, puede pulsar el boton del ícono <span class="btn btn-primary btn-xs"><i class="fa fa-file-text-o"></i> TXT</span>. para descargar el archivo de texto plano listo para el portal del SENIAT.</li>
+                        <li><strong>Exportar a Excel/Imprimir:</strong> Use los botones de <span class="btn btn-success btn-xs"><i class="fa fa-file-excel-o"></i> Excel</span> o <span class="btn btn-warning btn-xs"><i class="fa fa-print"></i> Imprimir</span> para descargar una copia del reporte que está viendo en pantalla.</li>
+                    </ul>
+                    <hr>
+                    
+                    <h4><i class="fa fa-search"></i> 4. Búsqueda y Ordenamiento</h4>
+                    <p>
+                        Utilice el campo de <strong>"Buscar"</strong> para filtrar rápidamente por número de factura, cliente o cualquier otro dato. También puede hacer clic en los encabezados de las columnas para ordenar la tabla.
+                    </p>
+
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Entendido</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     $(document).ready(function () {

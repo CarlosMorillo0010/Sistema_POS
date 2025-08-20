@@ -27,7 +27,7 @@ foreach ($respuesta as $key => $value) {
     /*=====================================
      CAPTURAMOS LAS VENTAS
     ======================================*/
-    $arrayVentas = array($fecha => $value["total"]);
+    $arrayVentas = array($fecha => $value["total_bs"]);
 
     /*=====================================
      SUMA DE LOS PAGOS EN EL MISMO MES

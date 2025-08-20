@@ -44,6 +44,32 @@ class ModelVentas{
     }
 
     /*=============================================
+    MOSTRAR VENTA DETALLADA
+    =============================================*/
+    static public function mdlMostrarVentaDetallada($tablaVentas, $tablaClientes, $item, $valor) {
+        
+        // Primero, obtenemos la venta y los datos del cliente con un JOIN
+        $stmtVenta = Connection::connect()->prepare("
+            SELECT v.*, c.nombre, c.documento, c.tipo_documento 
+            FROM $tablaVentas v
+            INNER JOIN $tablaClientes c ON v.id_cliente = c.id
+            WHERE v.$item = :$item
+        ");
+        $stmtVenta->bindParam(":".$item, $valor, PDO::PARAM_INT);
+        $stmtVenta->execute();
+        $venta = $stmtVenta->fetch(PDO::FETCH_ASSOC);
+
+        // Si se encontró la venta, ahora buscamos sus productos
+        if ($venta) {
+    
+            $productos = json_decode($venta["productos"], true);
+            $venta["productos"] = $productos;
+        }
+
+        return $venta;
+    }
+
+    /*=============================================
      RANGO FECHAS
     =============================================*/
     static public function mdlRangoFechasVentas($tabla, $fechaInicial, $fechaFinal)
