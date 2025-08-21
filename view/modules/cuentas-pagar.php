@@ -37,7 +37,7 @@ endforeach;
                             <th class="dt-center">IVA</th>
                             <th class="dt-center">Total</th>
                             <th class="dt-center">Emision</th>
-                            <th class="dt-center">Vencimiento</th>
+                            <th class="text-danger dt-center">Vencimiento</th>
                             <th class="dt-center">Estado</th>
                             <th class="dt-center">Acciones</th>
                         </tr>
@@ -59,7 +59,7 @@ endforeach;
                                     <td class="dt-center">' . number_format($value["iva"], 2, ',', '.') . '</td>
                                     <td class="dt-center">' . number_format($value["total"], 2, ',', '.') . '</td>
                                     <td class="dt-center">' . $value["fecha_emision"] . '</td>
-                                    <td class="dt-center">' . $value["fecha_vencimiento"] . '</td>';
+                                    <td class="dt-center"><strong>' . $value["fecha_vencimiento"] . '</strong></td>';
 
                             // Colorear el estado para mejor visualización
                             if ($value["estado"] == "Pendiente") {
@@ -125,60 +125,68 @@ MODAL VISUALIZAR CUENTA PAGAR
                         <!-- ENTRADA PARA EL MONTO -->
                         <div class="col-lg-4 mb-2">
                             <label style="color: #000;" for="verMonto" class="text-center">Monto:</label>
-                            <input type="number" class="form-control input-lg ver" style="text-align: center;" id="verMonto" readonly>
+                            <input type="number" class="form-control input-lg ver" style="text-align: center;"
+                                id="verMonto" readonly>
                         </div>
 
                         <!-- ENTRADA PARA EL IVA -->
                         <div class="col-lg-4 mb-2">
                             <label style="color: #000;" for="verIva" class="text-center">IVA:</label>
-                            <input type="number" class="form-control input-lg ver" style="text-align: center;" id="verIva" readonly>
+                            <input type="number" class="form-control input-lg ver" style="text-align: center;"
+                                id="verIva" readonly>
                         </div>
 
                         <!-- ENTRADA PARA EL TOTAL -->
                         <div class="col-lg-4 mb-2">
                             <label style="color: #000;" for="verTotal" class="text-center">Total:</label>
-                            <input type="number" class="form-control input-lg ver" style="text-align: center;" id="verTotal" readonly>
+                            <input type="number" class="form-control input-lg ver" style="text-align: center;"
+                                id="verTotal" readonly>
                         </div>
 
                         <!-- ENTRADA PARA LA FECHA EMISION -->
                         <div class="col-lg-4 mb-2">
-                                <label style="color: #000;" for="verFechaEmision" class="text-center">Fecha emision:</label>
-                                <input type="text" class="form-control input-lg ver" style="text-align: center;" id="verFechaEmision" readonly>
+                            <label style="color: #000;" for="verFechaEmision" class="text-center">Fecha emision:</label>
+                            <input type="text" class="form-control input-lg ver" style="text-align: center;"
+                                id="verFechaEmision" readonly>
                         </div>
 
                         <!-- ENTRADA PARA LA FECHA VENCIMIENTO -->
                         <div class="col-lg-4 mb-2">
-                            <label style="color: #000;" for="verFechaVencimiento" class="text-center">Fecha vencimiento:</label>
-                                <input type="text" class="form-control input-lg ver" style="text-align: center;" id="verFechaVencimiento" readonly>
-                            </div>
+                            <label style="color: #000;" for="verFechaVencimiento" class="text-center">Fecha
+                                vencimiento:</label>
+                            <input type="text" class="form-control input-lg ver" style="text-align: center;"
+                                id="verFechaVencimiento" readonly>
                         </div>
-
-                        <!-- ENTRADA PARA LA FECHA PAGO-->
-                        <div class="col-lg-4 mb-2">
-                            <label style="color: #000;" for="verFechaPago" class="text-center">Fecha pago:</label>
-                                <input type="text" class="form-control input-lg ver" style="text-align: center;" id="verFechaPago" readonly>
-                        </div>
-
-                        <!-- ENTRADA PARA EL ESTADO -->
-                        <div class="col-lg-12 mb-2">
-                            <label style="color: #000;" for="verEstado" class="text-center">Estado:</label>
-                            <input class="form-control input-lg ver" style="text-align: center;" id="verEstado" readonly>
-                        </div>
-
-                        <!-- ENTRADA PARA LA OBSERVACION -->
-                        <div class="col-lg-12 mb-2">
-                            <label style="color: #000;" for="verObservacion">Detalles:</label>
-                            <textarea type="text" class="form-control input-lg ver" id="verNotaPago" style="resize: none;" readonly></textarea>
-                        </div>
-
                     </div>
+
+                    <!-- ENTRADA PARA LA FECHA PAGO-->
+                    <div class="col-lg-4 mb-2">
+                        <label style="color: #000;" for="verFechaPago" class="text-center">Fecha pago:</label>
+                        <input type="text" class="form-control input-lg ver" style="text-align: center;"
+                            id="verFechaPago" readonly>
+                    </div>
+
+                    <!-- ENTRADA PARA EL ESTADO -->
+                    <div class="col-lg-12 mb-2">
+                        <label style="color: #000;" for="verEstado" class="text-center">Estado:</label>
+                        <input class="form-control input-lg ver" style="text-align: center;" id="verEstado" readonly>
+                    </div>
+
+                    <!-- ENTRADA PARA LA OBSERVACION -->
+                    <div class="col-lg-12 mb-2">
+                        <label style="color: #000;" for="verObservacion">Detalles:</label>
+                        <textarea type="text" class="form-control input-lg ver" id="verNotaPago" style="resize: none;"
+                            readonly></textarea>
+                    </div>
+
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Salir</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Salir</button>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <!--=====================================
@@ -206,7 +214,8 @@ MODAL REALIZAR PAGO
                         <div class="form-group">
 
                             <p class="text-center">¿Está seguro de que desea marcar esta deuda como
-                                <strong>PAGADA</strong>?</p>
+                                <strong>PAGADA</strong>?
+                            </p>
                             <p class="text-center">Esta acción no se puede deshacer fácilmente.</p>
 
                             <!-- Campo para notas sobre el pago -->

@@ -26,7 +26,7 @@ if (empty($ventas)) {
 
 //CONSTRUIR EL CONTENIDO DEL ARCHIVO TXT
 $contenidoTxt = "";
-$rifEmpresa = "J-12345678-9"; //Reemplaza esto con el RIF de tu empresa
+$rifEmpresa = "J-40982706-2"; //Reemplaza esto con el RIF de tu empresa
 
 foreach ($ventas as $venta) {
 
