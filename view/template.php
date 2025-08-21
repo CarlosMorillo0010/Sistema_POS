@@ -215,7 +215,7 @@ function versionAsset($path)
                 $_GET["ruta"] == "libro-ventas" ||
                 $_GET["ruta"] == "libro-compras" ||
                 // $_GET["ruta"] == "servicios" ||
-                // $_GET["ruta"] == "ajuste-inventario" ||
+                $_GET["ruta"] == "ajuste-inventario" ||
                 // $_GET["ruta"] == "traslado-almacen" ||
                 $_GET["ruta"] == "orden-compra" ||
                 // $_GET["ruta"] == "orden-pago" ||
@@ -315,7 +315,8 @@ function versionAsset($path)
                 'presupuesto' => 'presupuesto.js',
                 'reportes' => 'reportes.js',
                 'reportes-ventas' => 'reportes.js',
-                'vehiculos' => 'vehiculos.js'
+                'vehiculos' => 'vehiculos.js',
+                'ajuste-inventario' => 'ajuste-inventario.js'
             ];
 
             $globalScripts = [
