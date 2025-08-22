@@ -240,7 +240,7 @@ function versionAsset($path)
                 // $_GET["ruta"] == "crear-factura-gasto" ||
                 // $_GET["ruta"] == "crear-factura" ||
                 // $_GET["ruta"] == "crear-pedido" ||
-                // $_GET["ruta"] == "cuentas-cobrar" ||
+                $_GET["ruta"] == "cuentas-cobrar" ||
                 $_GET["ruta"] == "cuentas-pagar" ||
                 $_GET["ruta"] == "proveedores" ||
                 $_GET["ruta"] == "config-perfil" ||

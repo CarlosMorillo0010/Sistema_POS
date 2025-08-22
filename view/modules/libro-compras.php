@@ -47,9 +47,15 @@
                                     <td class="dt-center">' . $value["tipodoc"] . '</td>
                                     <td class="dt-center">' . number_format($value["monto"], 2, ',', '.') . '</td>
                                     <td class="dt-center">' . number_format($value["iva"], 2, ',', '.') . '</td>
-                                    <td class="dt-center">' . number_format($value["total"], 2, ',', '.') . '</td>
-                                    <td class="dt-center">' . $value["estado"] . '</td>
-                                    <td class="dt-center">' . $value["fecha"] . '</td>
+                                    <td class="dt-center">' . number_format($value["total"], 2, ',', '.') . '</td>';
+
+                                    if ($value["estado"] == "Pendiente") {
+                                        echo '<td class="dt-center"><button class="btn btn-danger btn-xs">Pendiente</button></td>';
+                                    } else {
+                                        echo '<td class="dt-center"><button class="btn btn-success btn-xs">Pagada</button></td>';
+                                    }
+
+                                    echo '<td class="dt-center">' . $value["fecha"] . '</td>
                                     <td class="dt-center">
                                         <div class="btn-group">
                                             <button class="btn btn-warning btnEditarLibroCompra" idLibroCompra="' . $value["id"] . '" data-toggle="modal" data-target="#modalEditarLibroCompra"><i class="fa fa-pencil"></i></button>

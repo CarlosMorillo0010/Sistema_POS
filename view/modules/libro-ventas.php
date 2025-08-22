@@ -155,6 +155,7 @@
 
                             // Mostrar el nombre del cliente con un ancho fijo
                             echo '<td class="dt-center" style="width: 15%;">' . ($respuestaCliente ? htmlspecialchars($respuestaCliente["nombre"]) : 'Cliente no encontrado') . '</td>';
+                            
                             // Mostrar el documento del cliente
                             echo '<td class="dt-center">' . ($respuestaCliente ? htmlspecialchars($respuestaCliente["tipo_documento"]) . ' ' . htmlspecialchars($respuestaCliente["documento"]) : 'Cliente no encontrado') . '</td>';
 
@@ -163,19 +164,33 @@
                                 <td class="dt-center">' . number_format($value["total_bs"], 2, ',', '.') . '</td>
                                 <td class="dt-center">' . number_format($value["total_usd"], 2, ',', '.') . '</td>';
 
-                            // Mostrar el estado de la venta con un select para cambiar el estado
-                            $estado = $value["estado"];
+                            // 1. Determinar el estado actual. Si es NULL, es "Pagada".
+                            $estado = $value["estado"] ?? "Pagada";
+
+                            // 2. Determinar la clase de color basada en el estado.
                             $claseBadge = '';
                             if ($estado == 'Pagada') {
                                 $claseBadge = 'label-success';
                             } elseif ($estado == 'Pendiente') {
                                 $claseBadge = 'label-warning';
+                            } elseif ($estado == 'Pagada Parcialmente') {
+                                $claseBadge = 'label-warning';
                             } elseif ($estado == 'Anulada') {
                                 $claseBadge = 'label-danger';
                             }
 
+                            // 3. Determinar si es un registro nuevo para el sistema de cobros.
+                            $esNuevo = ($value["estado"] === NULL) ? 'true' : 'false';
+
+                            // 4. Imprimir el botón con la SINTAXIS CORRECTA.
                             echo '<td>
-                                    <button class="label btn btn-block p-2 btn-sm btnCambiarEstado ' . $claseBadge . '"  style="cursor: pointer; font-size: 16px;" data-id-venta="' . $value["id_venta"] . '" data-estado-actual="' . $estado . '">' . $estado . '</button>
+                                    <button class="label btn btn-block p-2 btn-sm btnCambiarEstado ' . $claseBadge . '"  
+                                            style="cursor: pointer; font-size: 16px;" 
+                                            data-id-venta="' . $value["id_venta"] . '" 
+                                            data-estado-actual="' . $estado . '"
+                                            data-es-nuevo="' . $esNuevo . '">
+                                        ' . $estado . '
+                                    </button>
                                 </td>';
                             echo '</tr>';
                         }
@@ -204,7 +219,6 @@ MODAL DETALLE DE VENTA
             
             <div class="modal-body">
                 <div class="box-body" id="contenidoModalVenta">
-                    <!-- Aquí se cargará dinámicamente el contenido de la factura -->
                     <div class="text-center">
                         <i class="fa fa-spinner fa-spin fa-3x"></i>
                         <p>Cargando detalles...</p>
@@ -214,7 +228,6 @@ MODAL DETALLE DE VENTA
             
             <div class="modal-footer">
                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cerrar</button>
-                <!-- Podrías añadir un botón de impresión aquí en el futuro -->
                 <!-- <button type="button" class="btn btn-primary"><i class="fa fa-print"></i> Imprimir Factura</button> -->
             </div>
         </div>

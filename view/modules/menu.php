@@ -169,15 +169,15 @@ $perfil = ControllerPerfiles::ctrMostrarPerfil($item, $valor);
                         </a>
                     </li>
                     <li>
-                        <a href="cuentas-pagar">
-                            <i class="far fa-circle"></i>
-                            <span>Cuentas por Pagar</span>
-                        </a>
-                    </li>
-                    <li>
                         <a href="libro-compras">
                             <i class="far fa-circle"></i>
                             <span>Libro de compras</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="cuentas-pagar">
+                            <i class="far fa-circle"></i>
+                            <span>Cuentas por Pagar</span>
                         </a>
                     </li>
                     <li>
@@ -277,14 +277,8 @@ $perfil = ControllerPerfiles::ctrMostrarPerfil($item, $valor);
                             <i class="far fa-circle"></i>
                             <span>Notas de Entrega</span>
                         </a>
-                    </li>
-                    <li>
-                        <a href="cuentas-cobrar">
-                            <i class="far fa-circle"></i>
-                            <span>Cuentas por Cobrar</span>
-                        </a>
-                    </li>
-                    <li>
+                    </li> -->
+                    <!-- <li>
                         <a href="nota-credito">
                             <i class="far fa-circle"></i>
                             <span>Notas de Crédito</span>
@@ -299,13 +293,19 @@ $perfil = ControllerPerfiles::ctrMostrarPerfil($item, $valor);
                     <li>
                         <a href="ventas">
                             <i class="far fa-circle"></i>
-                            <span>Ventas</span>
+                            <span>Facturas de Venta</span>
                         </a>
                     </li>
                     <li>
                         <a href="libro-ventas">
                             <i class="far fa-circle"></i>
                             <span>Libro de ventas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="cuentas-cobrar">
+                            <i class="far fa-circle"></i>
+                            <span>Cuentas por Cobrar</span>
                         </a>
                     </li>
                     <!-- <li>

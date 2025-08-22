@@ -1,70 +1,3 @@
-$(".tablaLibro").DataTable({
-  order: [[0, "desc"]],
-  responsive: true,   
-  scrollX: true,        
-
-    dom: '<"row"<"col-sm-12 mb-1"B<"custom-buttons-container pull-right">>>' + // Ponemos los botones en su propia fila ancha
-        '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
-        't' + // La tabla
-        '<"row"<"col-sm-5"i><"col-sm-7"p>>', // Información y paginación
-          
-    buttons: [
-
-        {
-            extend: 'excelHtml5',
-            text: '<i class="fa fa-file-excel-o"></i> Excel',
-            titleAttr: 'Exportar a Excel',
-            className: 'btn btn-success'
-        },
-        {
-            extend: 'print',
-            text: '<i class="fa fa-print"></i> Imprimir',
-            titleAttr: 'Imprimir',
-            className: 'btn btn-warning'
-        }
-    ],
-    "fnDrawCallback": function( oSettings ) {
-    // Movemos nuestros botones personalizados al contenedor que creamos con 'dom'
-    $("#customButtons2").appendTo(".custom-buttons-container");
-    $("#customButtons2").removeClass("hidden"); // Los hacemos visibles
-    },
-
-    "initComplete": function( settings, json ) {
-
-        var customButtons = $("#customButtons").clone().removeClass('hidden').children();
-
-        $(".dt-buttons").prepend(customButtons);
-
-        initializeDateRangePicker();
-    },
-   language: {
-    sProcessing: "Procesando...",
-    sLengthMenu: "Mostrar _MENU_ registros",
-    sZeroRecords: "No se encontraron resultados",
-    sEmptyTable: "Ningún dato disponible en esta tabla",
-    sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
-    sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0",
-    sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
-    sInfoPostFix: "",
-    sSearch: "Buscar:",
-    sUrl: "",
-    sInfoThousands: ",",
-    sLoadingRecords: "Cargando...",
-    oPaginate: {
-      sFirst: "Primero",
-      sLast: "Último",
-      sNext: "Siguiente",
-      sPrevious: "Anterior",
-    },
-    oAria: {
-      sSortAscending: ": Activar para ordenar la columna de manera ascendente",
-      sSortDescending:
-        ": Activar para ordenar la columna de manera descendente",
-    },
-  },
-
-});
-
 function initializeDateRangePicker() {
     
     // Lógica para leer la URL y establecer el estado inicial
@@ -107,90 +40,188 @@ function initializeDateRangePicker() {
     });
 }
 
-// Usamos .on() con delegación de eventos para que funcione con DataTables
-$(".tablaLibro").on("click", ".btnCambiarEstado", function() {
+$(document).ready(function() {
+    $(".tablaLibro").DataTable({
+        order: [[0, "desc"]],
+        responsive: true,   
+        scrollX: true,        
 
-    var botonEstado = $(this); // Guardamos la referencia al span que se clickeó
-    var idVenta = botonEstado.data("idVenta");
-    var estadoActual = botonEstado.data("estado-actual");
-    
-    // Lógica para determinar el nuevo estado en un ciclo
-    var nuevoEstado = "";
-    if (estadoActual === "Pendiente") {
-        nuevoEstado = "Pagada";
-    } else if (estadoActual === "Pagada") {
-        nuevoEstado = "Anulada";
-    } else { // Si es "Anulada" o cualquier otro estado, vuelve a "Pendiente"
-        nuevoEstado = "Pendiente";
-    }
+            dom: '<"row"<"col-sm-12 mb-1"B<"custom-buttons-container pull-right">>>' + // Ponemos los botones en su propia fila ancha
+                '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+                't' + // La tabla
+                '<"row"<"col-sm-5"i><"col-sm-7"p>>', // Información y paginación
+                
+            buttons: [
 
-    // Mostramos una confirmación antes de cambiar, especialmente para "Anulada"
-    Swal.fire({
-        title: '¿Estás seguro?',
-        text: `¿Quieres cambiar el estado a "${nuevoEstado}"?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, cambiar',
-        cancelButtonText: 'No'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            
-            // Si el usuario confirma, procedemos con AJAX
-            var datos = new FormData();
-            datos.append("idVenta", idVenta);
-            datos.append("nuevoEstado", nuevoEstado);
-
-            $.ajax({
-                url: "ajax/ventas.ajax.php",
-                method: "POST",
-                data: datos,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: function(respuesta) {
-                    
-                     if (respuesta.trim().includes("ok")) {
-                        
-                        // 1. Quitar clases de color antiguas
-                        botonEstado.removeClass('label-warning label-success label-danger');
-
-                        // 2. Añadir nueva clase de color y texto
-                        var nuevaClase = "";
-                        if (nuevoEstado === "Pagada") {
-                            nuevaClase = "label-success";
-                        } else if (nuevoEstado === "Pendiente") {
-                            nuevaClase = "label-warning";
-                        } else {
-                            nuevaClase = "label-danger";
-                        }
-                        
-                        botonEstado.addClass(nuevaClase);
-                        botonEstado.html(nuevoEstado);
-                        
-                        // 3. Actualizar el atributo data-estado-actual para el próximo clic
-                        botonEstado.data("estado-actual", nuevoEstado);
-
-                        Swal.fire(
-                            '¡Actualizado!',
-                            'El estado de la factura ha sido cambiado.',
-                            'success'
-                        )
-                        actualizarCajasDeTotales();
-                    } else {
-                        Swal.fire(
-                            'Error',
-                            'No se pudo actualizar el estado.',
-                            'error'
-                        );
-                    }
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="fa fa-file-excel-o"></i> Excel',
+                    titleAttr: 'Exportar a Excel',
+                    className: 'btn btn-success'
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fa fa-print"></i> Imprimir',
+                    titleAttr: 'Imprimir',
+                    className: 'btn btn-warning'
                 }
-            });
-        }
-    });
-});
+            ],
+            "fnDrawCallback": function( oSettings ) {
+            // Movemos nuestros botones personalizados al contenedor que creamos con 'dom'
+            $("#customButtons2").appendTo(".custom-buttons-container");
+            $("#customButtons2").removeClass("hidden"); // Los hacemos visibles
+            },
 
+            "initComplete": function( settings, json ) {
+
+                var customButtons = $("#customButtons").clone().removeClass('hidden').children();
+
+                $(".dt-buttons").prepend(customButtons);
+
+                initializeDateRangePicker();
+            },
+        language: {
+            sProcessing: "Procesando...",
+            sLengthMenu: "Mostrar _MENU_ registros",
+            sZeroRecords: "No se encontraron resultados",
+            sEmptyTable: "Ningún dato disponible en esta tabla",
+            sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
+            sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0",
+            sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+            sInfoPostFix: "",
+            sSearch: "Buscar:",
+            sUrl: "",
+            sInfoThousands: ",",
+            sLoadingRecords: "Cargando...",
+            oPaginate: {
+            sFirst: "Primero",
+            sLast: "Último",
+            sNext: "Siguiente",
+            sPrevious: "Anterior",
+            },
+            oAria: {
+            sSortAscending: ": Activar para ordenar la columna de manera ascendente",
+            sSortDescending:
+                ": Activar para ordenar la columna de manera descendente",
+            },
+        },
+
+    });
+
+    $(".tablaLibro").on("click", ".btnCambiarEstado", function() {
+
+        console.log("--- Botón de estado presionado ---");
+
+        var botonEstado = $(this);
+        // Leemos los tres data-attributes del botón
+        var idVenta = botonEstado.data("id-venta");
+        var estadoActual = botonEstado.data("estado-actual");
+        var esNuevo = botonEstado.data("es-nuevo");
+
+        console.log("ID Venta:", idVenta);
+        console.log("Estado Actual:", estadoActual);
+        console.log("¿Es un nuevo registro?:", esNuevo);
+
+        // --- 1. DEFINIR LA ACCIÓN Y EL NUEVO ESTADO BASADO EN LA LÓGICA ---
+        var accionParaBackend = "";
+        var nuevoEstado = "";
+        var textoConfirmacion = "";
+
+        if (esNuevo === true && estadoActual === "Pagada") {
+            
+            accionParaBackend = "marcar_pendiente"; // Acción para el backend
+            nuevoEstado = "Pendiente";
+            textoConfirmacion = "Esto convertirá la venta en una cuenta por cobrar. ¿Estás seguro?";
+
+        } else {
+            
+            accionParaBackend = "actualizar_estado";
+            if (estadoActual === "Pagada") {
+                nuevoEstado = "Pendiente";
+            } else if (estadoActual === "Pendiente") {
+                nuevoEstado = "Anulada";
+            } else {
+                nuevoEstado = "Pagada";
+            }
+            textoConfirmacion = `¿Quieres cambiar el estado a "${nuevoEstado}"?`;
+        }
+
+        // --- 2. MOSTRAR SWEETALERT DE CONFIRMACIÓN ---
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: textoConfirmacion, // Usamos el texto dinámico
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, continuar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                
+                // --- 3. PREPARAR Y ENVIAR LA PETICIÓN AJAX ---
+                var datos = new FormData();
+                datos.append("idVenta", idVenta);
+                datos.append("nuevoEstado", nuevoEstado); // El estado al que va a cambiar
+                datos.append("accion", accionParaBackend); // La acción que el backend debe realizar
+
+                $.ajax({
+                    url: "ajax/ventas.ajax.php",
+                    method: "POST",
+                    data: datos,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function(respuesta) {
+                        
+                        if (respuesta.trim() === "ok") {
+                            
+                            // Si la acción fue crear un nuevo registro, es mejor recargar la página
+                            // para que el atributo 'data-es-nuevo' se actualice a 'false'.
+                            if (accionParaBackend === "marcar_pendiente") {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: '¡Venta marcada como pendiente!',
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                // Si solo fue una actualización, podemos hacerlo sin recargar
+                                // --- Actualización visual ---
+                                botonEstado.removeClass('label-warning label-success label-danger');
+                                var nuevaClase = "";
+                                if (nuevoEstado === "Pagada") { nuevaClase = "label-success"; } 
+                                else if (nuevoEstado === "Pendiente") { nuevaClase = "label-warning"; } 
+                                else { nuevaClase = "label-danger"; }
+                                
+                                botonEstado.addClass(nuevaClase);
+                                botonEstado.html(nuevoEstado);
+                                botonEstado.data("estado-actual", nuevoEstado);
+
+                                Swal.fire(
+                                    '¡Actualizado!',
+                                    'El estado de la factura ha sido cambiado.',
+                                    'success'
+                                );
+                                
+                                // Recalculamos los totales sin recargar
+                                actualizarCajasDeTotales();
+                            }
+                            
+                        } else {
+                            Swal.fire(
+                                'Error',
+                                'No se pudo actualizar el estado. Respuesta: ' + respuesta,
+                                'error'
+                            );
+                        }
+                    }
+                });
+            }
+        });
+    });
+
+});
 
 $(document).ready(function() {
     // Si la página ya cargó con fechas en la URL, también configuramos el botón
