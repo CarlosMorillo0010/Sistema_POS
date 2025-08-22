@@ -1,60 +1,42 @@
 <?php
-// ajax/configuracion.ajax.php
 
-// Inicia la sesión al principio para poder acceder a $_SESSION
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
+// 1. CONFIGURACIÓN INICIAL
+header('Content-Type: application/json; charset=utf-8');
+if (session_status() == PHP_SESSION_NONE) { session_start(); }
+
+// 2. CAPA DE SEGURIDAD CRÍTICA
+if (!isset($_SESSION["iniciarSesion"]) || $_SESSION["iniciarSesion"] != "ok" || $_SESSION["perfil"] != "ADMINISTRADOR") {
+    http_response_code(403); // Prohibido
+    echo json_encode(["status" => "error", "message" => "Acceso denegado. Permisos insuficientes."]);
+    exit(); 
 }
 
-// Ajusta las rutas según la estructura de tu proyecto
+// 3. CARGA DE DEPENDENCIAS
 require_once "../controller/divisas.controller.php";
 require_once "../model/divisas.model.php";
-require_once "../model/connection.php";
 
+// 4. CLASE AJAX
 class AjaxConfiguracion {
-
-    /**
-     * Maneja la solicitud AJAX para actualizar la tasa del BCV.
-     * Llama al controlador, procesa la respuesta y la devuelve como JSON.
-     */
     public function ajaxActualizarTasaBCV() {
-        // 1. Llama al método del controlador que hace todo el trabajo pesado.
-        $respuestaBCV = ControllerDivisas::ctrActualizarTasaDesdeBCV();
-        
-        // 2. Comprueba si la operación en el controlador fue exitosa.
-        if (isset($respuestaBCV["status"]) && $respuestaBCV["status"] === "ok") {
-            
-            // 3. ¡CLAVE! Actualiza la variable de sesión en tiempo real.
-            // Esto asegura que cualquier página nueva que se abra use el valor correcto.
-            $_SESSION['config']['tasa_bcv'] = $respuestaBCV["tasa"];
-            
-            // 4. Prepara la respuesta JSON de éxito para el cliente.
-            $respuesta = [
-                "status" => "ok",
-                "mensaje" => "Tasa del BCV actualizada exitosamente a " . number_format($respuestaBCV["tasa"], 2, ',', '.'),
-                "config" => [
-                    "tasa_bcv" => $respuestaBCV["tasa"],
-                    "iva_porcentaje" => $_SESSION['config']['iva_porcentaje'] ?? 16.00 // Enviamos otras configs relevantes
-                ]
-            ];
-
-        } else {
-            // Si el controlador devolvió un error, lo pasamos al cliente.
-            $respuesta = [
-                "status" => "error",
-                "mensaje" => $respuestaBCV["message"] ?? "Ocurrió un error desconocido al procesar la tasa."
-            ];
+        try {
+            $respuesta = ControllerDivisas::ctrActualizarTasaBCV();
+            if (isset($respuesta['status']) && in_array($respuesta['status'], ['ok', 'info']) && isset($respuesta["tasa"])) {
+                $_SESSION['config']['tasa_bcv'] = $respuesta["tasa"];
+            }
+            echo json_encode($respuesta);
+        } catch (Exception $e) {
+            http_response_code(500); // Error Interno del Servidor
+            // error_log("Error fatal en ajaxActualizarTasaBCV: " . $e->getMessage());
+            echo json_encode(["status" => "error", "message" => "Ocurrió un error interno inesperado en el servidor."]);
         }
-
-        // 5. Envía la respuesta final en formato JSON.
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($respuesta);
     }
 }
 
-// Punto de entrada para la llamada AJAX.
-// Verifica que la solicitud venga con la acción correcta.
+// 5. PUNTO DE ENTRADA (ROUTER)
 if (isset($_POST["accion"]) && $_POST["accion"] == "actualizarTasaBCV") {
     $config = new AjaxConfiguracion();
     $config->ajaxActualizarTasaBCV();
+} else {
+    http_response_code(400); // Petición Incorrecta
+    echo json_encode(["status" => "error", "message" => "Petición incorrecta: acción no especificada o no válida."]);
 }

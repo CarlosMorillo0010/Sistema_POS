@@ -4,6 +4,29 @@ require_once "connection.php";
 
 class ModelDivisas
 {
+    /**
+     * GUARDA O ACTUALIZA LA TASA DE CAMBIO.
+     * @throws Exception Si ocurre un error en la base de datos.
+     */
+    static public function mdlGuardarOActualizarTasa($datos)
+    {
+        $sql = "INSERT INTO tasas_cambio (divisa_id, tasa, fecha) VALUES (:divisa_id, :tasa, :fecha) ON DUPLICATE KEY UPDATE tasa = VALUES(tasa)";
+        try {
+            $stmt = Connection::connect()->prepare($sql);
+            $stmt->bindParam(":divisa_id", $datos["id_divisa"], PDO::PARAM_INT);
+            $stmt->bindParam(":tasa", $datos["tasa"], PDO::PARAM_STR);
+            $stmt->bindParam(":fecha", $datos["fecha"], PDO::PARAM_STR);
+            $stmt->execute();
+            switch ($stmt->rowCount()) {
+                case 1: return 'inserted';
+                case 2: return 'updated';
+                default: return 'not_changed';
+            }
+        } catch (PDOException $e) {
+            throw new Exception($e->getMessage());
+        }
+    }
+
     /**=====================================
      * CREAR DIVISAS
      * ======================================**/
@@ -88,31 +111,6 @@ class ModelDivisas
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
-    static public function mdlGuardarTasaCambio($tabla, $datos) {
-        $stmt_check = Connection::connect()->prepare("SELECT id, tasa FROM $tabla WHERE divisa_id = :divisa_id AND fecha = :fecha");
-        $stmt_check->bindParam(":divisa_id", $datos["divisa_id"], PDO::PARAM_INT);
-        $stmt_check->bindParam(":fecha", $datos["fecha"], PDO::PARAM_STR);
-        $stmt_check->execute();
-        $existente = $stmt_check->fetch(PDO::FETCH_ASSOC);
-
-        if ($existente) {
-            if (number_format((float)$existente['tasa'], 4) != number_format((float)$datos['tasa'], 4)) {
-                $stmt = Connection::connect()->prepare("UPDATE $tabla SET tasa = :tasa WHERE id = :id");
-                $stmt->bindParam(":tasa", $datos["tasa"], PDO::PARAM_STR);
-                $stmt->bindParam(":id", $existente["id"], PDO::PARAM_INT);
-                return $stmt->execute() ? "ok_updated" : "error";
-            } else {
-                return "not_changed";
-            }
-        } else {
-            $stmt = Connection::connect()->prepare("INSERT INTO $tabla (divisa_id, tasa, fecha) VALUES (:divisa_id, :tasa, :fecha)");
-            $stmt->bindParam(":divisa_id", $datos["divisa_id"], PDO::PARAM_INT);
-            $stmt->bindParam(":tasa", $datos["tasa"], PDO::PARAM_STR);
-            $stmt->bindParam(":fecha", $datos["fecha"], PDO::PARAM_STR);
-            return $stmt->execute() ? "ok_inserted" : "error";
-        }
-    }
-
     static public function mdlObtenerTasaActual($tablaTasas, $tablaDivisas, $codigoDivisa) {
         $stmt = Connection::connect()->prepare(
             "SELECT t.tasa 
@@ -130,37 +128,5 @@ class ModelDivisas
         $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
         
         return $resultado ? (float)$resultado['tasa'] : false;
-    }
-
-    /*===================================================================
-     GUARDAR O ACTUALIZAR LA TASA DE CAMBIO PARA UN DÍA ESPECÍFICO
-     Usa INSERT ... ON DUPLICATE KEY UPDATE para eficiencia.
-     PRE-REQUISITO: La tabla debe tener una UNIQUE KEY en (id_divisa, fecha_tasa)
-    ===================================================================*/
-    static public function mdlGuardarTasaDelDia($datos)
-    {
-        // El nombre de la tabla donde guardas el historial de tasas. ¡AJÚSTALO!
-        $tabla = "tasas_cambio";
-
-        $sql = "INSERT INTO $tabla (divisa_id, tasa, fecha) 
-                VALUES (:divisa_id, :tasa, :fecha)
-                ON DUPLICATE KEY UPDATE tasa = :tasa_update";
-        
-        try {
-            $stmt = Connection::connect()->prepare($sql);
-
-            $stmt->bindParam(":divisa_id", $datos["id_divisa"], PDO::PARAM_INT);
-            $stmt->bindParam(":tasa", $datos["tasa"], PDO::PARAM_STR);
-            $stmt->bindParam(":fecha", $datos["fecha"], PDO::PARAM_STR);
-            $stmt->bindParam(":tasa_update", $datos["tasa"], PDO::PARAM_STR); // El mismo valor para la actualización
-
-            if ($stmt->execute()) {
-                return "ok";
-            } else {
-                return implode(" - ", $stmt->errorInfo());
-            }
-        } catch (PDOException $e) {
-            return "Error de base de datos: " . $e->getMessage();
-        }
     }
 }
