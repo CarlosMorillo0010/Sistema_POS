@@ -180,6 +180,12 @@ $perfil = ControllerPerfiles::ctrMostrarPerfil($item, $valor);
                             <span>Cuentas por Pagar</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="ajuste-inventario">
+                            <i class="far fa-circle"></i>
+                            <span>Ajuste de Inventario</span>
+                        </a>
+                    </li>
                     <!-- <li>
                         <a href="notas-entrega">
                             <i class="far fa-circle"></i>
