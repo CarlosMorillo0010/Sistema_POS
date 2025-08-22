@@ -99,7 +99,7 @@ $monedaPrincipal = $_SESSION['config']['moneda_principal'] ?? 'USD';
              SECCION DE VENTA (DERECHA)
             ======================================-->
             <div class="col-md-5">
-                <div class="order-sidebar">
+                <div class="order-sidebar mb-4">
                     <form role="form" method="post" class="formularioVentas" id="formularioVentas" style="display: flex; flex-direction: column; height: 100%;">
 
                         <!-- HEADER DE LA ORDEN (DATOS DE LA VENTA) -->
@@ -151,11 +151,11 @@ $monedaPrincipal = $_SESSION['config']['moneda_principal'] ?? 'USD';
                             <!-- Campo oculto que almacenará el ID del cliente para el formulario. Se mantiene igual. -->
                             <input type="hidden" name="seleccionarCliente" id="seleccionarCliente" required>
                         </div>
-                </div>
 
-                <!-- LISTA DE ITEMS EN LA ORDEN -->
-                <div class="order-items nuevoProducto">
-                    <!-- Los productos se añadirán aquí dinámicamente -->
+                        <!-- LISTA DE ITEMS EN LA ORDEN -->
+                        <div class="order-items nuevoProducto mb-4">
+                            <!-- Los productos se añadirán aquí dinámicamente -->
+                        </div>
                 </div>
 
                 <!-- PIE DE PAGINA DE LA ORDEN (TOTALES Y BOTÓN DE PAGO) -->
