@@ -376,7 +376,7 @@ class ControllerVentas
                     "metodo_pago" => $_POST["pagoMetodo"],
                     "referencia" => $_POST["pagoReferencia"]
                 );
-                $idPago = ModelVentas::mdlIngresarPagoRecibido($pdo, "Pagos_Recibidos", $datosPago);
+                $idPago = ModelVentas::mdlIngresarPagoRecibido($pdo, "pagos_recibidos", $datosPago);
                 if (!$idPago) {
                     throw new Exception("No se pudo registrar el pago.");
                 }
@@ -387,7 +387,7 @@ class ControllerVentas
                     "factura_id" => $_POST["pagoIdVenta"],
                     "monto_aplicado_usd" => $montoEquivalenteUsd // Aplicamos el valor en USD
                 );
-                ModelVentas::mdlAplicarPagoFactura($pdo, "Aplicacion_Pagos_Facturas", $datosAplicacion);
+                ModelVentas::mdlAplicarPagoFactura($pdo, "aplicacion_pagos_facturas", $datosAplicacion);
 
                 // 5. ACTUALIZAR EL SALDO Y ESTADO
                 $estadoCobro = ModelVentas::mdlObtenerEstadoCobro("cobros_estado_factura", "id_venta", $_POST["pagoIdVenta"]);
