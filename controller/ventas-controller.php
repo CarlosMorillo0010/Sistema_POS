@@ -376,7 +376,7 @@ class ControllerVentas
                     "metodo_pago" => $_POST["pagoMetodo"],
                     "referencia" => $_POST["pagoReferencia"]
                 );
-                $idPago = ModelVentas::mdlIngresarPagoRecibido($pdo, "Pagos_Recibidos", $datosPago);
+                $idPago = ModelVentas::mdlIngresarPagoRecibido($pdo, "pagos_recibidos", $datosPago);
                 if (!$idPago) {
                     throw new Exception("No se pudo registrar el pago.");
                 }
