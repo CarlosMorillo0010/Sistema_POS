@@ -58,7 +58,7 @@ class ModelVentas
         // La consulta base ahora incluye el LEFT JOIN
         $consultaBase = "
             FROM $tabla v
-            LEFT JOIN Cobros_Estado_Factura c ON v.id_venta = c.id_venta
+            LEFT JOIN cobros_estado_factura c ON v.id_venta = c.id_venta
         ";
 
         // Las columnas que queremos seleccionar
