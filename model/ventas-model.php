@@ -58,7 +58,7 @@ class ModelVentas
         // La consulta base ahora incluye el LEFT JOIN
         $consultaBase = "
             FROM $tabla v
-            LEFT JOIN Cobros_Estado_Factura c ON v.id_venta = c.id_venta
+            LEFT JOIN cobros_estado_factura c ON v.id_venta = c.id_venta
         ";
 
         // Las columnas que queremos seleccionar
@@ -167,7 +167,7 @@ class ModelVentas
 
         // Apuntamos directamente a la tabla 'Cobros_Estado_Factura'
         $stmt = Connection::connect()->prepare("
-            UPDATE Cobros_Estado_Factura 
+            UPDATE cobros_estado_factura 
             SET estado = :estado 
             WHERE id_venta = :id_venta
         ");
@@ -222,7 +222,7 @@ class ModelVentas
                 cli.documento AS documento_cliente,
                 cli.tipo_documento AS tipo_doc_cliente
             FROM ventas v
-            INNER JOIN Cobros_Estado_Factura c ON v.id_venta = c.id_venta
+            INNER JOIN cobros_estado_factura c ON v.id_venta = c.id_venta
             INNER JOIN clientes cli ON v.id_cliente = cli.id
             WHERE c.estado = 'Pendiente' OR c.estado = 'Pagada Parcialmente'
             ORDER BY c.fecha_vencimiento ASC

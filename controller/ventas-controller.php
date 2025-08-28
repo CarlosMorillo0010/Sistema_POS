@@ -303,7 +303,7 @@ class ControllerVentas
                     "saldo_pendiente_usd" => $venta["total_usd"] // El saldo inicial es el total de la factura
                 );
 
-                ModelVentas::mdlCrearEstadoCobro($pdo, "Cobros_Estado_Factura", $datosCobro);
+                ModelVentas::mdlCrearEstadoCobro($pdo, "cobros_estado_factura", $datosCobro);
 
                 $pdo->commit();
 
@@ -376,7 +376,7 @@ class ControllerVentas
                     "metodo_pago" => $_POST["pagoMetodo"],
                     "referencia" => $_POST["pagoReferencia"]
                 );
-                $idPago = ModelVentas::mdlIngresarPagoRecibido($pdo, "Pagos_Recibidos", $datosPago);
+                $idPago = ModelVentas::mdlIngresarPagoRecibido($pdo, "pagos_recibidos", $datosPago);
                 if (!$idPago) {
                     throw new Exception("No se pudo registrar el pago.");
                 }
@@ -387,10 +387,10 @@ class ControllerVentas
                     "factura_id" => $_POST["pagoIdVenta"],
                     "monto_aplicado_usd" => $montoEquivalenteUsd // Aplicamos el valor en USD
                 );
-                ModelVentas::mdlAplicarPagoFactura($pdo, "Aplicacion_Pagos_Facturas", $datosAplicacion);
+                ModelVentas::mdlAplicarPagoFactura($pdo, "aplicacion_pagos_facturas", $datosAplicacion);
 
                 // 5. ACTUALIZAR EL SALDO Y ESTADO
-                $estadoCobro = ModelVentas::mdlObtenerEstadoCobro("Cobros_Estado_Factura", "id_venta", $_POST["pagoIdVenta"]);
+                $estadoCobro = ModelVentas::mdlObtenerEstadoCobro("cobros_estado_factura", "id_venta", $_POST["pagoIdVenta"]);
                 $nuevoSaldo = $estadoCobro["saldo_pendiente_usd"] - $montoEquivalenteUsd;
 
                 $nuevoSaldo = round($nuevoSaldo, 2);
@@ -401,7 +401,7 @@ class ControllerVentas
                     "saldo_pendiente_usd" => $nuevoSaldo,
                     "estado" => $nuevoEstado
                 );
-                ModelVentas::mdlActualizarSaldoYEstadoCobro($pdo, "Cobros_Estado_Factura", $datosActualizacion);
+                ModelVentas::mdlActualizarSaldoYEstadoCobro($pdo, "cobros_estado_factura", $datosActualizacion);
 
                 $pdo->commit();
 
