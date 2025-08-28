@@ -1,79 +1,96 @@
 <?php
-$item = null;
-$valor = null;
-$perfil = ControllerPerfiles::ctrMostrarPerfil($item, $valor);
-foreach ($perfil as $key => $value):
-    if ($_SESSION["perfil"] == $value["perfil"] && $value["compras"] == "N"){
-        echo '
-            <script>
-            window.location = "inicio";
-            </script>
-        ';
-        return;
-    }
-endforeach;
+// Código de seguridad y permisos...
 ?>
 <div class="content-wrapper">
     <section class="content-header">
         <h1>
-            Administrar orden de compra
+            Administrar Órdenes de Compra
         </h1>
         <ol class="breadcrumb">
             <li><a href="inicio"><i class="fa fa-dashboard"></i> Inicio</a></li>
-            <li class="active">Administrar orden de compra</li>
+            <li class="active">Administrar Órdenes</li>
         </ol>
-
     </section>
+
     <section class="content">
-        <div class="box" style="border-top-color: #3c8dbc;">
+        <div class="box">
             <div class="box-header with-border">
                 <a href="crear-orden-compra">
                     <button class="btn btn-primary">
-                        Crear orden de compra
+                        Nueva Orden de Compra
                     </button>
                 </a>
             </div>
             <div class="box-body">
-                <table class="table table-bordered table-striped dt-responsive tablas">
+                <table class="table table-bordered table-striped dt-responsive tabla-ordenes-compra" width="100%">
                     <thead>
-                    <tr>
-                        <th style="width:10px">#</th>
-                        <th>Nº de Orden</th>
-                        <th>Proveedor</th>
-                        <th>Fecha</th>
-                        <th>Acciones</th>
-                    </tr>
+                        <tr>
+                            <th style="width:10px">#</th>
+                            <th>Código</th>
+                            <th>Proveedor</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
                     </thead>
                     <tbody>
                     <?php
-                    date_default_timezone_set('America/Caracas');
-                    $item = null;
-                    $valor = null;
-                    $ordenCompra = ControllerOrdenesCompras::ctrMostrarOrdenCompra($item, $valor);
+                    $ordenes = ControllerOrdenesCompras::ctrMostrarOrdenCompra(null, null);
 
-                    foreach ($ordenCompra as $key => $value) {
-                        $length = 10;
-                        echo '<tr>
-                            <td>' . ($key + 1) . '</td>
-                            <td>' . str_pad($value["codigo"], $length, 0, STR_PAD_LEFT) . '</td>';
-                        $itemProveedor = "id_proveedor";
-                        $valorProveedor = $value["id_proveedor"];
-                        $respuestaProveedor = ControllerProveedores::ctrMostrarProveedores($itemProveedor, $valorProveedor);
-                        if (is_array($respuestaProveedor) && isset($respuestaProveedor["nombre"])) {
-                            echo '<td>' . strtoupper($respuestaProveedor["nombre"]) . '</td>';
-                        } else {
-                            echo '<td>NO ENCONTRADO</td>';
+                    foreach ($ordenes as $key => $orden) {
+                        $proveedor = ControllerProveedores::ctrMostrarProveedores("id_proveedor", $orden["id_proveedor"]);
+                        echo '<tr>';
+                        echo '<td>'.($key + 1).'</td>';
+                        echo '<td>'.str_pad($orden["codigo"], 8, '0', STR_PAD_LEFT).'</td>';
+                        echo '<td>'.($proveedor ? $proveedor["nombre"] : "N/A").'</td>';
+                        echo '<td>'.date("d/m/Y", strtotime($orden["fecha"])).'</td>';
+                        echo '<td>'.number_format($orden["total"], 2).'</td>';
+                        echo '<td>'.getStatusButton($orden["estado"]).'</td>';
+                        echo '<td>'.getActionButtons($orden).'</td>';
+                        echo '</tr>';
+                    }
+
+                    function getStatusButton($status) {
+                        switch ($status) {
+                            case 'Borrador':
+                                return '<button class="btn btn-default">Borrador</button>';
+                            case 'Enviada':
+                                return '<button class="btn btn-primary">Enviada</button>';
+                            case 'Completada':
+                                return '<button class="btn btn-success">Completada</button>';
+                            case 'Cancelada':
+                                return '<button class="btn btn-danger">Cancelada</button>';
+                            default:
+                                return '<button class="btn btn-default">'.$status.'</button>';
                         }
-                        echo '<td>' . $value["fecha"] . '</td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-info btnImprimir_ODC" codigo="' . $value["codigo"] . '" style="background-color: #00c0ef !important;"><i class="fa fa-print"></i></button>
-                                    <button class="btn bg-dark btnVerOrdenCompra" idOrden="' . $value["id_orden_compra"] . '" data-toggle="modal" data-target="#modalVerOrdenCompra"><i class="fa fa-search"></i></button>                              
-                                    <button class="btn btn-warning btnEditarOrdenCompra" idOrden="' . $value["id_orden_compra"] . '"><i class="fa fa-pencil"></i></button>                              
-                                    <button class="btn btn-danger btnEliminarOrdenCompra" idOrden="' . $value["id_orden_compra"] . '"><i class="fa fa-times"></i></button>
-                                </div>
-                            </td>
-                        </tr>';
+                    }
+
+                    function getActionButtons($orden) {
+                        $buttons = '<div class="btn-group">';
+                        $idOrden = $orden["id_orden_compra"];
+
+                        // Botón de Ver siempre disponible
+                        $buttons .= '<button class="btn btn-info btnVerOrdenCompra" idOrden="'.$idOrden.'" data-toggle="modal" data-target="#modalVerOrdenCompra"><i class="fa fa-eye"></i></button>';
+
+                        switch ($orden["estado"]) {
+                            case 'Borrador':
+                                $buttons .= '<a href="index.php?ruta=crear-orden-compra&idOrden='.$idOrden.'" class="btn btn-warning"><i class="fa fa-pencil"></i></a>';
+                                $buttons .= '<button class="btn btn-success btnEnviarOrden" idOrden="'.$idOrden.'"><i class="fa fa-send"></i></button>';
+                                $buttons .= '<button class="btn btn-danger btnEliminarOrdenCompra" idOrden="'.$idOrden.'"><i class="fa fa-times"></i></button>';
+                                break;
+                            case 'Enviada':
+                                $buttons .= '<button class="btn btn-primary btnImprimirOrden" idOrden="'.$idOrden.'"><i class="fa fa-print"></i></button>';
+                                $buttons .= '<button class="btn btn-danger btnCancelarOrden" idOrden="'.$idOrden.'"><i class="fa fa-ban"></i></button>';
+                                break;
+                            case 'Completada':
+                            case 'Cancelada':
+                                $buttons .= '<button class="btn btn-primary btnImprimirOrden" idOrden="'.$idOrden.'"><i class="fa fa-print"></i></button>';
+                                break;
+                        }
+
+                        $buttons .= '</div>';
+                        return $buttons;
                     }
                     ?>
                     </tbody>
@@ -83,88 +100,110 @@ endforeach;
     </section>
 </div>
 
-<!---------------------------------------
-MODAL VISUALIZAR DE ORDEN DE COMPRA
----------------------------------------->
+<!-- MODAL PARA VER DETALLE DE ORDEN DE COMPRA -->
 <div id="modalVerOrdenCompra" class="modal fade" role="dialog">
-    <div class="modal-dialog modal-lg" style="width: 95%;">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form class="formulario__OrdenCompra" role="form" method="post">
-                <div class="modal-header" style="background: #3c8dbc; color: #fff;">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4>Orden de Compra</h4>
-                </div>
-                <div class="modal-body" style="padding: 0;">
-                <div class="box-header with-border">
-                    <div class="col lg-12">
-                        <div class="row">
-                            <div class="col-lg-10" style="display: flex;align-items: center;">
-                            <h4 style="text-transform: uppercase;">Nº de Orden</h4>
-                                <!---------------------------------------
-                                CODIGO DE ORDEN DE COMPRA
-                                ---------------------------------------->
-                                <input id="verCodigo_OrdenCompra" type="text" class="form-control input-lg" readonly="readonly" style="color: red;font-weight: bold;font-size: 20px;width: 150px;background-color: transparent;height: 0px;border: 0;">
-                            </div>
-                            <div class="col-lg-2">
-                                <!---------------------------------------
-                                ENTRADA DE LA FECHA EMISION
-                                ---------------------------------------->
-                                <input id="verFechaEmision" type="date" class="form-control" readonly="readonly">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                    <div class="box-body">
-                        <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-lg-6 form-group" style="padding-left:0;padding-right:0;">
-                                <div class="agregarProveedores" style="display:flex;">
-                                    <div class="col-lg-2 input-group" style="padding-right: 10px;">
-                                    <label><small style="color: #000;">Letra:</small></label>
-                                    <input type="text" class="form-control" id="verTipoDocumento" readonly>
-                                    </div>
-                                    <div class="col-lg-4 input-group" style="padding-right: 10px;">
-                                    <label><small style="color: #000;">Documento:</small></label>
-                                    <input type="text" class="form-control" id="verDocumento" readonly>
-                                    </div>
-                                    <div class="col-lg-7 input-group">
-                                    <label><small style="color: #000;">Proveedor:</small></label>
-                                    <input class="form-control" id="verProveedor" readonly style="text-transform: uppercase;">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="row">
-                                <div style="height: 230px; overflow: auto;">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                        <tr>
-                                            <th style="width: 5%"></th>
-                                            <th style="width: 5%"></th>
-                                            <th style="width: 15%">Codigo</th>
-                                            <th style="width: 40%">Nombre producto</th>
-                                            <th style="width: 20%">Unidad</th>
-                                            <th style="width: 20%">Cantidad</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody id="verOrdenDeCompra">
-                                        
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                </div>
-            </form>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Detalles de la Orden de Compra</h4>
+            </div>
+            <div class="modal-body" id="detalleOrdenBody">
+                <!-- Contenido se carga con AJAX -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
         </div>
     </div>
 </div>
+
+
 <?php
+// Lógica para eliminar, cancelar, etc.
 $borrarOrdenCompra = new ControllerOrdenesCompras();
 $borrarOrdenCompra->ctrBorrarOrdenCompra();
 ?>
+
+<script>
+$(document).ready(function() {
+    $('.tabla-ordenes-compra').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
+        }
+    });
+
+    // Evento para Enviar Orden
+    $(".tabla-ordenes-compra").on("click", ".btnEnviarOrden", function(){
+        var idOrden = $(this).attr("idOrden");
+        cambiarEstadoOrden(idOrden, "Enviada");
+    });
+
+    // Evento para Cancelar Orden
+    $(".tabla-ordenes-compra").on("click", ".btnCancelarOrden", function(){
+        var idOrden = $(this).attr("idOrden");
+        cambiarEstadoOrden(idOrden, "Cancelada");
+    });
+
+    // Evento para ver el detalle de la orden
+    $(".tabla-ordenes-compra").on("click", ".btnVerOrdenCompra", function(){
+        var idOrden = $(this).attr("idOrden");
+        var datos = new FormData();
+        datos.append("idOrdenVer", idOrden);
+
+        $.ajax({
+            url: "ajax/ordenes-compras.ajax.php",
+            method: "POST",
+            data: datos,
+            cache: false,
+            contentType: false,
+            processData: false,
+            dataType: "html",
+            success: function(respuesta){
+                $("#detalleOrdenBody").html(respuesta);
+            }
+        });
+    });
+
+    // Evento para Imprimir Orden
+    $(".tabla-ordenes-compra").on("click", ".btnImprimirOrden", function(){
+        var idOrden = $(this).attr("idOrden");
+        window.open("view/modules/pdf-orden-compra.php?idOrden=" + idOrden, "_blank");
+    });
+
+    function cambiarEstadoOrden(idOrden, nuevoEstado) {
+        Swal.fire({
+            title: '¿Estás seguro de cambiar el estado de la orden?',
+            text: "¡Esta acción no se puede deshacer!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, cambiar estado!',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var datos = new FormData();
+                datos.append("idOrdenEstado", idOrden);
+                datos.append("nuevoEstado", nuevoEstado);
+
+                $.ajax({
+                    url: "ajax/ordenes-compras.ajax.php",
+                    method: "POST",
+                    data: datos,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function(respuesta){
+                        if(respuesta == "ok"){
+                            Swal.fire('¡Hecho!', 'El estado de la orden ha sido actualizado.', 'success').then(function(){
+                                window.location.reload();
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }
+});
+</script>
