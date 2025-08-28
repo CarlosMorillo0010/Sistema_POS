@@ -44,6 +44,7 @@ require_once "controller/inventarios.controller.php";
 require_once "controller/ventas-controller.php";
 require_once "controller/vehiculos.controller.php";
 require_once "controller/ajustes.controller.php";
+require_once "controller/compras.controller.php";
 
 /**=====================================
     MODELS
@@ -88,6 +89,7 @@ require_once "model/inventarios.model.php";
 require_once "model/ventas-model.php";
 require_once "model/vehiculos.model.php";
 require_once "model/ajustes.model.php";
+require_once "model/compras.model.php";
 
 $template = new ControllerTemplate();
 $template -> ctrTemplate();

@@ -13,38 +13,79 @@ class ControllerOrdenesCompras
     }
 
     /*=============================================
-     CREAR UNA ORDEN DE COMPRA
+     CREAR UNA ORDEN DE COMPRA (NUEVA LÓGICA)
     =============================================*/
     static public function ctrCrearOrdenCompra()
     {
-        if (isset($_POST["nuevoCodigo__OrdenCompra"])) {
+        if (isset($_POST["action"]) && isset($_POST["idOrden"]) == false) {
+
+            if (empty($_POST["idProveedor"]) || empty($_POST["listaProductosOrden"])) {
+                echo '<script>
+                    swal({
+                        type: "error",
+                        title: "¡Error en el formulario!",
+                        text: "El proveedor y al menos un producto son obligatorios.",
+                        showConfirmButton: true,
+                        confirmButtonText: "Cerrar"
+                    });
+                </script>';
+                return;
+            }
+
+            // Determinar el estado
+            $estado = ($_POST["action"] == "guardar_borrador") ? "Borrador" : "Enviada";
+
+            // Generar un código único para la orden
+            $item = null;
+            $valor = null;
+            $ordenes = self::ctrMostrarOrdenCompra($item, $valor);
+            $codigo = (count($ordenes) > 0) ? end($ordenes)["codigo"] + 1 : 1;
+
             date_default_timezone_set('America/Caracas');
-            $tabla = "orden_compra";
-            $fecha = date('Y-m-d h:i:s a');
+            $fecha = date('Y-m-d H:i:s');
+
             $datos = array(
                 "id_usuario" => $_SESSION["id_usuario"],
                 "id_proveedor" => $_POST["idProveedor"],
-                "codigo" => $_POST["nuevoCodigo__OrdenCompra"],
-                "fecha_emision" => $fecha,
-                "proveedor" => $_POST["listaProveedor"],
-                "productos" => $_POST["listarProductos_OrdenCompra"],
-                "feregistro" => $fecha
+                "codigo" => $codigo,
+                "fecha" => $fecha,
+                "subtotal" => $_POST["subtotalOrden"],
+                "impuestos" => $_POST["totalImpuestos"],
+                "descuento" => $_POST["descuentoOrden"],
+                "costo_envio" => $_POST["envioOrden"],
+                "total" => $_POST["totalOrden"],
+                "terminos_pago" => $_POST["terminosPago"],
+                "notas" => $_POST["notasOrden"],
+                "estado" => $estado,
+                "feregistro" => $fecha,
+                "productos" => $_POST["listaProductosOrden"]
             );
 
-            $respuesta = ModelOrdenesCompras::mdlIngresarOrdenCompra($tabla, $datos);
+            $respuesta = ModelOrdenesCompras::mdlIngresarOrdenCompra("orden_compra", "orden_compra_detalle", $datos);
+
             if ($respuesta == "ok") {
                 echo '<script>
                     swal({
                         type: "success",
-                        title: "¡La Orden de Compra se ha Generadado Correctamente!",
+                        title: "¡La Orden de Compra se ha guardado correctamente!",
                         showConfirmButton: true,
                         confirmButtonText: "Cerrar",
                         closeOnConfirm: false
-                        }).then((result) => {
-                            if(result.value){
-                                window.location = "orden-compra";
-                            }
-                        });
+                    }).then((result) => {
+                        if(result.value){
+                            window.location = "orden-compra";
+                        }
+                    });
+                </script>';
+            } else {
+                 echo '<script>
+                    swal({
+                        type: "error",
+                        title: "¡Error al guardar!",
+                        text: "Ocurrió un error al guardar la orden. ".json_encode($respuesta),
+                        showConfirmButton: true,
+                        confirmButtonText: "Cerrar"
+                    });
                 </script>';
             }
         }
@@ -55,64 +96,83 @@ class ControllerOrdenesCompras
     =======================================*/
     static public function ctrEditarOrdenCompra()
     {
-        if (isset($_POST["editarCodigo__OrdenCompra"])) {
-            date_default_timezone_set('America/Caracas');
-            $tabla = "orden_compra";
-            $item = "codigo";
-            $valor = $_POST["editarCodigo__OrdenCompra"];
-            $traerOrdenCompra = ModelOrdenesCompras::mdlMostrarOrdenCompra($tabla, $item, $valor);
-            /* var_dump($traerOrdenCompra); */
+        if (isset($_POST["idOrden"])) {
 
-            /*======================================
-                VALIDAR SI VIENEN ID PROVEEDOR EDITADOS
-            =======================================*/
-            if($_POST["editar_idProveedor"] == ""){
-                $idProveedor = $traerOrdenCompra["id_proveedor"];
-            }else{
-                $idProveedor = $_POST["editar_idProveedor"];
+            if (empty($_POST["idProveedor"]) || empty($_POST["listaProductosOrden"])) {
+                echo '<script>
+                    swal({
+                        type: "error",
+                        title: "¡Error en el formulario!",
+                        text: "El proveedor y al menos un producto son obligatorios.",
+                        showConfirmButton: true,
+                        confirmButtonText: "Cerrar"
+                    });
+                </script>';
+                return;
             }
 
-            /*======================================
-                VALIDAR SI VIENEN PROVEEDORES EDITADOS
-            =======================================*/
-            if($_POST["editarListaProveedor"] == ""){
-                $listaProveedor = $traerOrdenCompra["proveedor"];
-            }else{
-                $listaProveedor = $_POST["editarListaProveedor"];
-            }
-
-            /*======================================
-                VALIDAR SI VIENEN PRODUCTOS EDITADOS
-            =======================================*/
-            if($_POST["editarListaProductos"] == ""){
-                $listaProductos = $traerOrdenCompra["productos"];
-            }else{
-                $listaProductos = $_POST["editarListaProductos"];
-            }
+            // Determinar el estado
+            $estado = ($_POST["action"] == "guardar_borrador") ? "Borrador" : "Enviada";
 
             $datos = array(
-                "id_usuario" => $_SESSION["id_usuario"],
-                "id_proveedor" => $idProveedor,
-                "codigo" => $_POST["editarCodigo__OrdenCompra"],
-                "proveedor" => $listaProveedor,
-                "productos" => $listaProductos
+                "id_orden_compra" => $_POST["idOrden"],
+                "id_proveedor" => $_POST["idProveedor"],
+                "subtotal" => $_POST["subtotalOrden"],
+                "impuestos" => $_POST["totalImpuestos"],
+                "descuento" => $_POST["descuentoOrden"],
+                "costo_envio" => $_POST["envioOrden"],
+                "total" => $_POST["totalOrden"],
+                "terminos_pago" => $_POST["terminosPago"],
+                "notas" => $_POST["notasOrden"],
+                "estado" => $estado,
+                "productos" => $_POST["listaProductosOrden"]
             );
 
-            $respuesta = ModelOrdenesCompras::mdlEditarOrdenCompra($tabla, $datos);
+            $respuesta = ModelOrdenesCompras::mdlEditarOrdenCompra("orden_compra", "orden_compra_detalle", $datos);
+
             if ($respuesta == "ok") {
                 echo '<script>
                     swal({
                         type: "success",
-                        title: "¡La Orden de Compra se ha Editado Correctamente!",
+                        title: "¡La Orden de Compra se ha actualizado correctamente!",
                         showConfirmButton: true,
-                        confirmButtonText: "Cerrar",
-                        closeOnConfirm: false
-                        }).then((result) => {
-                            if(result.value){
-                                window.location = "orden-compra";
-                            }
-                        });
+                        confirmButtonText: "Cerrar"
+                    }).then((result) => {
+                        if(result.value){
+                            window.location = "orden-compra";
+                        }
+                    });
                 </script>';
+            } else {
+                 echo '<script>
+                    swal({
+                        type: "error",
+                        title: "¡Error al actualizar!",
+                        text: "Ocurrió un error al actualizar la orden. ".json_encode($respuesta),
+                        showConfirmButton: true,
+                        confirmButtonText: "Cerrar"
+                    });
+                </script>';
+            }
+        }
+    }
+
+    /*======================================
+     CAMBIAR ESTADO DE ORDEN DE COMPRA
+    =======================================*/
+    static public function ctrCambiarEstadoOrden()
+    {
+        if (isset($_POST["idOrdenEstado"])) {
+            $tabla = "orden_compra";
+            $datos = array(
+                "id_orden_compra" => $_POST["idOrdenEstado"],
+                "estado" => $_POST["nuevoEstado"]
+            );
+
+            $respuesta = ModelOrdenesCompras::mdlActualizarOrden($tabla, "estado", $datos["estado"], "id_orden_compra", $datos["id_orden_compra"]);
+
+            if ($respuesta == "ok") {
+                echo "ok";
             }
         }
     }
@@ -124,23 +184,40 @@ class ControllerOrdenesCompras
     {
         if (isset($_GET["idOrden"])) {
             $tabla = "orden_compra";
-            $datos = $_GET["idOrden"];
+            $idOrden = $_GET["idOrden"];
 
-            $respuesta = ModelOrdenesCompras::mdlBorrarOrdenCompra($tabla, $datos);
+            // Verificar que la orden esté en estado "Borrador"
+            $orden = self::ctrMostrarOrdenCompra("id_orden_compra", $idOrden);
 
-            if ($respuesta == "ok") {
-                echo '<script>
-                    swal({
-                        type: "success",
-                        title: "¡La orden de compra ha sido borrada correctamente!",
-                        showConfirmButton: true,
-                        confirmButtonText: "Cerrar",
-                        closeOnConfirm: false
+            if ($orden["estado"] == "Borrador") {
+                $respuesta = ModelOrdenesCompras::mdlBorrarOrdenCompra($tabla, $idOrden);
+                if ($respuesta == "ok") {
+                    echo '<script>
+                        swal({
+                            type: "success",
+                            title: "¡La orden de compra ha sido borrada correctamente!",
+                            showConfirmButton: true,
+                            confirmButtonText: "Cerrar"
                         }).then((result) => {
                             if(result.value){
                                 window.location = "orden-compra";
                             }
                         });
+                    </script>';
+                }
+            } else {
+                echo '<script>
+                    swal({
+                        type: "error",
+                        title: "¡Acción no permitida!",
+                        text: "Solo se pueden eliminar órdenes en estado Borrador.",
+                        showConfirmButton: true,
+                        confirmButtonText: "Cerrar"
+                    }).then((result) => {
+                        if(result.value){
+                            window.location = "orden-compra";
+                        }
+                    });
                 </script>';
             }
         }

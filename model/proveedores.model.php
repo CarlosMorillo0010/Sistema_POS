@@ -29,17 +29,19 @@ class ModelProveedores
     ======================================**/
     static public function mdlIngresarProveedor($tabla, $datos)
     {
-        $stmt = Connection::connect()->prepare("INSERT INTO $tabla(id_usuario, codigo, tipo_persona, tipo_documento, documento, nombre, telefono, dias_credito, email, direccion, nota, feregistro) VALUES (:id_usuario, :codigo, :tipo_persona, :tipo_documento, :documento, :nombre, :telefono, :dias_credito, :email, :direccion, :nota, :feregistro)");
+        $stmt = Connection::connect()->prepare("INSERT INTO $tabla(id_usuario, codigo, tipo_persona, tipo_documento, documento, nombre, telefono, dias_credito, email, estado, ciudad, direccion, nota, feregistro) VALUES (:id_usuario, :codigo, :tipo_persona, :tipo_documento, :documento, :nombre, :telefono, :dias_credito, :email, :estado, :ciudad, :direccion, :nota, :feregistro)");
 
         $stmt->bindParam(":id_usuario", $datos["id_usuario"], PDO::PARAM_STR);
         $stmt->bindParam(":codigo", $datos["codigo"], PDO::PARAM_STR);
         $stmt->bindParam(":tipo_persona", $datos["tipo_persona"], PDO::PARAM_STR);
         $stmt->bindParam(":tipo_documento", $datos["tipo_documento"], PDO::PARAM_STR);
-        $stmt->bindParam(":documento", $datos["documento"], PDO::PARAM_INT);
+        $stmt->bindParam(":documento", $datos["documento"], PDO::PARAM_STR); // Cambiado a STR para RIF
         $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
         $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);
         $stmt->bindParam(":dias_credito", $datos["dias_credito"], PDO::PARAM_INT);
         $stmt->bindParam(":email", $datos["email"], PDO::PARAM_STR);
+        $stmt->bindParam(":estado", $datos["estado"], PDO::PARAM_STR);
+        $stmt->bindParam(":ciudad", $datos["ciudad"], PDO::PARAM_STR);
         $stmt->bindParam(":direccion", $datos["direccion"], PDO::PARAM_STR);
         $stmt->bindParam(":nota", $datos["nota"], PDO::PARAM_STR);
         $stmt->bindParam(":feregistro", $datos["fecha"], PDO::PARAM_STR);
@@ -58,16 +60,18 @@ class ModelProveedores
     ======================================**/
     static public function mdlEditarProveedor($tabla, $datos)
     {
-        $stmt = Connection::connect()->prepare("UPDATE $tabla SET id_proveedor = :id_proveedor, tipo_persona = :tipo_persona, tipo_documento = :tipo_documento, documento = :documento, nombre = :nombre, telefono = :telefono, dias_credito = :dias_credito, email = :email, direccion = :direccion, nota = :nota WHERE id_proveedor = :id_proveedor");
+        $stmt = Connection::connect()->prepare("UPDATE $tabla SET tipo_persona = :tipo_persona, tipo_documento = :tipo_documento, documento = :documento, nombre = :nombre, telefono = :telefono, dias_credito = :dias_credito, email = :email, estado = :estado, ciudad = :ciudad, direccion = :direccion, nota = :nota WHERE id_proveedor = :id_proveedor");
 
-        $stmt->bindParam(":id_proveedor", $datos["id_proveedor"], PDO::PARAM_STR);
+        $stmt->bindParam(":id_proveedor", $datos["id_proveedor"], PDO::PARAM_INT);
         $stmt->bindParam(":tipo_persona", $datos["tipo_persona"], PDO::PARAM_STR);
         $stmt->bindParam(":tipo_documento", $datos["tipo_documento"], PDO::PARAM_STR);
-        $stmt->bindParam(":documento", $datos["documento"], PDO::PARAM_INT);
+        $stmt->bindParam(":documento", $datos["documento"], PDO::PARAM_STR); // Cambiado a STR para RIF
         $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
         $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);
         $stmt->bindParam(":dias_credito", $datos["dias_credito"], PDO::PARAM_INT);
         $stmt->bindParam(":email", $datos["email"], PDO::PARAM_STR);
+        $stmt->bindParam(":estado", $datos["estado"], PDO::PARAM_STR);
+        $stmt->bindParam(":ciudad", $datos["ciudad"], PDO::PARAM_STR);
         $stmt->bindParam(":direccion", $datos["direccion"], PDO::PARAM_STR);
         $stmt->bindParam(":nota", $datos["nota"], PDO::PARAM_STR);
 

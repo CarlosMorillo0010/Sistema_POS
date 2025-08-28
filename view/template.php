@@ -213,11 +213,11 @@ function versionAsset($path)
                 $_GET["ruta"] == "config-usuarios" ||
                 $_GET["ruta"] == "caja" ||
                 $_GET["ruta"] == "libro-ventas" ||
-                $_GET["ruta"] == "libro-compras" ||
                 // $_GET["ruta"] == "servicios" ||
                 $_GET["ruta"] == "ajuste-inventario" ||
                 // $_GET["ruta"] == "traslado-almacen" ||
                 $_GET["ruta"] == "orden-compra" ||
+                $_GET["ruta"] == "libro-compras" ||
                 // $_GET["ruta"] == "orden-pago" ||
                 // $_GET["ruta"] == "facturas-compra" ||
                 // $_GET["ruta"] == "facturas-gastos" ||
@@ -234,6 +234,7 @@ function versionAsset($path)
                 // $_GET["ruta"] == "crear-nota-credito" ||
                 // $_GET["ruta"] == "crear-factura-compra" ||
                 // $_GET["ruta"] == "crear-factura-venta" ||
+                $_GET["ruta"] == "crear-compra" ||
                 $_GET["ruta"] == "crear-orden-compra" ||
                 $_GET["ruta"] == "editar-orden-compra" ||
                 // $_GET["ruta"] == "crear-devolucion-compra" ||
@@ -297,7 +298,7 @@ function versionAsset($path)
                 'cuentas-pagar' => 'cuentas-pagar.js',
                 'cuentas-cobrar' => 'cuentas-cobrar.js',
                 'libro-ventas' => 'libro-ventas.js',
-                'libro-compras' => 'libro-compras.js',
+                'compra' => 'libro-compras.js',
                 'configuracion' => 'configuracion.js',
                 'config-empresa' => 'configuracion.js',
                 'crear-nota-entrega' => 'nota-entrega.js',

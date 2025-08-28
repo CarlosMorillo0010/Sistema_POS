@@ -23,7 +23,7 @@ class ControllerProveedores
                 preg_match('/^[0-9]+$/', $_POST["nuevoCodigo"]) &&
                 preg_match('/^[a-zA-Z]+$/', $_POST["tipoPersona"]) &&
                 preg_match('/^[a-zA-Z]+$/', $_POST["tipoDocumento"]) &&
-                preg_match('/^[0-9]+$/', $_POST["numeroDocumento"]))
+                preg_match('/^[0-9-]+$/', $_POST["numeroDocumento"])) // Se permite guión para el RIF
                 {
 
                 $tabla = "proveedores";
@@ -39,6 +39,8 @@ class ControllerProveedores
                     "telefono" => $_POST["nuevoTelefono"],
                     "dias_credito" => $_POST["nuevoDiasCredito"],
                     "email" => $_POST["nuevoEmail"],
+                    "estado" => $_POST["nuevoEstado"],
+                    "ciudad" => $_POST["nuevaCiudad"],
                     "direccion" => $_POST["nuevaDireccion"],
                     "nota" => $_POST["nuevaNota"],
                     "fecha" => $fecha
@@ -90,7 +92,7 @@ class ControllerProveedores
                 preg_match('/^[0-9]+$/', $_POST["editarCodigo"]) &&
                 preg_match('/^[a-zA-Z]+$/', $_POST["editarTipoPersona"]) &&
                 preg_match('/^[a-zA-Z]+$/', $_POST["editarTipoDocumento"]) &&
-                preg_match('/^[0-9]+$/', $_POST["editarNumeroDocumento"]))
+                preg_match('/^[0-9-]+$/', $_POST["editarNumeroDocumento"])) // Se permite guión para el RIF
                 {
 
                 $tabla = "proveedores";
@@ -104,6 +106,8 @@ class ControllerProveedores
                     "telefono" => $_POST["editarTelefono"],
                     "dias_credito" => $_POST["editarDiasCredito"],
                     "email" => $_POST["editarEmail"],
+                    "estado" => $_POST["editarEstado"],
+                    "ciudad" => $_POST["editarCiudad"],
                     "direccion" => $_POST["editarDireccion"],
                     "nota" => $_POST["editarNota"],
 
