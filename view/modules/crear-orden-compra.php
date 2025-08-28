@@ -1,483 +1,298 @@
+<?php
+require_once "model/ordenes-compras.model.php";
+$esEditar = false;
+if(isset($_GET["idOrden"])){
+    $esEditar = true;
+    $titulo = "Editar Orden de Compra";
+    $idOrden = $_GET["idOrden"];
+    $orden = ControllerOrdenesCompras::ctrMostrarOrdenCompra("id_orden_compra", $idOrden);
+    $detalle = ModelOrdenesCompras::mdlMostrarOrdenCompraDetalle("orden_compra_detalle", "id_orden_compra", $idOrden);
+} else {
+    $titulo = "Crear Orden de Compra";
+    $orden = null;
+    $detalle = array();
+}
+?>
+
+<div id="config-vars"
+     data-tasa-bcv="<?php echo htmlspecialchars($tasaBCV, ENT_QUOTES, 'UTF-8'); ?>"
+     data-iva-porcentaje="<?php echo htmlspecialchars($ivaPorcentaje, ENT_QUOTES, 'UTF-8'); ?>"
+     data-moneda-principal="<?php echo htmlspecialchars($monedaPrincipal, ENT_QUOTES, 'UTF-8'); ?>"
+     style="display: none;">
+</div>
+
 <div class="content-wrapper">
     <section class="content-header">
         <h1>
-            Orden de Compra
+            <?php echo $titulo; ?>
         </h1>
         <ol class="breadcrumb">
             <li><a href="inicio"><i class="fa fa-dashboard"></i> Inicio</a></li>
-            <li class="active">Orden de compra</li>
+            <li><a href="orden-compra">Administrar Órdenes</a></li>
+            <li class="active"><?php echo $titulo; ?></li>
         </ol>
-
     </section>
+
     <section class="content">
-        <form class="formulario__OrdenCompra" role="form" method="post">
-            <div class="box" style="border-top-color: #3c8dbc;">
-                <div class="box-header with-border">
-                    <div class="col lg-12">
-                        <div class="row">
-                            <div class="col-lg-10" style="display: flex;align-items: center;">
-                            <h4 style="text-transform: uppercase;">Nº de Orden</h4>
-                                <!---------------------------------------
-                                CODIGO DE ORDEN DE COMPRA
-                                ---------------------------------------->
-                                <?php
-                                $item = null;
-                                $valor = null;
-                                $ordenCompra = ControllerOrdenesCompras::ctrMostrarOrdenCompra($item, $valor);
-
-                                if (!$ordenCompra) {
-                                    $length = 10;
-                                    $string = "1";
-                                    echo '
-                                    <input type="text" style="color: red;font-weight: bold;font-size: 20px;width: 150px;background-color: transparent;height: 0px;border: 0;" class="form-control input-lg" name="nuevoCodigo__OrdenCompra" id="nuevoCodigo__OrdenCompra" readonly="readonly" value="' . str_pad($string, $length, 0, STR_PAD_LEFT) . '">';
-                                } else {
-                                    foreach ($ordenCompra as $key => $value) {
-
-                                    }
-                                    $length = 10;
-                                    $codigo = str_pad($value["codigo"] + 1, $length, 0, STR_PAD_LEFT) ;
-                                    echo '<input type="text" style="color: red;font-weight: bold;font-size: 20px;width: 150px;background-color: transparent;height: 0px;border: 0;" class="form-control input-lg" name="nuevoCodigo__OrdenCompra" id="nuevoCodigo__OrdenCompra" readonly="readonly" value="' . $codigo . '">';
-                                }
-                                ?>
-                            </div>
-                            <div class="col-lg-2">
-                                <!---------------------------------------
-                                ENTRADA DE LA FECHA EMISION
-                                ---------------------------------------->
-                                <input name="fechaEmision__OrdenCompra" id="fechaEmision__OrdenCompra" type="date" class="form-control" readonly="readonly"
-                                    value="<?php date_default_timezone_set('America/Caracas'); echo date('Y-m-d'); ?>">
-                            </div>
+        <form role="form" method="post" class="formulario-orden-compra">
+            <?php if($esEditar): ?>
+                <input type="hidden" name="idOrden" value="<?php echo $idOrden; ?>">
+            <?php endif; ?>
+            <div class="row">
+                <!-- Columna principal de la orden -->
+                <div class="col-lg-8 col-xs-12">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Detalles de la Orden</h3>
                         </div>
-                    </div>
-                </div>
+                        <div class="box-body" style="height: 670px; overflow-y: auto;">
+                            <div class="row">
+                                <!-- Selección de Proveedor -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Proveedor:</label>
+                                        <select class="form-control select2" name="idProveedor" id="seleccionarProveedor" required>
+                                            <option value="">Seleccionar un proveedor</option>
+                                            <?php
+                                            $proveedores = ControllerProveedores::ctrMostrarProveedores(null, null);
+                                            foreach ($proveedores as $key => $value) {
+                                                $selected = ($orden != null && $orden["id_proveedor"] == $value["id_proveedor"]) ? "selected" : "";
+                                                echo '<option value="'.$value["id_proveedor"].'" '.$selected.'>'.$value["nombre"].'</option>';
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
 
-                <div class="box-body">
-                    <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-lg-6 form-group" style="padding-left:0;padding-right:0;">
-                                <div class="agregarProveedores" style="display:flex;">
-                                    <div class="col-lg-2 input-group" style="padding-right: 10px;">
-                                    <label><small style="color: #000;">Letra:</small></label>
-                                    <input type="text" class="form-control nuevoTipoDocumento_OrdenCompra" id="nuevoTipoDocumento_OrdenCompra" name="nuevoTipoDocumento_OrdenCompra" required readonly>
-                                    </div>
-                                    <div class="col-lg-4 input-group" style="padding-right: 10px;">
-                                    <label><small style="color: #000;">Documento:</small></label>
-                                    <input type="text" class="form-control nuevoDocumento_OrdenCompra" id="nuevoDocumento_OrdenCompra" name="nuevoDocumento_OrdenCompra" required readonly>
-                                    </div>
-                                    <div class="col-lg-7 input-group">
-                                    <label><small style="color: #000;">Proveedor:</small></label>
-                                    <input class="form-control nuevo-ProveedorOrdenCompra" idProveedor name="nuevo-ProveedorOrdenCompra" required readonly>
+                                <!-- Buscador de Productos -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Añadir Productos:</label>
+                                        <select class="form-control select2" id="seleccionarProductoOC" name="seleccionarProductoOC">
+                                            <option value="">Buscar producto por código o nombre</option>
+                                             <?php
+                                            $productos = ControllerProducts::ctrMostrarProductos(null, null, "id_producto");
+                                            foreach ($productos as $key => $value) {
+                                                echo '<option value="'.$value["id_producto"].'">'.$value["codigo"].' - '.$value["descripcion"].'</option>';
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-6">
-                                <div class="form-group" style="display: flex;justify-content:end;">
-                                    <!---------------------------------------
-                                    ENTRADA AGREGAR PROVEEDOR
-                                    ---------------------------------------->
-                                    <div class="input-group" style="margin: 0 10px 0 0;">
-                                        <label></label>
-                                        <button type="button" class="btn btn-primary btnBuscarProveedores" data-toggle="modal" data-target="#modalBuscarProveedores">Buscar Proveedores</button>
-                                    </div>
-                                    <div class="input-group">
-                                        <label></label>
-                                        <button type="button" class="btn btn-primary" data-toggle="modal"
-                                                data-target="#modalAgregarProveedor">
-                                            Agregar Proveedor
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <input type="hidden" id="listaProveedor" name="listaProveedor">
-                        <input type="hidden" id="proveedorId" name="proveedorId">
-                    </div>
-                    <div class="col-lg-12">
-                        <div class="row">
-                            <div class="box-body" style="height: 230px; overflow: auto;">
-                                <table class="table table-bordered">
-                                    <thead>
+
+                            <!-- Tabla de Productos -->
+                            <table class="table table-bordered table-striped tabla-productos-orden">
+                                <thead>
                                     <tr>
-                                        <th style="width: 5%"></th>
-                                        <th style="width: 5%"></th>
-                                        <th style="width: 15%">Codigo</th>
-                                        <th style="width: 40%">Nombre producto</th>
-                                        <th style="width: 20%">Unidad</th>
-                                        <th style="width: 10%">Cantidad</th>
+                                        <th style="width: 10px">Quitar</th>
+                                        <th>Producto</th>
+                                        <th style="width: 120px">Cantidad</th>
+                                        <th style="width: 150px">Precio Unit.</th>
+                                        <th style="width: 150px">Subtotal</th>
                                     </tr>
-                                    </thead>
-                                    <tbody class="nuevaOrdenCompra">
-
-                                    </tbody>
-                                </table>
-                                <input type="hidden" id="listarProductos_OrdenCompra" name="listarProductos_OrdenCompra">
-                                <button type="button" class="btn btn-default btnAgregarOrdenCompra"
-                                        style="margin: 10px 0 0 0;">
-                                    Agregar productos
-                                </button>
-                            </div>
+                                </thead>
+                                <tbody class="productos-orden">
+                                    <?php if($esEditar): ?>
+                                        <?php foreach($detalle as $item): ?>
+                                            <tr data-idproducto="<?php echo $item['id_producto']; ?>">
+                                                <td><button type="button" class="btn btn-danger btn-xs quitar-producto-oc"><i class="fa fa-times"></i></button></td>
+                                                <td><?php echo $item['descripcion']; ?></td>
+                                                <td><input type="number" class="form-control cantidad-oc" value="<?php echo $item['cantidad']; ?>" min="1"></td>
+                                                <td><input type="number" class="form-control precio-oc" value="<?php echo $item['precio_compra']; ?>" min="0"></td>
+                                                <td class="subtotal-oc-celda" style="font-weight:bold; text-align:right;"><?php echo $item['subtotal']; ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                            <input type="hidden" name="listaProductosOrden" id="listaProductosOrden">
                         </div>
                     </div>
                 </div>
-                <div class="box-footer">
-                    <button class="btn btn-primary">Crear Orden de Compra</button>
+
+                <!-- Columna de resumen y totales -->
+                <div class="col-lg-4 col-xs-12">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Resumen Financiero</h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Subtotal:</label>
+                                        <div class="input-group">
+                                            <input style="margin-bottom: 20px;" type="text" class="form-control input-lg" name="subtotalOrden" id="subtotalOrden" value="<?php echo $esEditar ? $orden['subtotal'] : '0.00'; ?>" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>IVA (%):</label>
+                                        <div class="input-group">
+                                            <input style="margin-bottom: 20px;" type="number" class="form-control input-lg" name="porcentajeImpuestos" id="porcentajeImpuestos" min="0" value="<?php echo $esEditar && isset($orden['subtotal']) && $orden['subtotal'] > 0 ? ($orden['impuestos'] / $orden['subtotal'] * 100) : (isset($ivaPorcentaje) ? $ivaPorcentaje : 0); ?>">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                             <div class="form-group">
+                                <label>Total IVA:</label>
+                                <div class="input-group">
+                                    <input style="margin-bottom: 20px;" type="text" class="form-control input-lg" name="totalImpuestos" id="totalImpuestos" value="<?php echo $esEditar ? $orden['impuestos'] : '0.00'; ?>" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Descuento ($):</label>
+                                <div class="input-group">
+                                    <input style="margin-bottom: 20px;" type="number" class="form-control input-lg" name="descuentoOrden" id="descuentoOrden" min="0" value="<?php echo $esEditar ? $orden['descuento'] : '0.00'; ?>">
+                                </div>
+                            </div>
+                             <div class="form-group">
+                                <label>Costo de Envío ($):</label>
+                                <div class="input-group">
+                                    <input style="margin-bottom: 20px;" type="number" class="form-control input-lg" name="envioOrden" id="envioOrden" min="0" value="<?php echo $esEditar ? $orden['costo_envio'] : '0.00'; ?>">
+                                </div>
+                            </div>
+                            <hr>
+                            <h4>
+                                <strong>Total a Pagar:</strong>
+                                <strong class="pull-right" id="totalFinalOrden">$ <?php echo $esEditar ? number_format($orden['total'], 2) : '0.00'; ?></strong>
+                                <input type="hidden" name="totalOrden" id="totalOrdenInput" value="<?php echo $esEditar ? $orden['total'] : '0.00'; ?>">
+                            </h4>
+                        </div>
+                        <div class="box-footer">
+                            <div class="form-group">
+                                <label>Términos de Pago:</label>
+                                <input type="text" class="form-control" name="terminosPago" placeholder="Ej: Neto 30 días" value="<?php echo $esEditar ? $orden['terminos_pago'] : ''; ?>">
+                            </div>
+                             <div class="form-group">
+                                <label>Notas Adicionales:</label>
+                                <textarea style="height: 105px;" class="form-control" name="notasOrden" rows="3"><?php echo $esEditar ? $orden['notas'] : ''; ?></textarea>
+                            </div>
+                            <div class="btn-group btn-block">
+                                <button style="width: 33.33%;" type="button" class="btn btn-default btn-lg" onclick="window.location.href='orden-compra'">Cancelar</button>
+                                <button style="width: 33.33%;" type="submit" class="btn btn-primary btn-lg" name="action" value="guardar_borrador">Guardar Borrador</button>
+                                <button style="width: 33.33%;" type="submit" class="btn btn-success btn-lg" name="action" value="crear_enviar"><?php echo $esEditar ? 'Actualizar y Enviar' : 'Crear y Enviar'; ?></button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <?php
+                $controller = new ControllerOrdenesCompras();
+                if($esEditar){
+                    $controller->ctrEditarOrdenCompra();
+                } else {
+                    $controller->ctrCrearOrdenCompra();
+                }
+            ?>
         </form>
-        <?php
-        $crearOrdenCompra = new ControllerOrdenesCompras();
-        $crearOrdenCompra->ctrCrearOrdenCompra();
-        ?>
     </section>
 </div>
 
-<!--=====================================
-MODAL AGREGAR PROVEEDOR
-======================================-->
-<div id="modalAgregarProveedor" class="modal fade" role="dialog">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form role="form" method="post">
-                <!--=====================================
-                CABEZA DEL MODAL
-                ======================================-->
-                <div class="modal-header" style="background:#3c8dbc; color:white">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Agregar proveedor</h4>
-                </div>
-                <!--=====================================
-                CUERPO DEL MODAL
-                ======================================-->
-                <div class="modal-body">
-                    <div class="box-body">
+<script>
+$(document).ready(function() {
+    // Inicializar Select2
+    $('#seleccionarProveedor').select2({ placeholder: "Buscar y seleccionar un proveedor", allowClear: true });
+    $('#seleccionarProductoOC').select2({ placeholder: "Buscar un producto", allowClear: true });
 
-                        <!-- ENTRADA PARA EL CODIGO-->
-                        <div class="form-group col-lg-3">
-                            <div class="input-group">
-                                <label style="color: red;"> * <small style="color: #000;">Código:</small>
-                                    <?php
-                                        $item = null;
-                                        $valor = null;
-                                        $proveedores = ControllerProveedores::ctrMostrarProveedores($item, $valor);
+    // Añadir producto a la tabla
+    $('#seleccionarProductoOC').on('select2:select', function (e) {
+        var idProducto = e.params.data.id;
+        
+        // Evitar añadir el mismo producto dos veces
+        if($(".productos-orden").find(`[data-idproducto='${idProducto}']`).length > 0){
+            $(this).val(null).trigger('change'); // Limpiar select2
+            swal("Atención", "El producto ya ha sido agregado a la orden.", "warning");
+            return;
+        }
 
-                                        if (!$proveedores) {
-                                            $length = 10;
-                                            $string = "1";
-                                            echo '
-                                                    <input type="text" class="form-control input-lg" name="nuevoCodigo" id="nuevoCodigo" readonly="readonly" value="' . str_pad($string, $length, 0, STR_PAD_LEFT) . '">
-                                                ';
-                                        } else {
-                                            foreach ($proveedores as $key => $value) {
+        var datos = new FormData();
+        datos.append("idProducto", idProducto);
 
-                                            }
-                                            $length = 10;
-                                            $codigo = str_pad($value["codigo"] + 1, $length, 0, STR_PAD_LEFT) ;
-                                            echo '
-                                                <input type="text" class="form-control input-lg" name="nuevoCodigo" id="nuevoCodigo" readonly="readonly" value="' . $codigo . '">
-                                            ';
-                                        }
-                                    ?>
-                                </label>
-                            </div>
-                        </div>
+        $.ajax({
+            url: "ajax/productos.ajax.php", // Asumo que tienes un ajax de productos que devuelve info por id
+            method: "POST",
+            data: datos,
+            cache: false,
+            contentType: false,
+            processData: false,
+            dataType: "json",
+            success: function(respuesta) {
+                var newRow = `
+                    <tr data-idproducto="${respuesta.id_producto}">
+                        <td><button type="button" class="btn btn-danger btn-xs quitar-producto-oc"><i class="fa fa-times"></i></button></td>
+                        <td>${respuesta.descripcion}</td>
+                        <td><input type="number" class="form-control cantidad-oc" value="1" min="1"></td>
+                        <td><input type="number" class="form-control precio-oc" value="${respuesta.precio_costo}" min="0"></td>
+                        <td class="subtotal-oc-celda" style="font-weight:bold; text-align:right;">${respuesta.precio_costo}</td>
+                    </tr>`;
+                $(".productos-orden").append(newRow);
+                actualizarCalculos();
+                $(this).val(null).trigger('change'); // Limpiar select2
+            }.bind(this)
+        });
+    });
 
-                        <!-- ENTRADA PARA EL TIPO DE EMPRESA-->
-                        <div class="form-group col-lg-4">
-                            <div class="input-group">
-                                <label style="color: red;"> * <small style="color: #000;">Tipo de Persona:</small>
-                                    <select class="form-control input-lg" name="tipoPersona" id="tipoPersona">
-                                        <option value="">Tipo de Persona</option>
-                                        <option value="NATURAL">Natural</option>
-                                        <option value="JURIDICA">Juridica</option>
-                                    </select>
-                                </label>
-                            </div>
-                        </div>
+    // Quitar producto de la tabla
+    $(".productos-orden").on("click", ".quitar-producto-oc", function(){
+        $(this).closest("tr").remove();
+        actualizarCalculos();
+    });
 
-                        <!-- Tipo de Documento -->
-                        <div class="form-group col-lg-2">
-                            <div class="input-group">
-                                <label style="color: red;"> * <small style="color: #000;">Letra:</small>
-                                    <select class="form-control input-lg" name="tipoDocumento"
-                                            id="tipoDocumento">
-                                        <option value=""></option>
-                                        <option value="V">V</option>
-                                        <option value="J">J</option>
-                                        <option value="G">G</option>
-                                        <option value="C">C</option>
-                                        <option value="E">E</option>
-                                    </select>
-                                </label>
-                            </div>
-                        </div>
+    // Actualizar cálculos al cambiar valores
+    $(".formulario-orden-compra").on("change keyup", ".cantidad-oc, .precio-oc, #porcentajeImpuestos, #descuentoOrden, #envioOrden", function(){
+        actualizarCalcululosFila(this);
+        actualizarCalculos();
+    });
 
-                        <!-- ENTRADA PARA EL TIPO DE DOCUMENTO-->
-                        <div class="form-group col-lg-3">
-                            <div class="input-group">
-                                <label style="color: red;"> * <small style="color: #000;">Documento:</small>
-                                    <input type="text" class="form-control input-lg" placeholder="Documento"
-                                           name="numeroDocumento" id="numeroDocumento" required>
-                                </label>
-                            </div>
-                        </div>
+    function actualizarCalcululosFila(element) {
+        var fila = $(element).closest('tr');
+        var cantidad = parseFloat(fila.find('.cantidad-oc').val()) || 0;
+        var precio = parseFloat(fila.find('.precio-oc').val()) || 0;
+        fila.find('.subtotal-oc-celda').text((cantidad * precio).toFixed(2));
+    }
 
-                        <!-- ENTRADA PARA EL NOMBRE -->
-                        <div class="form-group col-lg-5">
-                            <div class="input-group">
-                                <label style="color: red;"> * <small style="color: #000;">Nombre o Razón Social:</small>
-                                    <input type="text" class="form-control input-lg" name="nuevoProveedor"
-                                           id="nuevoProveedor"
-                                           placeholder="Ingresar Nombre o Razón Social" required>
-                                </label>
-                            </div>
-                        </div>
+    function actualizarCalculos(){
+        var subtotal = 0;
+        $(".subtotal-oc-celda").each(function(){
+            subtotal += parseFloat($(this).text()) || 0;
+        });
+        $("#subtotalOrden").val(subtotal.toFixed(2));
 
-                        <!-- ENTRADA PARA EL TIPO DE PROVEEDOR -->
-                        <div class="form-group col-lg-3">
-                            <div class="input-group">
-                                <label style="color: red;"> * <small style="color: #000;">Tipo de Proveedor:</small>
-                                    <select class="form-control input-lg" name="tipoProveedor" id="tipoProveedor">
-                                        <option value="">Proveedor</option>
-                                        <option value="Nacional">Nacional</option>
-                                        <option value="Internacional">Internacional</option>
-                                    </select>
-                                </label>
-                            </div>
-                        </div>
+        var porcentajeImpuestos = parseFloat($("#porcentajeImpuestos").val()) || 0;
+        var totalImpuestos = subtotal * (porcentajeImpuestos / 100);
+        $("#totalImpuestos").val(totalImpuestos.toFixed(2));
 
-                        <!-- ENTRADA PARA EL TELEFONO -->
-                        <div class="form-group col-lg-4">
-                            <div class="input-group">
-                                <label><small style="color: #000;">Teléfono:</small>
-                                    <input type="text" class="form-control input-lg" name="nuevoTelefono"
-                                        placeholder="Teléfono" data-inputmask="'mask':'(9999) 999-99-99'"
-                                        data-mask required>
-                                </label>
-                            </div>
-                        </div>
+        var descuento = parseFloat($("#descuentoOrden").val()) || 0;
+        var envio = parseFloat($("#envioOrden").val()) || 0;
 
-                        <!-- ENTRADA PARA PAISES-->
-                        <div class="form-group col-lg-3">
-                            <div class="input-group">
-                                <label style="color: red;"> * <small style="color: #000;">Pais:</small>
-                                    <select class="form-control select2" name="nuevoPais" id="nuevoPais"
-                                            style="width: 100%;" required>
-                                        <option value="">Elija un pais</option>
-                                        <option value="Venezuela">Venezuela</option>
-                                    </select>
-                                </label>
-                            </div>
-                        </div>
+        var totalFinal = subtotal + totalImpuestos - descuento + envio;
+        $("#totalFinalOrden").text("$ " + totalFinal.toFixed(2));
+        $("#totalOrdenInput").val(totalFinal.toFixed(2));
 
-                        <!-- ENTRADA PARA ESTADOS-->
-                        <div class="form-group col-lg-3">
-                            <div class="input-group">
-                                <label style="color: red;"> * <small style="color: #000;">Estados:</small>
-                                    <select class="form-control select2" name="nuevoEstado" id="nuevoEstado"
-                                            style="width: 100%;" required>
-                                        <option value="">Elija un estado</option>
-                                        <?php
-                                        $item = null;
-                                        $valor = null;
+        // Actualizar lista de productos para el POST
+        actualizarListaProductos();
+    }
 
-                                        $paises = ControllerPaises::ctrMostrarEstados($item, $valor);
-                                        foreach ($paises as $key => $value) {
-                                            echo '<option value="' . $value["estado"] . '">' . $value["estado"] . '</option>';
-                                        }
-                                        ?>
-                                    </select>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <!-- ENTRADA PARA EL DIRECION -->
-                        <div class="form-group col-lg-12">
-                            <div class="input-group">
-                                <label style="color: red;"> * <small style="color: #000;">Dirección:</small>
-                                    <input type="text" class="form-control input-lg" name="nuevaDireccion"
-                                           id="nuevaDireccion"
-                                           placeholder="Ingresar Dirección" required>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <!-- ENTRADA PARA LA RETENCION -->
-                        <div class="form-group col-lg-6">
-                            <div class="input-group">
-                                <label style="color: red;"> * <small style="color: #000;">Retención:</small>
-                                    <select class="form-control input-lg" name="porcentajeRetencion" id="porcentajeRetencion">
-                                        <option value=""></option>
-                                        <option value="Exonerado">Exonerado</option>
-                                        <option value="75%">Retención 75%</option>
-                                        <option value="100%">Retención 100%</option>
-                                    </select>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- ENTRADA PARA CALIFICACION -->
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <label><small style="color: #000;">Clasificación:</small></label>
-                                    <p class="clasificacion">
-                                        <input id="radio1" type="radio" id="estrellasA" name="estrellas" value="5">
-                                        <label for="radio1">★</label>
-                                        <input id="radio2" type="radio" id="estrellasB" name="estrellas" value="4">
-                                        <label for="radio2">★</label>
-                                        <input id="radio3" type="radio" id="estrellasC" name="estrellas" value="3">
-                                        <label for="radio3">★</label>
-                                        <input id="radio4" type="radio" id="estrellasD" name="estrellas" value="2">
-                                        <label for="radio4">★</label>
-                                        <input id="radio5" type="radio" id="estrellasE" name="estrellas" value="1">
-                                        <label for="radio5">★</label>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ENTRADA PARA NOTA -->
-                        <div class="col-lg-12">
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <label><small style="color: #000;">Nota:</small>
-                                        <textarea type="text" class="form-control input-lg" name="nuevaNota"
-                                                  id="nuevaNota"
-                                                  placeholder="Ingresar nota" style="resize: none;"></textarea>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-                <!--=====================================
-                PIE DEL MODAL
-                ======================================-->
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Guardar</button>
-                </div>
-            </form>
-            <?php
-            $crearProveedor = new ControllerProveedores();
-            $crearProveedor->ctrCrearProveedor();
-            ?>
-        </div>
-    </div>
-</div>
-
-<!--=====================================
-MODAL BUSCAR PROVEEDORES
-======================================-->
-<div id="modalBuscarProveedores" class="modal fade" role="dialog">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <!--=====================================
-            CABEZA DEL MODAL
-            ======================================-->
-            <div class="modal-header" style="background:#3c8dbc; color:white">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Proveedores</h4>
-            </div>
-            <!--=====================================
-            CUERPO DEL MODAL
-            ======================================-->
-            <div class="modal-body">
-                <div class="box-body">
-                    <table class="table table-bordered table-striped tablas">
-                        <thead>
-                        <tr>
-                            <th style="width:10px">#</th>
-                            <th>Letra</th>
-                            <th>Documento</th>
-                            <th>Nombreo Razón Social</th>
-                            <th>Acciones</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php
-                        $item = null;
-                        $valor = null;
-                        $proveedores = ControllerProveedores::ctrMostrarProveedores($item, $valor);
-
-                        foreach ($proveedores as $key => $value) {
-                            echo '<tr>
-                                    <td>' . ($key + 1) . '</td>
-                                    <td>' . $value["tipo_documento"] . '</td>
-                                    <td>' . $value["documento"] . ' </td>
-                                    <td>' . $value["nombre"] . '</td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <button class="btn btn-primary btnTraerProveedor" idProveedor="' . $value["id_proveedor"] . '"><i class="fa fa-arrow-down"></i></button>
-                                        </div>  
-                                    </td>
-                                </tr>';
-                            }
-                        ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!--=====================================
-MODAL AGREGAR PRODUCTOS
-======================================-->
-<div id="modalAgregarProducto" class="modal fade" role="dialog">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <!--=====================================
-            CABEZA DEL MODAL
-            ======================================-->
-            <div class="modal-header" style="background:#3c8dbc; color:white">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Agregar Productos</h4>
-            </div>
-            <!--=====================================
-            CUERPO DEL MODAL
-            ======================================-->
-            <div class="modal-body">
-                <div class="box-body">
-                    <table class="table table-bordered table-striped tablas">
-                        <thead>
-                        <tr>
-                            <th style="width:10px">#</th>
-                            <th>Codigo</th>
-                            <th>Marca</th>
-                            <th>Nombre producto</th>
-                            
-                            <th>Acciones</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php
-                        $item = null;
-                        $valor = null;
-                        $orden = "codigo";
-                        $proveedores = ControllerProducts::ctrMostrarProductos($item, $valor, $orden);
-
-                        foreach ($proveedores as $key => $value) {
-                            //var_dump($value);
-                            echo '<tr>
-                                    <td>' . ($key + 1) . '</td>
-                                    <td>' . $value["codigo"] . '</td>
-                                    <td>' . $value["marca"] . ' </td>
-                                    <td>' . $value["descripcion"] . '</td>
-                                    
-                                    <td>
-                                        <div class="btn-group">
-                                            <button class="btn btn-primary btnTraerProducto" idProducto="' . $value["id_producto"] . '"><i class="fa fa-arrow-down"></i></button>
-                                        </div>  
-                                    </td>
-                                </tr>';
-                            }
-                        ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    function actualizarListaProductos(){
+        var listaProductos = [];
+        $(".productos-orden tr").each(function(){
+            var fila = $(this);
+            listaProductos.push({
+                "id_producto": fila.data("idproducto"),
+                "descripcion": fila.find("td:nth-child(2)").text(),
+                "cantidad": fila.find(".cantidad-oc").val(),
+                "precio_compra": fila.find(".precio-oc").val(),
+                "subtotal": fila.find(".subtotal-oc-celda").text()
+            });
+        });
+        $("#listaProductosOrden").val(JSON.stringify(listaProductos));
+    }
+    
+    <?php if($esEditar): ?>
+        actualizarCalculos();
+    <?php endif; ?>
+});
+</script>
