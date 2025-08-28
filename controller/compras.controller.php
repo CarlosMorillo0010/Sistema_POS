@@ -36,7 +36,7 @@ class ControllerCompras
                         confirmButtonText: "Cerrar"
                     }).then(function(result){
                         if (result.value) {
-                            window.location = "compra";
+                            window.location = "crear-compra";
                         }
                     })
 
