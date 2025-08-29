@@ -83,3 +83,14 @@ $(".tablas").on("click", ".btnImprimirFactura", function(){
     window.open("extensions/tcpdf/pdf/factura.php?codigo_venta="+codigoVenta, "_blank");
 
 })
+
+/*=============================================
+IMPRIMIR TICKET
+=============================================*/
+$(".tablas").on("click", ".btnImprimirTicket", function(){
+
+	var idVenta = $(this).attr("idVenta");
+
+	window.open("pdf/ticket.php?venta=" + idVenta, "_blank");
+
+})

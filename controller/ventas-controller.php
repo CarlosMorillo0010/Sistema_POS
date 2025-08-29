@@ -117,7 +117,7 @@ class ControllerVentas
                     "fecha" => date('Y-m-d H:i:s')
                 );
 
-                ModelVentas::mdlIngresarVentaConexion($pdo, "ventas", "detalle_ventas", $datosVenta);
+                $idVenta = ModelVentas::mdlIngresarVentaConexion($pdo, "ventas", "detalle_ventas", $datosVenta);
 
                 // 7. --- SI TODO FUE BIEN, CONFIRMAR LA TRANSACCIÓN ---
                 $pdo->commit();
@@ -130,6 +130,7 @@ class ControllerVentas
                           confirmButtonText: "Cerrar"
                     }).then(function(result){
                         if (result.value) {
+                            window.open("pdf/ticket.php?venta=' . $idVenta . '", "_blank");
                             window.location = "caja";
                         }
                     });
