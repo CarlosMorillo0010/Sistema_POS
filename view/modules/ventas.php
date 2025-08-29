@@ -113,6 +113,12 @@ endforeach;
 
                                         </button>
 
+                                        <button class="btn btn-success btnImprimirTicket" idVenta="'.$value["id_venta"].'">
+
+                                        <i class="fa fa-ticket"></i>
+
+                                        </button>
+
                                     </div>
 
                                 </td>

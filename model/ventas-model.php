@@ -151,7 +151,7 @@ class ModelVentas
             }
         }
 
-        return true; // Si todo sale bien, retorna true
+        return $idVenta; // Si todo sale bien, retorna el ID de la venta
     }
 
     /*=============================================

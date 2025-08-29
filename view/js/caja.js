@@ -327,6 +327,8 @@ jQuery(function($) {
   });
 
   $("#modalMetodoPago").on("click", ".payment-option", function() {
+      const metodoSeleccionado = $(this).data("value");
+      $("#modalConfirmacionPago").data("metodo", metodoSeleccionado);
       $("#modalMetodoPago").modal("hide");
       $("#modalConfirmacionPago").modal("show");
   });
@@ -345,12 +347,62 @@ jQuery(function($) {
       $(".vuelto-container").hide();
       $("#alertaMontoInsuficiente").hide();
       $("#btnConfirmarYCrearVenta").prop("disabled", true);
+
+      // Lógica para autocompletar el monto
+      const metodo = $(this).data("metodo");
+      if (metodo === "Pago-Movil" || metodo === "Punto-Venta" || metodo === "Transferencia" || metodo === "Efectivo-BS") {
+          const totalBsFormatted = granTotalBsModal.toLocaleString("es-VE", formatoVeLocale);
+          $("#montoRecibidoBs").val(totalBsFormatted);
+      } else if (metodo === "Efectivo-USD" || metodo === "Zelle") {
+          $("#montoRecibidoUsd").val(granTotalUsdModal.toFixed(2));
+      }
       
       calcularPagosYVuelto();
-      setTimeout(() => $("#montoRecibidoUsd").focus(), 500);
+      setTimeout(() => {
+          if ($("#montoRecibidoBs").val() !== "") {
+              $("#montoRecibidoBs").focus();
+          } else {
+              $("#montoRecibidoUsd").focus();
+          }
+      }, 500);
   });
 
   $("#montoRecibidoUsd, #montoRecibidoBs").on("input keyup", calcularPagosYVuelto);
+
+  $("#montoRecibidoUsd").on("keyup", function() {
+    const metodo = $("#modalConfirmacionPago").data("metodo");
+    const metodosBs = ["Pago-Movil", "Punto-Venta", "Transferencia", "Efectivo-BS"];
+
+    if (metodosBs.includes(metodo)) {
+        const recibidoUsd = parseFloat($(this).val().replace(/[^0-9.]/g, "")) || 0;
+        
+        let restanteEnUsd = granTotalUsdModal - recibidoUsd;
+        if (restanteEnUsd < 0) {
+            restanteEnUsd = 0;
+        }
+
+        const restanteEnBs = restanteEnUsd * TASA_BCV;
+        const formatoVeLocale = { minimumFractionDigits: 2, maximumFractionDigits: 2 };
+        
+        $("#montoRecibidoBs").val(restanteEnBs.toLocaleString("es-VE", formatoVeLocale));
+    }
+  });
+
+  $("#montoRecibidoBs").on("keyup", function() {
+    const metodo = $("#modalConfirmacionPago").data("metodo");
+
+    if (metodo === "Efectivo-USD") {
+        const recibidoBs = parseFloat($(this).val().replace(/\./g, "").replace(",", ".")) || 0;
+        const recibidoBsEnUsd = recibidoBs / TASA_BCV;
+        
+        let restanteEnUsd = granTotalUsdModal - recibidoBsEnUsd;
+        if (restanteEnUsd < 0) {
+            restanteEnUsd = 0;
+        }
+        
+        $("#montoRecibidoUsd").val(restanteEnUsd.toFixed(2));
+    }
+  });
 
   function calcularPagosYVuelto() {
       const recibidoUsd = parseFloat($("#montoRecibidoUsd").val().replace(/[^0-9.]/g, "")) || 0;
