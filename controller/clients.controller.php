@@ -20,27 +20,46 @@ class ControllerClients
         if (isset($_POST["nuevoNombre"])) {
 
             if (preg_match('/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ]+$/', $_POST["nuevoNombre"]) &&
-                preg_match('/^[0-9]+$/', $_POST["codigoCliente"]) &&
                 preg_match('/^[a-zA-Z]+$/', $_POST["nuevaNacionalidad"]) &&
-                preg_match('/^[0-9]+$/', $_POST["nuevoDocumento"]))
+                preg_match('/^[0-9-]+$/', $_POST["nuevoDocumento"]))
                 {
                     
                 $tabla = "clientes";
 
-                date_default_timezone_set('America/Caracas');
+                // Unir teléfonos
+                $telefono = "";
+                if(!empty($_POST["nuevoTelefono1"])){
+                    $telefono .= "Cel: " . $_POST["nuevoTelefono1"];
+                }
+                if(!empty($_POST["nuevoTelefono2"])){
+                    if(!empty($telefono)) $telefono .= " / ";
+                    $telefono .= "Fijo: " . $_POST["nuevoTelefono2"];
+                }
 
+                // Unir dirección
+                $direccion = "";
+                if(!empty($_POST["nuevoEstado"])){
+                    $direccion .= $_POST["nuevoEstado"];
+                }
+                if(!empty($_POST["nuevaCiudad"])){
+                    if(!empty($direccion)) $direccion .= ", ";
+                    $direccion .= $_POST["nuevaCiudad"];
+                }
+                if(!empty($_POST["nuevaDireccion"])){
+                    if(!empty($direccion)) $direccion .= ", ";
+                    $direccion .= $_POST["nuevaDireccion"];
+                }
+
+                date_default_timezone_set('America/Caracas');
                 $fecha = date('Y-m-d h:i:s');
 
                 $datos = array(
-
                     "id_usuario" => $_SESSION["id_usuario"],
-                    "codigo" => $_POST["codigoCliente"],
                     "tipo_documento" => $_POST["nuevaNacionalidad"],
                     "documento" => $_POST["nuevoDocumento"],
                     "nombre" => $_POST["nuevoNombre"],
-                    "email" => $_POST["nuevoEmail"],
-                    "telefono" => $_POST["nuevoTelefono"],
-                    "direccion" => $_POST["nuevaDireccion"],
+                    "telefono" => $telefono,
+                    "direccion" => $direccion,
                     "feregistro" => $fecha
                 );
 
@@ -85,23 +104,42 @@ class ControllerClients
         if (isset($_POST["editarNombre"])) {
             
             if (preg_match('/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ]+$/', $_POST["editarNombre"]) &&
-                preg_match('/^[0-9]+$/', $_POST["editarCodigo"]) &&
                 preg_match('/^[a-zA-Z]+$/', $_POST["editarNacionalidad"]) &&
-                preg_match('/^[0-9]+$/', $_POST["editarDocumento"]))
+                preg_match('/^[0-9-]+$/', $_POST["editarDocumento"]))
                 {
                 $tabla = "clientes";
 
-                $datos = array(
+                // Unir teléfonos
+                $telefono = "";
+                if(!empty($_POST["editarTelefono1"])){
+                    $telefono .= "Cel: " . $_POST["editarTelefono1"];
+                }
+                if(!empty($_POST["editarTelefono2"])){
+                    if(!empty($telefono)) $telefono .= " / ";
+                    $telefono .= "Fijo: " . $_POST["editarTelefono2"];
+                }
 
+                // Unir dirección
+                $direccion = "";
+                if(!empty($_POST["editarEstado"])){
+                    $direccion .= $_POST["editarEstado"];
+                }
+                if(!empty($_POST["editarCiudad"])){
+                    if(!empty($direccion)) $direccion .= ", ";
+                    $direccion .= $_POST["editarCiudad"];
+                }
+                if(!empty($_POST["editarDireccion"])){
+                    if(!empty($direccion)) $direccion .= ", ";
+                    $direccion .= $_POST["editarDireccion"];
+                }
+
+                $datos = array(
                     "id" => $_POST["idCliente"],
-                    "codigo" => $_POST["editarCodigo"],
                     "tipo_documento" => $_POST["editarNacionalidad"],
                     "documento" => $_POST["editarDocumento"],
                     "nombre" => $_POST["editarNombre"],
-                    "email" => $_POST["editarEmail"],
-                    "telefono" => $_POST["editarTelefono"],
-                    "direccion" => $_POST["editarDireccion"],
-
+                    "telefono" => $telefono,
+                    "direccion" => $direccion,
                 );
                 $respuesta = ModelClients::mdlEditarCliente($tabla, $datos);
                 if ($respuesta == "ok") {
@@ -137,7 +175,7 @@ class ControllerClients
 
     /*======================================
     BORRAR CLIENTES
-    ======================================**/
+    ======================================*/
     static public function ctrEliminarCliente()
     {
         if (isset($_GET["idCliente"])) {
