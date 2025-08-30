@@ -160,7 +160,7 @@ jQuery(function($) {
                   return;
               }
               const itemHtml = `
-                  <div class="order-item" idProducto="${respuesta.id_producto}">
+                  <div class="order-item" idProducto="${respuesta.id_producto}" data-id-impuesto="${respuesta.id_impuesto}">
                       <img src="${respuesta.imagen}" alt="${respuesta.descripcion}">
                       <div class="item-details">
                           <div class="item-name">${respuesta.descripcion}</div>
@@ -170,7 +170,7 @@ jQuery(function($) {
                               <button type="button" class="btn-agregar-uno">+</button>
                           </div>
                       </div>
-                      <div class="item-price" pvp_referencia="${respuesta.pvp_referencia}">$${parseFloat(respuesta.pvp_referencia).toFixed(2)}</div>
+                      <div class="item-price" pvp_referencia="${respuesta.pvp_referencia}">${parseFloat(respuesta.pvp_referencia).toFixed(2)}</div>
                       <button type="button" class="btn-remover-item quitarProducto"><i class="fa fa-times"></i></button>
                   </div>`;
               $(".order-items").append(itemHtml);
@@ -261,6 +261,7 @@ jQuery(function($) {
           const item = $(this);
           listaProductosOculta.push({
               id: item.attr("idProducto"),
+              id_impuesto: item.data("id-impuesto"),
               descripcion: item.find(".item-name").text().trim(),
               cantidad: item.find(".cantidad-producto").val(),
               stock: item.find(".cantidad-producto").attr("stock"),
@@ -463,18 +464,9 @@ jQuery(function($) {
       // 2. Deshabilitar botón para prevenir doble envío
       boton.prop("disabled", true).html('<i class="fa fa-spinner fa-spin"></i> CREANDO VENTA...');
 
-      // 3. Determinar el método de pago para el backend
-      const recibidoUsd = parseFloat($("#montoRecibidoUsd").val()) || 0;
-      const recibidoBs = parseFloat($("#montoRecibidoBs").val()) || 0;
-      let metodoPagoDesc = "Pago Exacto";
-      if (recibidoUsd > 0 && recibidoBs > 0) {
-          metodoPagoDesc = "Pago Mixto";
-      } else if (recibidoUsd > 0) {
-          metodoPagoDesc = "Pago en Dólares";
-      } else if (recibidoBs > 0) {
-          metodoPagoDesc = "Pago en Bolívares";
-      }
-      $("#listaMetodoPago").val(metodoPagoDesc);
+      // 3. Usar el método de pago específico seleccionado
+      const metodoPagoSeleccionado = $("#modalConfirmacionPago").data("metodo");
+      $("#listaMetodoPago").val(metodoPagoSeleccionado);
 
       // 4. Enviar el formulario
       $("#formularioVentas").submit();
