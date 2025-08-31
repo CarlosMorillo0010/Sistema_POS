@@ -71,21 +71,21 @@
                         $idOrden = $orden["id_orden_compra"];
 
                         // Botón de Ver siempre disponible
-                        $buttons .= '<button class="btn btn-info btnVerOrdenCompra" idOrden="'.$idOrden.'" data-toggle="modal" data-target="#modalVerOrdenCompra"><i class="fa fa-eye"></i></button>';
+                        $buttons .= '<button class="btn btn-secundary btnVerOrdenCompra" idOrden="'.$idOrden.'" data-toggle="modal" data-target="#modalVerOrdenCompra"><i class="fa fa-eye"></i></button>';
+
+                        // Botón de Imprimir PDF (disponible para todos los estados excepto Borrador)
+                        if ($orden["estado"] != 'Borrador') {
+                            $buttons .= '<a href="pdf/reporte-orden-compra.php?idOrden='.$idOrden.'" class="btn btn-danger" target="_blank"><i class="fa fa-file-pdf-o"></i></a>';
+                        }
 
                         switch ($orden["estado"]) {
                             case 'Borrador':
-                                $buttons .= '<a href="index.php?ruta=crear-orden-compra&idOrden='.$idOrden.'" class="btn btn-warning"><i class="fa fa-pencil"></i></a>';
-                                $buttons .= '<button class="btn btn-success btnEnviarOrden" idOrden="'.$idOrden.'"><i class="fa fa-send"></i></button>';
+                                $buttons .= '<a href="index.php?ruta=editar-orden-compra&idOrden='.$idOrden.'" class="btn btn-warning"><i class="fa fa-pencil"></i></a>';
+                                $buttons .= '<button class="btn btn-success btnEnviarOrden" idOrden="'.$idOrden.'"><i class="fa fa-paper-plane"></i></button>';
                                 $buttons .= '<button class="btn btn-danger btnEliminarOrdenCompra" idOrden="'.$idOrden.'"><i class="fa fa-times"></i></button>';
                                 break;
                             case 'Enviada':
-                                $buttons .= '<button class="btn btn-primary btnImprimirOrden" idOrden="'.$idOrden.'"><i class="fa fa-print"></i></button>';
                                 $buttons .= '<button class="btn btn-danger btnCancelarOrden" idOrden="'.$idOrden.'"><i class="fa fa-ban"></i></button>';
-                                break;
-                            case 'Completada':
-                            case 'Cancelada':
-                                $buttons .= '<button class="btn btn-primary btnImprimirOrden" idOrden="'.$idOrden.'"><i class="fa fa-print"></i></button>';
                                 break;
                         }
 
