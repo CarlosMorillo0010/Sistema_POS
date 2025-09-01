@@ -73,4 +73,14 @@ class ModelCompras
         $stmt->close();
         $stmt = null;
     }
+
+    /*=============================================
+    MOSTRAR DETALLE DE COMPRA
+    =============================================*/
+    static public function mdlMostrarDetalleCompra($tabla, $item, $valor){
+        $stmt = Connection::connect()->prepare("SELECT dc.*, p.codigo, p.descripcion FROM $tabla dc JOIN productos p ON dc.id_producto = p.id_producto WHERE dc.$item = :$item");
+        $stmt->bindParam(":".$item, $valor, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 }

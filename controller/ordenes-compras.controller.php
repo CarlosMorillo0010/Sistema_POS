@@ -13,6 +13,26 @@ class ControllerOrdenesCompras
     }
 
     /*=============================================
+     MOSTRAR DETALLE DE ORDEN DE COMPRA
+    =============================================*/
+    static public function ctrMostrarOrdenCompraDetalle($item, $valor)
+    {
+        $tabla = "orden_compra_detalle";
+        $respuesta = ModelOrdenesCompras::mdlMostrarOrdenCompraDetalle($tabla, $item, $valor);
+        return $respuesta;
+    }
+
+    /*=============================================
+     MOSTRAR MULTIPLES ORDENES POR FILTRO
+    =============================================*/
+    static public function ctrMostrarMultiplesOrdenes($item, $valor)
+    {
+        $tabla = "orden_compra";
+        $respuesta = ModelOrdenesCompras::mdlMostrarMultiplesOrdenes($tabla, $item, $valor);
+        return $respuesta;
+    }
+
+    /*=============================================
      CREAR UNA ORDEN DE COMPRA (NUEVA LÓGICA)
     =============================================*/
     static public function ctrCrearOrdenCompra()

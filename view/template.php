@@ -215,6 +215,7 @@ function versionAsset($path)
                 $_GET["ruta"] == "libro-ventas" ||
                 // $_GET["ruta"] == "servicios" ||
                 $_GET["ruta"] == "ajuste-inventario" ||
+                $_GET["ruta"] == "entradas-almacen" ||
                 // $_GET["ruta"] == "traslado-almacen" ||
                 $_GET["ruta"] == "orden-compra" ||
                 $_GET["ruta"] == "libro-compras" ||
@@ -317,6 +318,7 @@ function versionAsset($path)
                 'reportes' => 'reportes.js',
                 'reportes-ventas' => 'reportes.js',
                 'vehiculos' => 'vehiculos.js',
+                'entradas-almacen' => 'entradas.js',
                 'ajuste-inventario' => 'ajuste-inventario.js'
             ];
 

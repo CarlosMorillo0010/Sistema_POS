@@ -164,4 +164,14 @@ class ModelOrdenesCompras
         $stmt->close();
         $stmt = null;
     }
+
+    /*=============================================
+	 MOSTRAR MULTIPLES ORDENES POR FILTRO
+	=============================================*/
+    static public function mdlMostrarMultiplesOrdenes($tabla, $item, $valor){
+        $stmt = Connection::connect()->prepare("SELECT * FROM $tabla WHERE $item = :$item ORDER BY fecha DESC");
+        $stmt->bindParam(":".$item, $valor, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll(); // Devuelve siempre un array
+    }
 }

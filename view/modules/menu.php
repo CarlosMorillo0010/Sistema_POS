@@ -163,15 +163,21 @@ $perfil = ControllerPerfiles::ctrMostrarPerfil($item, $valor);
                 </a>
                 <ul class="treeview-menu">
                     <li>
-                        <a href="crear-compra">
-                            <i class="far fa-circle"></i>
-                            <span>Registrar Compra</span>
-                        </a>
-                    </li>
-                    <li>
                         <a href="orden-compra">
                             <i class="far fa-circle"></i>
                             <span>Administrar Órdenes de Compra</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="entradas-almacen">
+                            <i class="far fa-circle"></i>
+                            <span>Recepción de Mercancía</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="crear-compra">
+                            <i class="far fa-circle"></i>
+                            <span>Administrar Compras</span>
                         </a>
                     </li>
                     <li>
