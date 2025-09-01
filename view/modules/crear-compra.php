@@ -44,7 +44,7 @@
                         <td>'.number_format($value["monto_total"], 2).'</td>
                         <td>
                           <div class="btn-group">
-                            <button class="btn btn-info btnImprimirCompra" idCompra="'.$value["id_compra"].'"><i class="fa fa-print"></i></button>
+                            <button class="btn btn-info btnImprimirCompra" idCompra="'.$value["id_compra"].'" style="background-color: #00c0ef !important;"><i class="fa fa-print"></i></button>
                           </div>
                         </td>
                       </tr>';
@@ -64,6 +64,11 @@ $(document).ready(function() {
         "language": {
             "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
         }
+    });
+
+    $('.tablaCompras').on('click', '.btnImprimirCompra', function() {
+        var idCompra = $(this).attr('idCompra');
+        window.open('pdf/reporte-compra.php?idCompra=' + idCompra, '_blank');
     });
 });
 </script>

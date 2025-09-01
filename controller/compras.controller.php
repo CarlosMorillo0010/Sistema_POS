@@ -80,4 +80,14 @@ class ControllerCompras
         return $respuesta;
     }
 
+    /*=============================================
+    MOSTRAR DETALLE DE COMPRA
+    =============================================*/
+    static public function ctrMostrarDetalleCompra($item, $valor)
+    {
+        $tabla = "detalle_compras";
+        $respuesta = ModelCompras::mdlMostrarDetalleCompra($tabla, $item, $valor);
+        return $respuesta;
+    }
+
 }
