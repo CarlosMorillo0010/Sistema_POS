@@ -2,137 +2,47 @@
 
 require_once "../controller/kardex.controller.php";
 require_once "../model/kardex.model.php";
+require_once "../model/connection.php";
 
 class TablaKardex{
 
-    /*======================================
-     MOSTRAR TABLA DE KARDEX VALORIZADO
-    ======================================**/
     public function mostrarTablaKardex(){
 
-        if (!isset($_GET["idProducto"]) || empty($_GET["idProducto"])) {
+        // Validar que los datos necesarios lleguen por POST
+        if (!isset($_POST["id_producto"]) || empty($_POST["id_producto"])) {
             echo '{"data": []}';
             return;
         }
 
         $item = "id_producto";
-        $valor = $_GET["idProducto"];
+        $valor = $_POST["id_producto"];
+        $fechaInicial = $_POST["fechaInicial"] ?? date("Y-m-d");
+        $fechaFinal = $_POST["fechaFinal"] ?? date("Y-m-d");
 
-        $fechaInicial = (isset($_GET["fechaInicial"]) && $_GET["fechaInicial"] != '') ? $_GET["fechaInicial"] : null;
-        $fechaFinal = (isset($_GET["fechaFinal"]) && $_GET["fechaFinal"] != '') ? $_GET["fechaFinal"] : date("Y-m-d");
+        $kardexData = ControllerKardex::ctrMostrarKardex($item, $valor, $fechaInicial, $fechaFinal);
 
-        // Get all movements up to fechaFinal to calculate the running stock and cost correctly
-        $kardexCompleto = ControllerKardex::ctrMostrarKardex($item, $valor, null, $fechaFinal);
-
-        if(empty($kardexCompleto)){
+        if(empty($kardexData)){
             echo '{"data": []}';
             return;
         }
 
-        $cantidadSaldo = 0;
-        $costoTotalSaldo = 0.00;
-        $kardexProcesado = [];
-
-        $fechaInicialDate = $fechaInicial ? new DateTime($fechaInicial) : null;
-
-        // 1. Calculate Initial Balance
-        if ($fechaInicialDate) {
-            foreach ($kardexCompleto as $movimiento) {
-                $fechaMovimientoDate = new DateTime($movimiento['fecha']);
-                if ($fechaMovimientoDate < $fechaInicialDate) {
-                    $tipo = $movimiento["tipo"];
-                    $cantidad = $movimiento["cantidad"];
-                    $precio = $movimiento["precio"];
-
-                    if ($tipo == 'COMPRA' || $tipo == 'DEV. VENTA' || $tipo == 'ENTRADA') {
-                        $cantidadSaldo += $cantidad;
-                        $costoTotalSaldo += $cantidad * $precio;
-                    } else { // VENTA, DEV. COMPRA, SALIDA
-                        $costoUnitarioSalida = ($cantidadSaldo > 0) ? $costoTotalSaldo / $cantidadSaldo : 0;
-                        $costoTotalSalida = $cantidad * $costoUnitarioSalida;
-                        $cantidadSaldo -= $cantidad;
-                        $costoTotalSaldo -= $costoTotalSalida;
-                    }
-                }
-            }
-
-            $costoUnitarioSaldo = ($cantidadSaldo != 0) ? $costoTotalSaldo / $cantidadSaldo : 0;
-            $kardexProcesado[] = [
-                "fecha" => date("d/m/Y", strtotime($fechaInicial . ' -1 day')),
-                "documento" => "",
-                "concepto" => "SALDO INICIAL",
-                "ent_cant" => "", "ent_costo_u" => "", "ent_costo_t" => "",
-                "sal_cant" => "", "sal_costo_u" => "", "sal_costo_t" => "",
-                "sld_cant" => $cantidadSaldo,
-                "sld_costo_u" => number_format($costoUnitarioSaldo, 2, ',', '.'),
-                "sld_costo_t" => number_format($costoTotalSaldo, 2, ',', '.')
-            ];
-        }
-
-        // 2. Process movements within the date range
-        foreach ($kardexCompleto as $movimiento) {
-            $fechaMovimientoDate = new DateTime($movimiento['fecha']);
-            if (!$fechaInicialDate || $fechaMovimientoDate >= $fechaInicialDate) {
-                $tipo = $movimiento["tipo"];
-                $cantidad = $movimiento["cantidad"];
-                $precio = $movimiento["precio"];
-
-                $fila = [
-                    "fecha" => date("d/m/Y", strtotime($movimiento['fecha'])),
-                    "documento" => $movimiento["documento"],
-                    "concepto" => $movimiento["tipo"],
-                    "ent_cant" => "", "ent_costo_u" => "", "ent_costo_t" => "",
-                    "sal_cant" => "", "sal_costo_u" => "", "sal_costo_t" => ""
-                ];
-
-                if ($tipo == 'COMPRA' || $tipo == 'DEV. VENTA' || $tipo == 'ENTRADA') {
-                    $costoUnitarioEntrada = $precio;
-                    $costoTotalEntrada = $cantidad * $costoUnitarioEntrada;
-                    
-                    $cantidadSaldo += $cantidad;
-                    $costoTotalSaldo += $costoTotalEntrada;
-
-                    $fila["ent_cant"] = $cantidad;
-                    $fila["ent_costo_u"] = number_format($costoUnitarioEntrada, 2, ',', '.');
-                    $fila["ent_costo_t"] = number_format($costoTotalEntrada, 2, ',', '.');
-
-                } else { // VENTA, DEV. COMPRA, SALIDA
-                    $costoUnitarioSalida = ($cantidadSaldo > 0) ? $costoTotalSaldo / $cantidadSaldo : 0;
-                    $costoTotalSalida = $cantidad * $costoUnitarioSalida;
-
-                    $cantidadSaldo -= $cantidad;
-                    $costoTotalSaldo -= $costoTotalSalida;
-
-                    $fila["sal_cant"] = $cantidad;
-                    $fila["sal_costo_u"] = number_format($costoUnitarioSalida, 2, ',', '.');
-                    $fila["sal_costo_t"] = number_format($costoTotalSalida, 2, ',', '.');
-                }
-
-                $costoUnitarioSaldo = ($cantidadSaldo != 0) ? $costoTotalSaldo / $cantidadSaldo : 0;
-                $fila["sld_cant"] = $cantidadSaldo;
-                $fila["sld_costo_u"] = number_format($costoUnitarioSaldo, 2, ',', '.');
-                $fila["sld_costo_t"] = number_format($costoTotalSaldo, 2, ',', '.');
-
-                $kardexProcesado[] = $fila;
-            }
-        }
-
         $datosJson = [];
-        foreach ($kardexProcesado as $key => $value) {
+        $contador = 1;
+        foreach ($kardexData as $key => $value) {
             $datosJson[] = [
-                ($key + 1),
+                $contador++,
                 $value["fecha"],
                 $value["documento"],
                 $value["concepto"],
-                $value["ent_cant"],
-                $value["ent_costo_u"],
-                $value["ent_costo_t"],
-                $value["sal_cant"],
-                $value["sal_costo_u"],
-                $value["sal_costo_t"],
-                $value["sld_cant"],
-                $value["sld_costo_u"],
-                $value["sld_costo_t"]
+                $value["ent_cant"] !== "" ? number_format($value["ent_cant"], 2, ',', '.') : "",
+                $value["ent_costo_u"] !== "" ? number_format($value["ent_costo_u"], 2, ',', '.') : "",
+                $value["ent_costo_t"] !== "" ? number_format($value["ent_costo_t"], 2, ',', '.') : "",
+                $value["sal_cant"] !== "" ? number_format($value["sal_cant"], 2, ',', '.') : "",
+                $value["sal_costo_u"] !== "" ? number_format($value["sal_costo_u"], 2, ',', '.') : "",
+                $value["sal_costo_t"] !== "" ? number_format($value["sal_costo_t"], 2, ',', '.') : "",
+                number_format($value["sld_cant"], 2, ',', '.'),
+                number_format($value["sld_costo_u"], 2, ',', '.'),
+                number_format($value["sld_costo_t"], 2, ',', '.')
             ];
         }
 
@@ -140,9 +50,5 @@ class TablaKardex{
     }
 }
 
-/*======================================
- ACTIVAR TABLA DE KARDEX
-======================================**/
 $activarKardex = new TablaKardex();
 $activarKardex -> mostrarTablaKardex();
-

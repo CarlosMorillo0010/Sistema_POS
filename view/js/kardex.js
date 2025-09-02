@@ -1,108 +1,88 @@
-$('#seleccionarProductoKardex').select2({
-    placeholder: "Seleccione un producto",
-    allowClear: true
-});
+$(document).ready(function() {
+    // Inicializar Select2 para el buscador de productos
+    $('#seleccionarProductoKardex').select2({
+        placeholder: "Seleccione un producto",
+        allowClear: true
+    });
 
-// Variables para almacenar el rango de fechas seleccionado
-var fechaInicialKardex = moment().startOf('month').format('YYYY-MM-DD');
-var fechaFinalKardex = moment().endOf('month').format('YYYY-MM-DD');
-
-// Inicializar el texto del botón con el rango de fechas por defecto
-$('#daterange-btn-kardex span').html(moment().startOf('month').format('MMMM D, YYYY') + ' - ' + moment().endOf('month').format('MMMM D, YYYY'));
-
-var tablaKardex = $('.tablaKardex').DataTable({
-    "ajax": {
-        "url": "ajax/datatable-kardex.ajax.php",
-        "type": "GET",
-        "data": function (d) {
-            d.idProducto = $('#seleccionarProductoKardex').val();
-            d.fechaInicial = fechaInicialKardex;
-            d.fechaFinal = fechaFinalKardex;
+    // Inicializar el DateRangePicker
+    $('#daterange-btn-kardex').daterangepicker({
+        ranges: {
+            'Hoy': [moment(), moment()],
+            'Ayer': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Últimos 7 Días': [moment().subtract(6, 'days'), moment()],
+            'Últimos 30 Días': [moment().subtract(29, 'days'), moment()],
+            'Este Mes': [moment().startOf('month'), moment().endOf('month')],
+            'Mes Anterior': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
         },
-        "dataSrc": function(json) {
-            // No cargar datos si no hay producto seleccionado
-            if ($('#seleccionarProductoKardex').val() === "" || $('#seleccionarProductoKardex').val() === null) {
-                return [];
-            }
-            return json.data;
+        startDate: moment().subtract(29, 'days'),
+        endDate: moment(),
+        locale: {
+            "format": "DD/MM/YYYY",
+            "separator": " - ",
+            "applyLabel": "Aplicar",
+            "cancelLabel": "Cancelar",
+            "fromLabel": "Desde",
+            "toLabel": "Hasta",
+            "customRangeLabel": "Rango Personalizado",
+            "daysOfWeek": ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+            "monthNames": ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
         }
-    },
-    "columns": [
-        { "data": 0 }, // #
-        { "data": 1 }, // Fecha
-        { "data": 2 }, // Documento
-        { "data": 3 }, // Concepto
-        { "data": 4, "className": "text-right" }, // Ent Cant
-        { "data": 5, "className": "text-right" }, // Ent Costo U
-        { "data": 6, "className": "text-right" }, // Ent Costo T
-        { "data": 7, "className": "text-right" }, // Sal Cant
-        { "data": 8, "className": "text-right" }, // Sal Costo U
-        { "data": 9, "className": "text-right" }, // Sal Costo T
-        { "data": 10, "className": "text-right" },// Saldo Cant
-        { "data": 11, "className": "text-right" },// Saldo Costo U
-        { "data": 12, "className": "text-right" } // Saldo Costo T
-    ],
-    "language": {
-        "sProcessing":     "Procesando...",
-        "sLengthMenu":     "Mostrar _MENU_ registros",
-        "sZeroRecords":    "No se encontraron resultados",
-        "sEmptyTable":     "Seleccione un producto para ver su kardex",
-        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
-        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0",
-        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-        "sInfoPostFix":    "",
-        "sSearch":         "Buscar:",
-        "sUrl":            "",
-        "sInfoThousands":  ",",
-        "sLoadingRecords": "Cargando...",
-        "oPaginate": {
-            "sFirst":    "Primero",
-            "sLast":     "Último",
-            "sNext":     "Siguiente",
-            "sPrevious": "Anterior"
-        },
-        "oAria": {
-            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-        }
-    },
-    "responsive": true,
-    "autoWidth": false,
-    "ordering": false // Es importante mantener el orden cronológico que viene del servidor
-});
-
-// Recargar la tabla cuando se cambia el producto
-$('#seleccionarProductoKardex').on('change', function(){
-    tablaKardex.ajax.reload();
-});
-
-// Configuración del daterangepicker
-$('#daterange-btn-kardex').daterangepicker(
-    {
-        ranges   : {
-            'Hoy'       : [moment(), moment()],
-            'Ayer'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-            'Últimos 7 días' : [moment().subtract(6, 'days'), moment()],
-            'Últimos 30 días': [moment().subtract(29, 'days'), moment()],
-            'Este mes'  : [moment().startOf('month'), moment().endOf('month')],
-            'Último mes'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        },
-        startDate: moment().startOf('month'),
-        endDate  : moment().endOf('month')
     },
     function (start, end) {
-        // Actualizar el texto del botón
-        $('#daterange-btn-kardex span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-        
-        // Actualizar las variables de fecha
-        fechaInicialKardex = start.format('YYYY-MM-DD');
-        fechaFinalKardex = end.format('YYYY-MM-DD');
-        
-        // Recargar la tabla si hay un producto seleccionado
-        var idProducto = $('#seleccionarProductoKardex').val();
-        if(idProducto){
-            tablaKardex.ajax.reload();
+        $('#daterange-btn-kardex span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+        // Disparar la recarga de datos cuando cambia la fecha
+        if ($('#seleccionarProductoKardex').val()) {
+            $('.tablaKardex').DataTable().ajax.reload();
         }
-    }
-);
+    });
 
+    // Inicializar DataTable
+    var tablaKardex = $('.tablaKardex').DataTable({
+        "ajax": {
+            "url": "ajax/datatable-kardex.ajax.php",
+            "type": "POST",
+            "data": function(d) {
+                // Enviar los filtros al servidor
+                var idProducto = $('#seleccionarProductoKardex').val();
+                var fechaInicial = $('#daterange-btn-kardex').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                var fechaFinal = $('#daterange-btn-kardex').data('daterangepicker').endDate.format('YYYY-MM-DD');
+
+                d.id_producto = idProducto;
+                d.fechaInicial = fechaInicial;
+                d.fechaFinal = fechaFinal;
+            }
+        },
+        "deferRender": true,
+        "destroy": true,
+        "processing": true,
+        "language": {
+            "sProcessing": "Procesando...",
+            "sLengthMenu": "Mostrar _MENU_ registros",
+            "sZeroRecords": "No se encontraron resultados para el producto y rango de fechas seleccionados.",
+            "sEmptyTable": "Seleccione un producto para ver su kardex.",
+            "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
+            "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0",
+            "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+            "sSearch": "Buscar en reporte:",
+            "oPaginate": {
+                "sFirst": "Primero",
+                "sLast": "Último",
+                "sNext": "Siguiente",
+                "sPrevious": "Anterior"
+            }
+        },
+        "columnDefs": [
+            { "className": "dt-body-right", "targets": [4, 5, 6, 7, 8, 9, 10, 11, 12] } // Alinear columnas numéricas a la derecha
+        ]
+    });
+
+    // Recargar la tabla cuando se selecciona un producto
+    $('#seleccionarProductoKardex').on('change', function() {
+        if ($(this).val() !== "") {
+            tablaKardex.ajax.reload();
+        } else {
+            tablaKardex.clear().draw();
+        }
+    });
+});
