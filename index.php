@@ -7,6 +7,7 @@ require_once "controller/template.controller.php";
 require_once "controller/users.controller.php";
 require_once "controller/categories.controller.php";
 require_once "controller/products.controller.php";
+require_once "controller/kardex.controller.php";
 require_once "controller/compuests.controller.php";
 require_once "controller/clients.controller.php";
 require_once "controller/sales.controller.php";
@@ -45,6 +46,7 @@ require_once "controller/ventas-controller.php";
 require_once "controller/vehiculos.controller.php";
 require_once "controller/ajustes.controller.php";
 require_once "controller/compras.controller.php";
+require_once "controller/kardex.controller.php";
 
 /**=====================================
     MODELS
@@ -52,6 +54,7 @@ require_once "controller/compras.controller.php";
 require_once "model/users.model.php";
 require_once "model/categories.model.php";
 require_once "model/products.model.php";
+require_once "model/kardex.model.php";
 require_once "model/compuests.model.php";
 require_once "model/clients.model.php";
 require_once "model/sales.model.php";
@@ -90,6 +93,7 @@ require_once "model/ventas-model.php";
 require_once "model/vehiculos.model.php";
 require_once "model/ajustes.model.php";
 require_once "model/compras.model.php";
+require_once "model/kardex.model.php";
 
 $template = new ControllerTemplate();
 $template -> ctrTemplate();

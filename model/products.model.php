@@ -1,7 +1,5 @@
 <?php
 
-require_once "connection.php";
-
 class ModelProducts
 {
     static public function mdlMostrarProductos($tabla, $item, $valor, $orden)

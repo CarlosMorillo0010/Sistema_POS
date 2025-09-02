@@ -130,6 +130,12 @@ $perfil = ControllerPerfiles::ctrMostrarPerfil($item, $valor);
                                     <span>Productos</span>
                                 </a>
                             </li>
+                            <li>
+                                <a href="kardex">
+                                    <i class="far fa-circle"></i>
+                                    <span>Kardex</span>
+                                </a>
+                            </li>
                              <!-- <li>
                                 <a href="ajuste-inventario">
                                     <i class="far fa-circle"></i>
@@ -199,53 +205,17 @@ $perfil = ControllerPerfiles::ctrMostrarPerfil($item, $valor);
                         </a>
                     </li>
                     <li>
+                        <a href="crear-devolucion-compra">
+                            <i class="far fa-circle"></i>
+                            <span>Devolución de Compra</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="ajuste-inventario">
                             <i class="far fa-circle"></i>
                             <span>Ajuste de Inventario</span>
                         </a>
                     </li>
-                    <!-- <li>
-                        <a href="notas-entrega">
-                            <i class="far fa-circle"></i>
-                            <span>Notas de Entrega</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="orden-compra">
-                            <i class="far fa-circle"></i>
-                            <span>Orden de compra</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="orden-pago">
-                            <i class="far fa-circle"></i>
-                            <span>Orden de Pago</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="facturas-compra">
-                            <i class="far fa-circle"></i>
-                            <span>Facturas de Compra</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="facturas-gastos">
-                            <i class="far fa-circle"></i>
-                            <span>Facturas de Gastos</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="anticipos">
-                            <i class="far fa-circle"></i>
-                            <span>Anticipos</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="devolucion-compra">
-                            <i class="far fa-circle"></i>
-                            <span>Devolución de Compra</span>
-                        </a>
-                    </li> -->
                 </ul>
                 ';
                     }
@@ -326,12 +296,12 @@ $perfil = ControllerPerfiles::ctrMostrarPerfil($item, $valor);
                             <span>Cuentas por Cobrar</span>
                         </a>
                     </li>
-                    <!-- <li>
-                        <a href="caja">
+                    <li>
+                        <a href="crear-devolucion-venta">
                             <i class="far fa-circle"></i>
-                            <span>Crear Venta</span>
+                            <span>Devolución de Venta</span>
                         </a>
-                    </li> -->
+                    </li>
                 </ul>
                 ';
                     }
