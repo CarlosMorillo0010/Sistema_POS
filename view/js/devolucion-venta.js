@@ -1,5 +1,5 @@
-$('.tablaCompras').DataTable({
-    "ajax": "ajax/datatable-compras.ajax.php",
+$('.tablaVentas').DataTable({
+    "ajax": "ajax/datatable-ventas.ajax.php",
     "deferRender": true,
     "retrieve": true,
     "processing": true,
@@ -29,15 +29,16 @@ $('.tablaCompras').DataTable({
     }
 });
 
-$(".tablaCompras").on("click", ".btnAgregarCompra", function(){
+$(".tablaVentas").on("click", ".btnAgregarVenta", function(){
 
-    var idCompra = $(this).attr("idCompra");
+    var idVenta = $(this).attr("idVenta");
+    $("#idVenta").val(idVenta);
 
     var datos = new FormData();
-    datos.append("idCompra", idCompra);
+    datos.append("idVenta", idVenta);
 
     $.ajax({
-        url:"ajax/compras.ajax.php",
+        url:"ajax/ventas.ajax.php",
         method: "POST",
         data: datos,
         cache: false,
@@ -46,20 +47,21 @@ $(".tablaCompras").on("click", ".btnAgregarCompra", function(){
         dataType:"json",
         success:function(respuesta){
 
-            var idProveedor = respuesta.compra.id_proveedor;
-            var detalle = respuesta.detalle;
+            var idCliente = respuesta.id_cliente;
+            var productos = JSON.parse(respuesta.productos);
 
-            $("#seleccionarProveedor").val(idProveedor);
-            $("#seleccionarProveedor").trigger("change");
+            $("#seleccionarCliente").val(idCliente);
+            $("#seleccionarCliente").trigger("change");
 
             $(".nuevoProducto").html('');
 
-            detalle.forEach(function(producto, index){
+            productos.forEach(function(producto, index){
 
-                var idProducto = producto.id_producto;
+                var idProducto = producto.id;
                 var descripcion = producto.descripcion;
                 var cantidad = producto.cantidad;
-                var precio = producto.precio_unitario;
+                var precio = producto.precio;
+                var subtotal = producto.total;
 
                 $(".nuevoProducto").append(
                     '<div class="row" style="padding:5px 15px">'+
@@ -70,12 +72,12 @@ $(".tablaCompras").on("click", ".btnAgregarCompra", function(){
                             '</div>'+
                         '</div>'+
                         '<div class="col-xs-3">'+
-                            '<input type="number" class="form-control nuevaCantidadProducto" name="nuevaCantidadProducto" min="1" value="'+cantidad+'" stock="'+cantidad+'" nuevoStock="'+cantidad+'" required>'+
+                            '<input type="number" class="form-control nuevaCantidadProducto" name="nuevaCantidadProducto" min="1" value="'+cantidad+'" stock="'+cantidad+'" required>'+
                         '</div>'+
                         '<div class="col-xs-3" style="padding-left:0px">'+
                             '<div class="input-group">'+
                                 '<span class="input-group-addon"><i class="ion ion-social-usd"></i></span>'+
-                                '<input type="text" class="form-control nuevoPrecioProducto" precioReal="'+precio+'" name="nuevoPrecioProducto" value="'+(precio * cantidad)+'" readonly required>'+
+                                '<input type="text" class="form-control nuevoPrecioProducto" precioReal="'+precio+'" name="nuevoPrecioProducto" value="'+subtotal+'" readonly required>'+
                             '</div>'+
                         '</div>'+
                     '</div>');
@@ -87,13 +89,13 @@ $(".tablaCompras").on("click", ".btnAgregarCompra", function(){
     });
 });
 
-$(".formularioDevolucionCompra").on("click", ".quitarProducto", function(){
+$(".formularioDevolucionVenta").on("click", ".quitarProducto", function(){
     $(this).parent().parent().parent().parent().remove();
     sumarTotalPrecios();
     listarProductos();
 });
 
-$(".formularioDevolucionCompra").on("change", "input.nuevaCantidadProducto", function(){
+$(".formularioDevolucionVenta").on("change", "input.nuevaCantidadProducto", function(){
     var precioUnitario = $(this).parent().parent().find(".nuevoPrecioProducto").attr("precioReal");
     var subtotalInput = $(this).parent().parent().find(".nuevoPrecioProducto");
 
@@ -106,7 +108,7 @@ $(".formularioDevolucionCompra").on("change", "input.nuevaCantidadProducto", fun
 
         Swal.fire({
             icon: "error",
-            title: "La cantidad supera la comprada",
+            title: "La cantidad supera la vendida",
             text: "¡Sólo puedes devolver hasta "+cantidadMaxima+" unidades!",
             confirmButtonText: "¡Cerrar!"
         });
@@ -134,20 +136,20 @@ function sumarTotalPrecios(){
 
 function listarProductos(){
     var listaProductos = [];
-    var items = $(".formularioDevolucionCompra .nuevoProducto .row");
+    var items = $(".formularioDevolucionVenta .nuevoProducto .row");
 
     for(var i = 0; i < items.length; i++){
         var item = $(items[i]);
         var idProducto = item.find(".nuevaDescripcionProducto").attr("idProducto");
         var cantidad = item.find(".nuevaCantidadProducto").val();
-        var costo = item.find(".nuevoPrecioProducto").attr("precioReal");
-        var subtotal = item.find(".nuevoPrecioProducto").val();
+        var precio = item.find(".nuevoPrecioProducto").attr("precioReal");
+        var total = item.find(".nuevoPrecioProducto").val();
 
         listaProductos.push({
             "id_producto" : idProducto,
             "cantidad" : cantidad,
-            "costo" : costo,
-            "subtotal" : subtotal
+            "precio" : precio,
+            "total" : total
         });
     }
 
