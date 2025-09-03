@@ -1,11 +1,11 @@
 <div class="content-wrapper">
     <section class="content-header">
         <h1>
-            Crear Devolución de Compra
+            Crear Devolución de Venta
         </h1>
         <ol class="breadcrumb">
             <li><a href="inicio"><i class="fa fa-dashboard"></i> Inicio</a></li>
-            <li class="active">Crear Devolución de Compra</li>
+            <li class="active">Crear Devolución de Venta</li>
         </ol>
     </section>
 
@@ -15,9 +15,10 @@
             <div class="col-lg-7 col-xs-12">
                 <div class="box box-primary">
                     <div class="box-header with-border"></div>
-                    <form role="form" method="post" class="formularioDevolucionCompra">
+                    <form role="form" method="post" class="formularioDevolucionVenta">
                         <div class="box-body">
                             <div class="box">
+                                <input type="hidden" name="idVenta" id="idVenta">
                                 <div class="form-group">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-user"></i></span>
@@ -35,13 +36,13 @@
 
                                 <div class="form-group">
                                     <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-truck"></i></span>
-                                        <select class="form-control select2" id="seleccionarProveedor" name="idProveedor" required>
-                                            <option value="">Seleccionar Proveedor</option>
+                                        <span class="input-group-addon"><i class="fa fa-users"></i></span>
+                                        <select class="form-control select2" id="seleccionarCliente" name="idCliente" required>
+                                            <option value="">Seleccionar Cliente</option>
                                             <?php
-                                            $proveedores = ControllerProveedores::ctrMostrarProveedores(null, null);
-                                            foreach ($proveedores as $key => $value) {
-                                                echo '<option value="' . $value["id_proveedor"] . '">' . $value["nombre"] . '</option>';
+                                            $clientes = ControllerClients::ctrMostrarClientes(null, null);
+                                            foreach ($clientes as $key => $value) {
+                                                echo '<option value="' . $value["id"] . '">' . $value["nombre"] . '</option>';
                                             }
                                             ?>
                                         </select>
@@ -49,7 +50,7 @@
                                 </div>
 
                                 <div class="form-group row nuevoProducto">
-                                    <!-- Aquí se cargarán los productos de la compra seleccionada -->
+                                    <!-- Aquí se cargarán los productos de la venta seleccionada -->
                                 </div>
 
                                 <input type="hidden" id="listaProductosDevolucion" name="listaProductosDevolucion">
@@ -87,19 +88,19 @@
                 </div>
             </div>
 
-            <!-- La tabla de compras -->
+            <!-- La tabla de ventas -->
             <div class="col-lg-5 col-xs-12">
                 <div class="box box-warning">
                     <div class="box-header with-border">
-                        <h3 class="box-title">Seleccionar Compra</h3>
+                        <h3 class="box-title">Seleccionar Venta</h3>
                     </div>
                     <div class="box-body">
-                        <table class="table table-bordered table-striped dt-responsive tablaCompras" width="100%">
+                        <table class="table table-bordered table-striped dt-responsive tablaVentas" width="100%">
                             <thead>
                                 <tr>
                                     <th style="width: 10px">#</th>
-                                    <th>N° Compra</th>
-                                    <th>Proveedor</th>
+                                    <th>N° Venta</th>
+                                    <th>Cliente</th>
                                     <th>Fecha</th>
                                     <th>Acciones</th>
                                 </tr>
@@ -111,4 +112,3 @@
         </div>
     </section>
 </div>
-
