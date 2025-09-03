@@ -5,148 +5,129 @@ require_once "connection.php";
 class ModeloKardex
 {
     /**
-     * Muestra el historial de movimientos (Kardex) para un producto específico dentro de un rango de fechas.
-     * Calcula un saldo inicial basado en los movimientos anteriores a la fecha de inicio.
-     * Utiliza el método de costo promedio ponderado para valorar las salidas.
+     * Genera el Kardex valorizado leyendo la estructura de tu base de datos.
+     * Lee: compras.fecha_compra, detalle_compras.cantidad, detalle_compras.precio_unitario
+     * Lee: ventas.fecha, ventas.codigo_venta, detalle_ventas.cantidad
      */
-    static public function mdlMostrarKardex($item, $valor, $fechaInicial, $fechaFinal)
+    static public function mdlMostrarKardex($idProducto, $fechaInicial, $fechaFinal)
     {
-        $pdo = Connection::connect();
+        try {
+            $pdo = Connection::connect();
 
-        // --- 1. CÁLCULO DEL SALDO INICIAL (MOVIMIENTOS ANTERIORES A $fechaInicial) ---
-        $stmtComprasAnt = $pdo->prepare(
-            "SELECT c.fecha_compra as fecha, 'Compra' as tipo, CONCAT('OC-', c.id_compra) as documento, dc.cantidad, dc.precio_unitario as valor
-             FROM compras c JOIN detalle_compras dc ON c.id_compra = dc.id_compra
-             WHERE dc.id_producto = :id_producto AND c.fecha_compra < :fechaInicial"
-        );
-        $stmtComprasAnt->bindParam(":id_producto", $valor, PDO::PARAM_INT);
-        $stmtComprasAnt->bindParam(":fechaInicial", $fechaInicial, PDO::PARAM_STR);
-        $stmtComprasAnt->execute();
-        $compras_ant = $stmtComprasAnt->fetchAll(PDO::FETCH_ASSOC);
+            // --- FASE 1: CALCULAR SALDO INICIAL ---
+            // Leemos de `compras` y `detalle_compras` para las entradas anteriores.
+            // Leemos de `ventas` y `detalle_ventas` para las salidas anteriores.
+            $stmtAnteriores = $pdo->prepare(
+                "SELECT * FROM (
+                    (SELECT c.fecha_compra as fecha, 'Compra' as tipo, dc.cantidad, dc.precio_unitario as valor
+                     FROM compras c JOIN detalle_compras dc ON c.id_compra = dc.id_compra 
+                     WHERE dc.id_producto = :id_producto AND c.fecha_compra < :fechaInicial)
+                     UNION ALL
+                    (SELECT v.fecha, 'Venta' as tipo, dv.cantidad, 0 as valor
+                     FROM ventas v JOIN detalle_ventas dv ON v.id_venta = dv.id_venta 
+                     WHERE dv.id_producto = :id_producto AND v.fecha < :fechaInicial)
+                 ) AS movimientos_anteriores
+                 ORDER BY fecha ASC, (CASE WHEN tipo = 'Compra' THEN 0 ELSE 1 END) ASC"
+            );
+            $stmtAnteriores->bindParam(":id_producto", $idProducto, PDO::PARAM_INT);
+            $stmtAnteriores->bindParam(":fechaInicial", $fechaInicial, PDO::PARAM_STR);
+            $stmtAnteriores->execute();
+            $movimientos_anteriores = $stmtAnteriores->fetchAll(PDO::FETCH_ASSOC);
 
-        $stmtVentasAnt = $pdo->prepare(
-            "SELECT v.fecha, 'Venta' as tipo, v.codigo_venta as documento, dv.cantidad, 0 as valor
-             FROM ventas v JOIN detalle_ventas dv ON v.id_venta = dv.id_venta
-             WHERE dv.id_producto = :id_producto AND v.fecha < :fechaInicial"
-        );
-        $stmtVentasAnt->bindParam(":id_producto", $valor, PDO::PARAM_INT);
-        $stmtVentasAnt->bindParam(":fechaInicial", $fechaInicial, PDO::PARAM_STR);
-        $stmtVentasAnt->execute();
-        $ventas_ant = $stmtVentasAnt->fetchAll(PDO::FETCH_ASSOC);
-
-        $movimientos_anteriores = array_merge($compras_ant, $ventas_ant);
-        usort($movimientos_anteriores, function ($a, $b) {
-            $fechaA = strtotime($a['fecha']);
-            $fechaB = strtotime($b['fecha']);
-            if ($fechaA == $fechaB) return ($a['tipo'] == 'Compra') ? -1 : 1;
-            return $fechaA - $fechaB;
-        });
-
-        $saldo_inicial_cantidad = 0;
-        $saldo_inicial_valor_total = 0;
-        foreach ($movimientos_anteriores as $mov) {
-            if ($mov['tipo'] == 'Compra') {
-                $saldo_inicial_cantidad += $mov['cantidad'];
-                $saldo_inicial_valor_total += $mov['cantidad'] * $mov['valor'];
-            } else { // Venta
-                $costo_unitario_salida = ($saldo_inicial_cantidad != 0) ? $saldo_inicial_valor_total / $saldo_inicial_cantidad : 0;
-                $saldo_inicial_cantidad -= $mov['cantidad'];
-                $saldo_inicial_valor_total -= $mov['cantidad'] * $costo_unitario_salida;
+            $saldo_inicial_cantidad = 0.00;
+            $saldo_inicial_valor_total = 0.00;
+            foreach ($movimientos_anteriores as $mov) {
+                if ($mov['tipo'] == 'Compra' && (float)$mov['valor'] > 0) {
+                    $saldo_inicial_cantidad += (float)$mov['cantidad'];
+                    // EL VALOR SE INCREMENTA GRACIAS A `detalle_compras.precio_unitario`
+                    $saldo_inicial_valor_total += (float)$mov['cantidad'] * (float)$mov['valor'];
+                } else { // Venta
+                    $costo_unitario_salida = ($saldo_inicial_cantidad > 0) ? $saldo_inicial_valor_total / $saldo_inicial_cantidad : 0;
+                    $saldo_inicial_cantidad -= (float)$mov['cantidad'];
+                    $saldo_inicial_valor_total -= round((float)$mov['cantidad'] * $costo_unitario_salida, 2);
+                }
             }
-        }
-        $saldo_inicial_costo_unitario = ($saldo_inicial_cantidad != 0) ? $saldo_inicial_valor_total / $saldo_inicial_cantidad : 0;
+            $saldo_inicial_costo_unitario = ($saldo_inicial_cantidad > 0) ? $saldo_inicial_valor_total / $saldo_inicial_cantidad : 0;
 
-        // --- 2. OBTENER MOVIMIENTOS DENTRO DEL RANGO DE FECHAS ---
-        $fechaFinalMasUnDia = date('Y-m-d', strtotime($fechaFinal . ' +1 day'));
+            // --- FASE 2: OBTENER MOVIMIENTOS DEL PERIODO ---
+            // Nuevamente, se usan los mismos nombres de campo que coinciden con tu BD.
+            $stmtRango = $pdo->prepare(
+                "SELECT * FROM (
+                    (SELECT c.fecha_compra as fecha, 'Compra' as tipo, CONCAT('Orden de Compra - ', c.id_compra) as documento, dc.cantidad, dc.precio_unitario as valor
+                     FROM compras c JOIN detalle_compras dc ON c.id_compra = dc.id_compra 
+                     WHERE dc.id_producto = :id_producto AND c.fecha_compra BETWEEN :fechaInicial AND :fechaFinal)
+                     UNION ALL
+                    (SELECT v.fecha, 'Venta' as tipo, v.codigo_venta as documento, dv.cantidad, 0 as valor
+                     FROM ventas v JOIN detalle_ventas dv ON v.id_venta = dv.id_venta 
+                     WHERE dv.id_producto = :id_producto AND v.fecha BETWEEN :fechaInicial AND :fechaFinal)
+                ) AS movimientos_rango
+                ORDER BY fecha ASC, (CASE WHEN tipo = 'Compra' THEN 0 ELSE 1 END) ASC"
+            );
+            $stmtRango->bindParam(":id_producto", $idProducto, PDO::PARAM_INT);
+            $stmtRango->bindParam(":fechaInicial", $fechaInicial, PDO::PARAM_STR);
+            $stmtRango->bindParam(":fechaFinal", $fechaFinal, PDO::PARAM_STR);
+            $stmtRango->execute();
+            $movimientos_rango = $stmtRango->fetchAll(PDO::FETCH_ASSOC);
 
-        $stmtCompras = $pdo->prepare(
-            "SELECT c.fecha_compra as fecha, 'Compra' as tipo, CONCAT('OC-', c.id_compra) as documento, dc.cantidad, dc.precio_unitario as valor
-             FROM compras c JOIN detalle_compras dc ON c.id_compra = dc.id_compra
-             WHERE dc.id_producto = :id_producto AND c.fecha_compra >= :fechaInicial AND c.fecha_compra < :fechaFinal"
-        );
-        $stmtCompras->bindParam(":id_producto", $valor, PDO::PARAM_INT);
-        $stmtCompras->bindParam(":fechaInicial", $fechaInicial, PDO::PARAM_STR);
-        $stmtCompras->bindParam(":fechaFinal", $fechaFinalMasUnDia, PDO::PARAM_STR);
-        $stmtCompras->execute();
-        $compras = $stmtCompras->fetchAll(PDO::FETCH_ASSOC);
+            // --- FASE 3: CONSTRUIR EL REPORTE FINAL ---
+            $kardexProcesado = [];
+            $saldo_cantidad_actual = $saldo_inicial_cantidad;
+            $saldo_valor_total_actual = $saldo_inicial_valor_total;
 
-        $stmtVentas = $pdo->prepare(
-            "SELECT v.fecha, 'Venta' as tipo, v.codigo_venta as documento, dv.cantidad, 0 as valor
-             FROM ventas v JOIN detalle_ventas dv ON v.id_venta = dv.id_venta
-             WHERE dv.id_producto = :id_producto AND v.fecha >= :fechaInicial AND v.fecha < :fechaFinal"
-        );
-        $stmtVentas->bindParam(":id_producto", $valor, PDO::PARAM_INT);
-        $stmtVentas->bindParam(":fechaInicial", $fechaInicial, PDO::PARAM_STR);
-        $stmtVentas->bindParam(":fechaFinal", $fechaFinalMasUnDia, PDO::PARAM_STR);
-        $stmtVentas->execute();
-        $ventas = $stmtVentas->fetchAll(PDO::FETCH_ASSOC);
-
-        $movimientos_rango = array_merge($compras, $ventas);
-        usort($movimientos_rango, function ($a, $b) {
-            $fechaA = strtotime($a['fecha']);
-            $fechaB = strtotime($b['fecha']);
-            if ($fechaA == $fechaB) return ($a['tipo'] == 'Compra') ? -1 : 1;
-            return $fechaA - $fechaB;
-        });
-
-        // --- 3. PROCESAR Y CONSTRUIR EL KARDEX ---
-        $kardexProcesado = [];
-        $saldo_cantidad = $saldo_inicial_cantidad;
-        $saldo_valor_total = $saldo_inicial_valor_total;
-
-        // Fila de Saldo Inicial
-        $kardexProcesado[] = [
-            "fecha" => date("d/m/Y", strtotime($fechaInicial)),
-            "documento" => "",
-            "concepto" => "SALDO INICIAL",
-            "ent_cant" => "", "ent_costo_u" => "", "ent_costo_t" => "",
-            "sal_cant" => "", "sal_costo_u" => "", "sal_costo_t" => "",
-            "sld_cant" => $saldo_inicial_cantidad,
-            "sld_costo_u" => $saldo_inicial_costo_unitario,
-            "sld_costo_t" => $saldo_inicial_valor_total
-        ];
-
-        foreach ($movimientos_rango as $mov) {
-            $fila = [
-                "fecha" => date("d/m/Y", strtotime($mov['fecha'])),
-                "documento" => $mov['documento'],
-                "concepto" => $mov['tipo'],
-                "ent_cant" => "", "ent_costo_u" => "", "ent_costo_t" => "",
-                "sal_cant" => "", "sal_costo_u" => "", "sal_costo_t" => ""
+            $kardexProcesado[] = [
+                "fecha" => date("d/m/Y", strtotime($fechaInicial . ' -1 day')),
+                "documento" => "",
+                "concepto" => "SALDO INICIAL",
+                "ent_cant" => "",
+                "ent_costo_u" => "",
+                "ent_costo_t" => "",
+                "sal_cant" => "",
+                "sal_costo_u" => "",
+                "sal_costo_t" => "",
+                "sld_cant" => $saldo_inicial_cantidad,
+                "sld_costo_u" => $saldo_inicial_costo_unitario,
+                "sld_costo_t" => $saldo_inicial_valor_total
             ];
 
-            if ($mov['tipo'] == 'Compra') {
-                $cantidad_entrada = floatval($mov['cantidad']);
-                $costo_unitario_entrada = floatval($mov['valor']);
-                $costo_total_entrada = $cantidad_entrada * $costo_unitario_entrada;
+            foreach ($movimientos_rango as $mov) {
+                $fila = ["fecha" => date("d/m/Y", strtotime($mov['fecha'])), "documento" => $mov['documento']];
 
-                $saldo_cantidad += $mov['cantidad'];
-                $saldo_valor_total += $costo_total_entrada;
+                if ($mov['tipo'] == 'Compra' && (float)$mov['valor'] > 0) {
+                    $fila["concepto"] = 'COMPRA';
+                    $cantidad_entrada = (float)$mov['cantidad'];
+                    $costo_unitario_entrada = (float)$mov['valor']; // <-- Viene de `detalle_compras.precio_unitario`
+                    $costo_total_entrada = $cantidad_entrada * $costo_unitario_entrada;
 
-                $fila["ent_cant"] = $cantidad_entrada;
-                $fila["ent_costo_u"] = $costo_unitario_entrada;
-                $fila["ent_costo_t"] = $costo_total_entrada;
-            } else { // Venta
-                $cantidad_salida = floatval($mov['cantidad']);
-                $costo_unitario_salida = ($saldo_cantidad != 0) ? $saldo_valor_total / $saldo_cantidad : 0;
-                $costo_total_salida = $cantidad_salida * $costo_unitario_salida;
+                    $saldo_cantidad_actual += $cantidad_entrada;
+                    $saldo_valor_total_actual += $costo_total_entrada;
 
-                $saldo_cantidad -= $cantidad_salida;
-                $saldo_valor_total -= $costo_total_salida;
+                    $fila += ["ent_cant" => $cantidad_entrada, "ent_costo_u" => $costo_unitario_entrada, "ent_costo_t" => $costo_total_entrada, "sal_cant" => "", "sal_costo_u" => "", "sal_costo_t" => ""];
+                } else { // Venta
+                    $fila["concepto"] = 'VENTA';
+                    $cantidad_salida = (float)$mov['cantidad']; // <-- Viene de `detalle_ventas.cantidad`
 
-                $fila["sal_cant"] = $cantidad_salida;
-                $fila["sal_costo_u"] = $costo_unitario_salida;
-                $fila["sal_costo_t"] = $costo_total_salida;
+                    $costo_unitario_salida = ($saldo_cantidad_actual > 0) ? $saldo_valor_total_actual / $saldo_cantidad_actual : 0;
+                    $costo_total_salida = round($cantidad_salida * $costo_unitario_salida, 2);
+
+                    $saldo_cantidad_actual -= $cantidad_salida;
+                    $saldo_valor_total_actual -= $costo_total_salida;
+
+                    $fila += ["ent_cant" => "", "ent_costo_u" => "", "ent_costo_t" => "", "sal_cant" => $cantidad_salida, "sal_costo_u" => $costo_unitario_salida, "sal_costo_t" => $costo_total_salida];
+                }
+
+                if ($saldo_cantidad_actual < 0.001) {
+                    $saldo_cantidad_actual = 0;
+                    $saldo_valor_total_actual = 0;
+                }
+
+                $costo_unitario_saldo = ($saldo_cantidad_actual > 0) ? $saldo_valor_total_actual / $saldo_cantidad_actual : 0;
+                $fila += ["sld_cant" => $saldo_cantidad_actual, "sld_costo_u" => $costo_unitario_saldo, "sld_costo_t" => $saldo_valor_total_actual];
+
+                $kardexProcesado[] = $fila;
             }
-
-            $costo_unitario_saldo = ($saldo_cantidad != 0) ? $saldo_valor_total / $saldo_cantidad : 0;
-            $fila["sld_cant"] = $saldo_cantidad;
-            $fila["sld_costo_u"] = $costo_unitario_saldo;
-            $fila["sld_costo_t"] = $saldo_valor_total;
-
-            $kardexProcesado[] = $fila;
+            return $kardexProcesado;
+        } catch (Exception $e) {
+            return [];
         }
-
-        return $kardexProcesado;
     }
 }
