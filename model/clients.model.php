@@ -28,14 +28,12 @@ class ModelClients{
     ======================================**/
     static public function mdlIngresarClientes($tabla, $datos){
         
-        $stmt = Connection::connect()->prepare("INSERT INTO $tabla(id_usuario, codigo, tipo_documento, documento, nombre, email, telefono, direccion, feregistro) VALUES (:id_usuario, :codigo, :tipo_documento, :documento, :nombre, :email, :telefono, :direccion, :feregistro)");
+        $stmt = Connection::connect()->prepare("INSERT INTO $tabla(id_usuario, tipo_documento, documento, nombre, telefono, direccion, feregistro) VALUES (:id_usuario, :tipo_documento, :documento, :nombre, :telefono, :direccion, :feregistro)");
         
         $stmt->bindParam(":id_usuario", $datos["id_usuario"], PDO::PARAM_STR);
-        $stmt->bindParam(":codigo", $datos["codigo"], PDO::PARAM_INT);
         $stmt->bindParam(":tipo_documento", $datos["tipo_documento"], PDO::PARAM_STR);
-        $stmt->bindParam(":documento", $datos["documento"], PDO::PARAM_INT);
+        $stmt->bindParam(":documento", $datos["documento"], PDO::PARAM_STR);
         $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
-        $stmt->bindParam(":email", $datos["email"], PDO::PARAM_STR);
         $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);
         $stmt->bindParam(":direccion", $datos["direccion"], PDO::PARAM_STR);
         $stmt->bindParam(":feregistro", $datos["feregistro"], PDO::PARAM_STR);
@@ -54,13 +52,12 @@ class ModelClients{
     ======================================**/
     static public function mdlEditarCliente($tabla, $datos)
     {
-        $stmt = Connection::connect()->prepare("UPDATE $tabla SET id = :id, tipo_documento = :tipo_documento, documento = :documento, nombre = :nombre, email = :email, telefono = :telefono, direccion = :direccion WHERE id = :id");
+        $stmt = Connection::connect()->prepare("UPDATE $tabla SET tipo_documento = :tipo_documento, documento = :documento, nombre = :nombre, telefono = :telefono, direccion = :direccion WHERE id = :id");
         
         $stmt->bindParam(":id", $datos["id"], PDO::PARAM_INT);
         $stmt->bindParam(":tipo_documento", $datos["tipo_documento"], PDO::PARAM_STR);
         $stmt->bindParam(":documento", $datos["documento"], PDO::PARAM_STR);
         $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
-        $stmt->bindParam(":email", $datos["email"], PDO::PARAM_STR);
         $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);
         $stmt->bindParam(":direccion", $datos["direccion"], PDO::PARAM_STR);
 
