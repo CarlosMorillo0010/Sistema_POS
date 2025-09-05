@@ -304,8 +304,8 @@ $(".tablaLibro").on("click", ".btnVerDetalleVenta", function() {
         processData: false,
         dataType: "json", // Esperamos una respuesta JSON
         success: function(respuesta) {
-            
-            if (respuesta) {
+
+            if (respuesta && Array.isArray(respuesta.productos)) {
                 // Construimos el HTML con los datos recibidos
                 var html = `
                     <div class="row">
@@ -327,19 +327,23 @@ $(".tablaLibro").on("click", ".btnVerDetalleVenta", function() {
                             <tr>
                                 <th>Descripción</th>
                                 <th>Cantidad</th>
-                                <th>Precio Unit.</th>
-                                <th>Total.</th>
+                                <th>Precio Unit. (Bs)</th>
+                                <th>Total (Bs)</th>
                             </tr>
                         </thead>
                         <tbody>`;
                 
+                const tasaDia = Number(respuesta.tasa_dia);
                 // Iteramos sobre los productos
                 respuesta.productos.forEach(function(producto) {
+                    const precioUnitarioBs = Number(producto.pvp_referencia) * tasaDia;
+                    const totalBs = Number(producto.total) * tasaDia;
+
                     html += `<tr>
                                 <td>${producto.descripcion}</td>
                                 <td>${producto.cantidad}</td>
-                                <td>${Number(producto.pvp_referencia).toLocaleString('es-VE', {minimumFractionDigits: 2})} USD.</td>
-                                <td>${Number(producto.total).toLocaleString('es-VE', {minimumFractionDigits: 2})} USD.</td>
+                                <td>${precioUnitarioBs.toLocaleString('es-VE', {minimumFractionDigits: 2})}</td>
+                                <td>${totalBs.toLocaleString('es-VE', {minimumFractionDigits: 2})}</td>
                              </tr>`;
                 });
 
@@ -381,6 +385,9 @@ $(".tablaLibro").on("click", ".btnVerDetalleVenta", function() {
             } else {
                  $("#contenidoModalVenta").html("<p class='text-danger'>No se pudo cargar la información de la venta.</p>");
             }
+        },
+        error: function() {
+            $("#contenidoModalVenta").html("<p class='text-danger'>Ocurrió un error al contactar al servidor.</p>");
         }
     });
 
