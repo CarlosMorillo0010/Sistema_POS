@@ -17,7 +17,7 @@ class ControllerConfiguraciones {
             if (isset($_FILES["imagenEmpresa"]["tmp_name"]) && !empty($_FILES["imagenEmpresa"]["tmp_name"])) {
                 list($ancho, $alto) = getimagesize($_FILES["imagenEmpresa"]["tmp_name"]);
                 $nuevoAncho = 500; $nuevoAlto = 500;
-                $directorio = "views/img/config";
+                $directorio = "view/img/config";
 
                 if (!is_dir($directorio)) { mkdir($directorio, 0755); }
 
