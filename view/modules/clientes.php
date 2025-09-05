@@ -37,7 +37,6 @@ $estados = ["Amazonas", "Anzoátegui", "Apure", "Aragua", "Barinas", "Bolívar",
                     <thead>
                     <tr>
                         <th style="width:10px">#</th>
-                        <th>Codigo</th>
                         <th>Cliente</th>
                         <th>Documento</th>
                         <th>Teléfono</th>
@@ -55,7 +54,6 @@ $estados = ["Amazonas", "Anzoátegui", "Apure", "Aragua", "Barinas", "Bolívar",
                     foreach ($clientes as $key => $value) {
                         echo '<tr>    
                     <td>' . ($key + 1) . '</td>    
-                    <td>' . $value["codigo"] . '</td>   
                     <td>' . $value["nombre"] . '</td>   
                     <td>' . $value["tipo_documento"] . $value["documento"] . '</td>        
                     <td>' . $value["telefono"] . '</td>    
@@ -121,11 +119,11 @@ MODAL AGREGAR CLIENTE
                         <div class="row">
                             <div class="form-group col-lg-6">
                                 <label><small style="color: #000;">Teléfono Celular:</small></label>
-                                <input type="text" class="form-control input-lg" name="nuevoTelefono1" placeholder="Ej: (0414)-123.45.67" data-inputmask="'mask': '(9999)-999.99.99'" data-mask>
+                                <input type="text" class="form-control input-lg" name="nuevoTelefono1" placeholder="Ingresar teléfono celular">
                             </div>
                             <div class="form-group col-lg-6">
                                 <label><small style="color: #000;">Teléfono Fijo:</small></label>
-                                <input type="text" class="form-control input-lg" name="nuevoTelefono2" placeholder="Ej: (0212)-987.65.43" data-inputmask="'mask': '(9999)-999.99.99'" data-mask>
+                                <input type="text" class="form-control input-lg" name="nuevoTelefono2" placeholder="Ingresar teléfono fijo">
                             </div>
                         </div>
                         <div class="row">
@@ -190,7 +188,7 @@ MODAL EDITAR CLIENTE
                                 <div class="input-group">
                                     <span class="input-group-addon" style="padding: 0; border: none;">
                                         <select class="form-control input-lg nacionalidad-select" name="editarNacionalidad" id="editarNacionalidadSelect" required style="width: 80px;">
-                                            <option id="editarNacionalidadOption"></option>
+                                            
                                             <option value="V">V</option>
                                             <option value="E">E</option>
                                             <option value="P">P</option>
@@ -206,11 +204,11 @@ MODAL EDITAR CLIENTE
                         <div class="row">
                             <div class="form-group col-lg-6">
                                 <label><small style="color: #000;">Teléfono Celular:</small></label>
-                                <input type="text" class="form-control input-lg" id="editarTelefono1" name="editarTelefono1" data-inputmask="'mask': '(9999)-999.99.99'" data-mask>
+                                <input type="text" class="form-control input-lg" id="editarTelefono1" name="editarTelefono1">
                             </div>
                             <div class="form-group col-lg-6">
                                 <label><small style="color: #000;">Teléfono Fijo:</small></label>
-                                <input type="text" class="form-control input-lg" id="editarTelefono2" name="editarTelefono2" data-inputmask="'mask': '(9999)-999.99.99'" data-mask>
+                                <input type="text" class="form-control input-lg" id="editarTelefono2" name="editarTelefono2">
                             </div>
                         </div>
                         <div class="row">

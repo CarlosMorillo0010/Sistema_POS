@@ -15,14 +15,44 @@ $(document).on("click", ".btnVerCliente", function(){
 		dataType: "json",
 		success:function(respuesta){
 
-			$("#verCodigo").val(respuesta["codigo"]);
-			$("#verNacionalidad").val(respuesta["tipo_documento"]);
-			$("#verNacionalidad").html(respuesta["tipo_documento"]);
-			$("#verDocumento").val(respuesta["documento"]);
+			$("#verDocumento").val(respuesta["tipo_documento"] + respuesta["documento"]);
 			$("#verNombre").val(respuesta["nombre"]);
-	        $("#verEmail").val(respuesta["email"]);
-	        $("#verTelefono").val(respuesta["telefono"]);
-	        $("#verDireccion").val(respuesta["direccion"]);
+
+            // Parse and display telefono
+            var telefono = respuesta["telefono"] || "";
+            var tel1 = "";
+            var tel2 = "";
+            if (telefono.includes("Cel: ")) {
+                var parts = telefono.split(" / ");
+                tel1 = parts[0].replace("Cel: ", "");
+                if (parts.length > 1 && parts[1].includes("Fijo: ")) {
+                    tel2 = parts[1].replace("Fijo: ", "");
+                }
+            } else if (telefono.includes("Fijo: ")) {
+                tel2 = telefono.replace("Fijo: ", "");
+            }
+            $("#verTelefono1").val(tel1);
+            $("#verTelefono2").val(tel2);
+
+            // Parse and display direccion
+            var direccionCompleta = respuesta["direccion"] || "";
+            var direccionParts = direccionCompleta.split(", ");
+            var estado = "";
+            var ciudad = "";
+            var direccion = "";
+            if (direccionParts.length >= 3) {
+                estado = direccionParts[0];
+                ciudad = direccionParts[1];
+                direccion = direccionParts.slice(2).join(", ");
+            } else if (direccionParts.length == 2) {
+                estado = direccionParts[0];
+                ciudad = direccionParts[1];
+            } else if (direccionParts.length == 1) {
+                direccion = direccionParts[0];
+            }
+            $("#verEstado").val(estado);
+            $("#verCiudad").val(ciudad);
+            $("#verDireccion").val(direccion);
 		}
 	})
 })
@@ -45,15 +75,45 @@ $(document).on("click", ".btnEditarCliente", function(){
 		success:function(respuesta){
 
 			$("#idCliente").val(respuesta["id"]);
-			$("#editarCodigo").val(respuesta["codigo"]);
-			$("#editarNacionalidad").val(respuesta["tipo_documento"]);
-			$("#editarNacionalidad").html(respuesta["tipo_documento"]);
+			$("#editarNacionalidadSelect").val(respuesta["tipo_documento"]);
 			$("#editarDocumento").val(respuesta["documento"]);
 			$("#editarNombre").val(respuesta["nombre"]);
-	        $("#editarEmail").val(respuesta["email"]);
-	        $("#editarTelefono").val(respuesta["telefono"]);
-	        $("#editarDireccion").val(respuesta["direccion"]);
+	        
+            // Parse and populate telefono
+            var telefono = respuesta["telefono"] || "";
+            var tel1 = "";
+            var tel2 = "";
+            if (telefono.includes("Cel: ")) {
+                var parts = telefono.split(" / ");
+                tel1 = parts[0].replace("Cel: ", "");
+                if (parts.length > 1 && parts[1].includes("Fijo: ")) {
+                    tel2 = parts[1].replace("Fijo: ", "");
+                }
+            } else if (telefono.includes("Fijo: ")) {
+                tel2 = telefono.replace("Fijo: ", "");
+            }
+            $("#editarTelefono1").val(tel1);
+            $("#editarTelefono2").val(tel2);
 
+            // Parse and populate direccion
+            var direccionCompleta = respuesta["direccion"] || "";
+            var direccionParts = direccionCompleta.split(", ");
+            var estado = "";
+            var ciudad = "";
+            var direccion = "";
+            if (direccionParts.length >= 3) {
+                estado = direccionParts[0];
+                ciudad = direccionParts[1];
+                direccion = direccionParts.slice(2).join(", ");
+            } else if (direccionParts.length == 2) {
+                estado = direccionParts[0];
+                ciudad = direccionParts[1];
+            } else if (direccionParts.length == 1) {
+                direccion = direccionParts[0];
+            }
+            $("#editarEstado").val(estado);
+            $("#editarCiudad").val(ciudad);
+            $("#editarDireccion").val(direccion);
 		}
 	})
 })
