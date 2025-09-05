@@ -193,6 +193,7 @@ function versionAsset($path)
                 $_GET["ruta"] == "bancos" ||
                 // $_GET["ruta"] == "almacenes" ||
                 $_GET["ruta"] == "inventario" ||
+                $_GET["ruta"] == "kardex" ||
                 $_GET["ruta"] == "formas-pago" ||
                 $_GET["ruta"] == "crear-usuario" ||
                 $_GET["ruta"] == "categorias" ||
@@ -238,7 +239,9 @@ function versionAsset($path)
                 $_GET["ruta"] == "crear-compra" ||
                 $_GET["ruta"] == "crear-orden-compra" ||
                 $_GET["ruta"] == "editar-orden-compra" ||
-                // $_GET["ruta"] == "crear-devolucion-compra" ||
+                $_GET["ruta"] == "crear-devolucion-compra" ||
+                $_GET["ruta"] == "crear-devolucion-venta" ||
+                $_GET["ruta"] == "kardex" ||
                 // $_GET["ruta"] == "crear-factura-gasto" ||
                 // $_GET["ruta"] == "crear-factura" ||
                 // $_GET["ruta"] == "crear-pedido" ||
@@ -286,6 +289,7 @@ function versionAsset($path)
                 'unidades-medida' => 'productos.js',
                 'impuestos' => 'impuestos.js',
                 'inventario' => 'inventario.js',
+                'kardex' => 'kardex.js',
                 'ingresos' => 'inventario.js',
                 'divisas' => 'divisas.js',
                 'config-divisas' => 'divisas.js',
@@ -308,7 +312,10 @@ function versionAsset($path)
                 'crear-factura-gasto' => 'facturas-gastos.js',
                 'crear-orden-compra' => 'orden-compra.js',
                 'editar-orden-compra' => 'orden-compra.js',
+                'crear-devolucion-compra' => 'devolucion-compra.js',
                 'devolucion-compra' => 'devolucion-compra.js',
+                'crear-devolucion-venta' => 'devolucion-venta.js',
+                'kardex' => 'kardex.js',
                 'pedidos-ventas' => 'pedidos-ventas.js',
                 'crear-factura-venta' => 'factura-venta.js',
                 'ventas' => 'ventas.js',

@@ -1,44 +1,34 @@
 <?php
-require_once "../controller/ventas-controller.php";
-require_once "../controller/clients.controller.php";
-require_once "../model/ventas-model.php";
-require_once "../model/clients.model.php";
-require_once "../model/connection.php";
 
-// PRIMERA CONDICIÓN: Verificamos si se envió 'idVentaDetalle'
-if (isset($_POST["idVentaDetalle"])) {
+require_once "../controller/ventas.controller.php";
+require_once "../model/ventas.model.php";
 
-    $item = "id_venta"; // Nombre de la columna en la tabla de ventas
-    $valor = $_POST["idVentaDetalle"];
+class AjaxVentas{
 
-    // Llamamos a un nuevo método en el controlador
-    $venta = ControllerVentas::ctrMostrarVentaDetallada($item, $valor);
-    
-    // Devolvemos la respuesta en formato JSON y terminamos el script
-    echo json_encode($venta);
+    /*======================================
+     TRAER VENTA
+    ======================================**/
+    public $idVenta;
 
-// SEGUNDA CONDICIÓN: Si no se envió 'idVentaDetalle', verificamos si se envió 'accion'
-} else if (isset($_POST["accion"])) {
+    public function ajaxTraerVenta(){
 
-    $accion = $_POST["accion"];
+        $item = "id_venta";
+        $valor = $this->idVenta;
 
-    switch ($accion) {
-        
-        case 'marcar_pendiente':
-            ControllerVentas::ctrMarcarVentaComoPendiente();
-            break;
+        $venta = ControllerVentas::ctrMostrarVenta($item, $valor);
 
-        case 'actualizar_estado':
-            ControllerVentas::ctrActualizarEstadoVenta();
-            break;
-        
-        default:
-            echo "error_accion_desconocida";
-            break;
+        echo json_encode($venta);
+
     }
+}
 
-// SI NINGUNA DE LAS CONDICIONES ANTERIORES SE CUMPLIÓ
-} else {
-    // Si no se envía ni 'idVentaDetalle' ni 'accion', no se puede procesar
-    echo json_encode(["error" => "No se proporcionó una acción o ID válido"]);
+/*======================================
+ OBJETO
+======================================**/
+if(isset($_POST["idVenta"])){
+
+    $traerVenta = new AjaxVentas();
+    $traerVenta -> idVenta = $_POST["idVenta"];
+    $traerVenta -> ajaxTraerVenta();
+
 }

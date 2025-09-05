@@ -1,45 +1,43 @@
 <?php
 
-require_once "../controller/ordenes-compras.controller.php";
-require_once "../model/ordenes-compras.model.php";
+require_once "../controller/compras.controller.php";
+require_once "../model/compras.model.php";
 
-class AjaxCompras
-{
+class AjaxCompras{
 
-    /*=============================================
-    CARGAR PRODUCTOS DE ORDEN DE COMPRA
-    =============================================*/
+    /*======================================
+     TRAER COMPRA
+    ======================================**/
+    public $idCompra;
 
-    public $idOrdenCompra;
+    public function ajaxTraerCompra(){
 
-    public function ajaxCargarProductos()
-    {
+        $item = "id_compra";
+        $valor = $this->idCompra;
 
-        $item = "id_orden_compra";
-        $valor = $this->idOrdenCompra;
+        $compra = ControllerCompras::ctrMostrarCompras($item, $valor);
 
-        $orden = ControllerOrdenesCompras::ctrMostrarOrdenCompra($item, $valor);
-        $detalle = ModelOrdenesCompras::mdlMostrarOrdenCompraDetalle("orden_compra_detalle", $item, $valor);
+        $itemDetalle = "id_compra";
+        $valorDetalle = $this->idCompra;
+        $detalle = ControllerCompras::ctrMostrarDetalleCompra($itemDetalle, $valorDetalle);
 
         $respuesta = array(
-            "orden" => $orden,
+            "compra" => $compra,
             "detalle" => $detalle
         );
 
         echo json_encode($respuesta);
 
     }
-
 }
 
-/*=============================================
-OBJETO
-=============================================*/
+/*======================================
+ OBJETO
+======================================**/
+if(isset($_POST["idCompra"])){
 
-if (isset($_POST["idOrdenCompra"])) {
-
-    $cargarProductos = new AjaxCompras();
-    $cargarProductos->idOrdenCompra = $_POST["idOrdenCompra"];
-    $cargarProductos->ajaxCargarProductos();
+    $traerCompra = new AjaxCompras();
+    $traerCompra -> idCompra = $_POST["idCompra"];
+    $traerCompra -> ajaxTraerCompra();
 
 }
