@@ -10,54 +10,48 @@ class ModeloKardex
      */
     static public function mdlMostrarKardex($idProducto, $fechaInicial, $fechaFinal)
     {
+        // Ajuste para incluir el día completo en la fecha final
+        $fechaFinal = $fechaFinal . ' 23:59:59';
+
         try {
             $pdo = Connection::connect();
 
-            // --- FASE 1: CALCULAR SALDO INICIAL (MÉTODO HISTÓRICO) ---
-            // Se leen todas las transacciones ANTERIORES a la fecha de inicio del reporte.
-            $stmtAnteriores = $pdo->prepare(
-                "SELECT * FROM (
-                    (SELECT c.fecha_compra as fecha, 'Compra' as tipo, dc.cantidad, dc.precio_unitario as valor
+            // --- FASE 1: CALCULAR SALDO INICIAL (USANDO ÚLTIMO COSTO DE COMPRA) ---
+
+            // 1.1. Calcular cantidad inicial
+            $stmtCantidades = $pdo->prepare(
+                "SELECT 
+                    (SELECT COALESCE(SUM(dc.cantidad), 0) 
                      FROM compras c JOIN detalle_compras dc ON c.id_compra = dc.id_compra 
                      WHERE dc.id_producto = :id_producto AND c.fecha_compra < :fechaInicial)
-                     UNION ALL
-                    (SELECT v.fecha, 'Venta' as tipo, dv.cantidad, 0 as valor
+                    -
+                    (SELECT COALESCE(SUM(dv.cantidad), 0) 
                      FROM ventas v JOIN detalle_ventas dv ON v.id_venta = dv.id_venta 
                      WHERE dv.id_producto = :id_producto AND v.fecha < :fechaInicial)
-                 ) AS movimientos_anteriores
-                 ORDER BY fecha ASC, (CASE WHEN tipo = 'Compra' THEN 0 ELSE 1 END) ASC"
+                 AS cantidad_inicial"
             );
-            $stmtAnteriores->bindParam(":id_producto", $idProducto, PDO::PARAM_INT);
-            $stmtAnteriores->bindParam(":fechaInicial", $fechaInicial, PDO::PARAM_STR);
-            $stmtAnteriores->execute();
-            $movimientos_anteriores = $stmtAnteriores->fetchAll(PDO::FETCH_ASSOC);
+            $stmtCantidades->bindParam(":id_producto", $idProducto, PDO::PARAM_INT);
+            $stmtCantidades->bindParam(":fechaInicial", $fechaInicial, PDO::PARAM_STR);
+            $stmtCantidades->execute();
+            $resultado = $stmtCantidades->fetch(PDO::FETCH_ASSOC);
+            $saldo_inicial_cantidad = (float)($resultado['cantidad_inicial'] ?? 0.0);
 
-            $saldo_inicial_cantidad = 0.0;
-            $saldo_inicial_valor_total = 0.0;
+            // 1.2. Obtener el último costo de compra
+            $stmtUltimoCosto = $pdo->prepare(
+                "SELECT dc.precio_unitario 
+                 FROM compras c JOIN detalle_compras dc ON c.id_compra = dc.id_compra
+                 WHERE dc.id_producto = :id_producto AND c.fecha_compra < :fechaInicial
+                 ORDER BY c.fecha_compra DESC, c.id_compra DESC
+                 LIMIT 1"
+            );
+            $stmtUltimoCosto->bindParam(":id_producto", $idProducto, PDO::PARAM_INT);
+            $stmtUltimoCosto->bindParam(":fechaInicial", $fechaInicial, PDO::PARAM_STR);
+            $stmtUltimoCosto->execute();
+            $ultimo_costo = $stmtUltimoCosto->fetch(PDO::FETCH_ASSOC);
+            $saldo_inicial_costo_unitario = (float)($ultimo_costo['precio_unitario'] ?? 0.0);
 
-            // Se procesan los movimientos para obtener el saldo inicial por costo promedio móvil.
-            foreach ($movimientos_anteriores as $mov) {
-                if ($mov['tipo'] == 'Compra') {
-                    $cantidad_entrada = (float)$mov['cantidad'];
-                    $costo_total_entrada = $cantidad_entrada * (float)$mov['valor'];
-
-                    $saldo_inicial_cantidad += $cantidad_entrada;
-                    $saldo_inicial_valor_total += $costo_total_entrada;
-
-                } else if ($mov['tipo'] == 'Venta') {
-                    $cantidad_salida = (float)$mov['cantidad'];
-                    
-                    // El costo de la salida se calcula con el promedio actual.
-                    $costo_unitario_salida = ($saldo_inicial_cantidad > 0) ? $saldo_inicial_valor_total / $saldo_inicial_cantidad : 0;
-                    $costo_total_salida = $cantidad_salida * $costo_unitario_salida;
-
-                    $saldo_inicial_cantidad -= $cantidad_salida;
-                    $saldo_inicial_valor_total -= $costo_total_salida;
-                }
-            }
-
-            // Se calcula el costo unitario promedio final para el saldo inicial.
-            $saldo_inicial_costo_unitario = ($saldo_inicial_cantidad > 0) ? $saldo_inicial_valor_total / $saldo_inicial_cantidad : 0;
+            // 1.3. Calcular el valor total inicial
+            $saldo_inicial_valor_total = $saldo_inicial_cantidad * $saldo_inicial_costo_unitario;
 
             // --- FASE 2: OBTENER MOVIMIENTOS DEL PERIODO ---
             $stmtRango = $pdo->prepare(
