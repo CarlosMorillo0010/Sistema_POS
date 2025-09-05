@@ -136,7 +136,7 @@ MODAL REGISTRAR PAGO DE CLIENTE
                             <div class="col-lg-4 mb-2">
                                 <label>Monto Recibido:</label>
                                 <input type="number" step="0.01" class="form-control" id="pagoMonto" name="pagoMonto"
-                                        placeholder="0.00" required>
+                                    placeholder="0.00" required>
                             </div>
                         </div>
 
@@ -152,11 +152,17 @@ MODAL REGISTRAR PAGO DE CLIENTE
                         </div>
 
                         <!-- Campo para Tasa de Cambio (inicialmente oculto) -->
-                        <div class="form-group" id="pagoTasaCambioContainer">
+                        <?php
+                            require_once "controller/divisas.controller.php";
+                            require_once "model/divisas.model.php";
+                            $tasaUSD = ControllerDivisas::ctrObtenerTasaActual("USD");
+                            $valorTasa = $tasaUSD ? number_format($tasaUSD, 2, ',', '.') : '';
+                        ?>
+                        <div class="form-group" id="pagoTasaCambioContainer" style="display: none;">
                             <div class="col-lg-4 mb-2">
                                 <label>BCV del día del pago:</label>
                                 <input type="number" step="0.01" class="form-control" name="pagoTasaCambio"
-                                    placeholder="Bolivar por Dólar" readonly>
+                                    placeholder="Bolivar por Dólar" value="<?php echo $tasaUSD; ?>">
                             </div>
                         </div>
 

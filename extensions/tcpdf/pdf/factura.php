@@ -9,7 +9,7 @@ require_once "../../../controller/users.controller.php";
 require_once "../../../model/users.model.php";
 require_once "../../../controller/products.controller.php";
 require_once "../../../model/products.model.php";
-// --- NUEVAS DEPENDENCIAS PARA OBTENER DATOS DE LA EMPRESA ---
+// --- DEPENDENCIAS PARA OBTENER DATOS DE LA EMPRESA ---
 require_once "../../../controller/configuraciones.controller.php";
 require_once "../../../model/configuraciones.model.php";
 require_once "../../../model/connection.php";
