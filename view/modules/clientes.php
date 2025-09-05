@@ -58,7 +58,7 @@ $estados = ["Amazonas", "Anzoátegui", "Apure", "Aragua", "Barinas", "Bolívar",
                     <td>' . $value["tipo_documento"] . $value["documento"] . '</td>        
                     <td>' . $value["telefono"] . '</td>    
                     <td>' . $value["direccion"] . '</td>    
-                    <td>' . $value["compras"] . '</td>  
+                    <td>$ ' . number_format($value["compras"], 2, ',', '.') . '</td>  
                     <td>' . $value["feregistro"] . '</td>   
                     <td>    
                       <div class="btn-group">
@@ -67,7 +67,7 @@ $estados = ["Amazonas", "Anzoátegui", "Apure", "Aragua", "Barinas", "Bolívar",
 
                         <button class="btn btn-warning btnEditarCliente" data-toggle="modal" data-target="#modalEditarCliente" idCliente="' . $value["id"] . '"><i class="fa fa-pencil"></i></button>
 
-                        <button class="btn btn-danger btnEliminarCliente" idCliente="' . $value["id"] . '"><i class="fa fa-times"></i></button>
+                        <button class="btn btn-danger btnEliminarCliente" idCliente="' . $value["id"] . '" data-compras="' . $value["compras"] . '"><i class="fa fa-times"></i></button>
 
                       </div>      
                     </td>    
