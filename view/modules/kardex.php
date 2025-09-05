@@ -1,3 +1,14 @@
+<style>
+  .entrada-cell {
+    background-color: #d4edda !important; /* light green */
+  }
+  .salida-cell {
+    background-color: #f8d7da !important; /* light red */
+  }
+  .saldo-cell {
+    background-color: #cce5ff !important; /* light blue */
+  }
+</style>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -221,6 +232,22 @@ $(function () {
                 "deferRender": true,
                 "retrieve": true,
                 "processing": true,
+                "createdRow": function(row, data, dataIndex){
+                    // Pintar las celdas de entradas
+                    $('td', row).eq(4).addClass('entrada-cell');
+                    $('td', row).eq(5).addClass('entrada-cell');
+                    $('td', row).eq(6).addClass('entrada-cell');
+
+                    // Pintar las celdas de salidas
+                    $('td', row).eq(7).addClass('salida-cell');
+                    $('td', row).eq(8).addClass('salida-cell');
+                    $('td', row).eq(9).addClass('salida-cell');
+
+                    // Pintar las celdas de saldos
+                    $('td', row).eq(10).addClass('saldo-cell');
+                    $('td', row).eq(11).addClass('saldo-cell');
+                    $('td', row).eq(12).addClass('saldo-cell');
+                },
                 "language": {
                     "sProcessing": "Procesando...",
                     "sLengthMenu": "Mostrar _MENU_ registros",
