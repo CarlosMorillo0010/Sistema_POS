@@ -1,10 +1,10 @@
 <?php
-// Requerimos los archivos necesarios para la conexión y los modelos/controladores
-// Asegúrate de que las rutas sean correctas desde la ubicación de este archivo
 require_once "../../controller/ventas-controller.php";
 require_once "../../controller/clients.controller.php";
 require_once "../../model/ventas-model.php";
-require_once "../../model/clients.model.php"; // Lo necesitaremos para el RIF del cliente
+require_once "../../model/clients.model.php";
+require_once "../../controller/configuraciones.controller.php";
+require_once "../../model/configuraciones.model.php";
 require_once "../../model/connection.php";
 
 // 1. OBTENER LAS FECHAS DESDE LA URL
@@ -17,8 +17,10 @@ if (isset($_GET["fechaInicial"]) && isset($_GET["fechaFinal"])) {
 }
 
 // OBTENER LOS DATOS DE LAS VENTAS
-// Usamos el mismo método del controlador que usa el Libro de Ventas
 $ventas = ControllerVentas::ctrRangoFechasVentas($fechaInicial, $fechaFinal);
+
+// OBTENER DATOS DE LA EMPRESA
+$empresa = ControllerConfiguraciones::ctrMostrarConfiguracion();
 
 if (empty($ventas)) {
     die("No hay ventas para el período seleccionado.");
@@ -26,7 +28,7 @@ if (empty($ventas)) {
 
 //CONSTRUIR EL CONTENIDO DEL ARCHIVO TXT
 $contenidoTxt = "";
-$rifEmpresa = "J-40982706-2"; //Reemplaza esto con el RIF de tu empresa
+$rifEmpresa = $empresa["rif"];
 
 foreach ($ventas as $venta) {
 

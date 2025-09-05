@@ -7,6 +7,28 @@ require_once "../model/ventas-model.php";
 require_once "../controller/clients.controller.php";
 require_once "../model/clients.model.php";
 
+/*============================================
+ ACCIONES DE ESTADO (DESDE LIBRO DE VENTAS)
+============================================*/
+if (isset($_POST["accion"])) {
+
+    switch ($_POST["accion"]) {
+
+        case "marcar_pendiente":
+            // Esta función ya se encarga de todo el proceso y de imprimir "ok" o un error.
+            ControllerVentas::ctrMarcarVentaComoPendiente();
+            break;
+
+        case "actualizar_estado":
+            // Esta función actualiza el estado y también imprime la respuesta.
+            ControllerVentas::ctrActualizarEstadoVenta();
+            break;
+    }
+
+    // Detenemos el script aquí para que no continúe con los otros bloques if.
+    return; 
+}
+
 
 class AjaxVentas{
 
@@ -30,7 +52,8 @@ class AjaxVentas{
 /*======================================
  OBJETO PARA TRAER VENTA SIMPLE
 ======================================*/
-if(isset($_POST["idVenta"])){
+// Se añade !isset($_POST["accion"]) para evitar que se ejecute durante una actualización de estado.
+if(isset($_POST["idVenta"]) && !isset($_POST["accion"])){
 
     $traerVenta = new AjaxVentas();
     $traerVenta -> idVenta = $_POST["idVenta"];

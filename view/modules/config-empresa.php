@@ -38,8 +38,8 @@ if(!$configuracion) $configuracion = [];
                         <div class="col-md-6">
                             <h4>Configuración Financiera y Fiscal</h4><hr>
                             <div class="row">
-                                <div class="col-sm-6 form-group"><label>IVA (%):</label><div class="input-group"><input type="number" class="form-control" name="iva" min="0" step="0.01" value="<?php echo $configuracion['iva'] ?? '16.00'; ?>" required><span class="input-group-addon">%</span></div></div>
-                                <div class="col-sm-6 form-group"><label>IGTF (%):</label><div class="input-group"><input type="number" class="form-control" name="igtf" min="0" step="0.01" value="<?php echo $configuracion['igtf'] ?? '3.00'; ?>" required><span class="input-group-addon">%</span></div></div>
+                                <div class="col-sm-6 form-group"><label>IVA (%):</label><div class="input-group"><input type="number" class="form-control" name="iva" min="0" step="0.01" value="<?php echo $configuracion['iva'] ?? '16.00'; ?>" required></div></div>
+                                <div class="col-sm-6 form-group"><label>IGTF (%):</label><div class="input-group"><input type="number" class="form-control" name="igtf" min="0" step="0.01" value="<?php echo $configuracion['igtf'] ?? '3.00'; ?>" required></div></div>
                             </div>
                             <div class="form-group">
                                 <label>Moneda Principal del Sistema:</label>

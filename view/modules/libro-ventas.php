@@ -1,11 +1,11 @@
 <div class="content-wrapper">
-    
+
     <section class="content-header">
-        
+
         <h1>
             Libro de ventas
         </h1>
-        
+
         <ol class="breadcrumb">
             <li><a href="inicio"><i class="fa fa-dashboard"></i> Inicio</a></li>
             <li class="active">Libro de ventas</li>
@@ -72,16 +72,17 @@
                         </span>
                         <i class="fa fa-caret-down"></i>
                     </button>
-                    <button class="btn btn-default mr-1" data-toggle="modal" data-target="#modalInstruccionesVentas" title="Ver instrucciones de uso">
+                    <button class="btn btn-default mr-1" data-toggle="modal" data-target="#modalInstruccionesVentas"
+                        title="Ver instrucciones de uso">
                         <i class="fa fa-question-circle"></i>
                     </button>
 
                 </div>
-                
+
                 <div id="customButtons" class="hidden">
 
-                    <a id="btnGenerarTxtSeniat" title="Exportar TXT SENIAT" class="btn btn-primary pull-left" target="_blank"><i
-                        class="fa fa-file-text-o"></i> TXT</a>  
+                    <a id="btnGenerarTxtSeniat" title="Exportar TXT SENIAT" class="btn btn-primary pull-left"
+                        target="_blank"><i class="fa fa-file-text-o"></i> TXT</a>
                 </div>
 
             </div>
@@ -138,7 +139,7 @@
 
                                 <td class="dt-center">' . ($key + 1) . '</td>
                                 <td class="dt-center">' . date("d/m/Y", strtotime($value["fecha"])) . '</td>';
-                                
+
                             echo '<td class="dt-center">
                                 <button class="btn btn-default btnVerDetalleVenta" style="color:#000; font-size: 16px;" 
                                         data-id-venta="' . $value["id_venta"] . '" 
@@ -155,7 +156,7 @@
 
                             // Mostrar el nombre del cliente con un ancho fijo
                             echo '<td class="dt-center" style="width: 15%;">' . ($respuestaCliente ? htmlspecialchars($respuestaCliente["nombre"]) : 'Cliente no encontrado') . '</td>';
-                            
+
                             // Mostrar el documento del cliente
                             echo '<td class="dt-center">' . ($respuestaCliente ? htmlspecialchars($respuestaCliente["tipo_documento"]) . ' ' . htmlspecialchars($respuestaCliente["documento"]) : 'Cliente no encontrado') . '</td>';
 
@@ -216,7 +217,7 @@ MODAL DETALLE DE VENTA
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Detalle de la Venta</h4>
             </div>
-            
+
             <div class="modal-body">
                 <div class="box-body" id="contenidoModalVenta">
                     <div class="text-center">
@@ -225,7 +226,7 @@ MODAL DETALLE DE VENTA
                     </div>
                 </div>
             </div>
-            
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cerrar</button>
                 <!-- <button type="button" class="btn btn-primary"><i class="fa fa-print"></i> Imprimir Factura</button> -->
@@ -244,38 +245,51 @@ MODAL DE INSTRUCCIONES - LIBRO DE VENTAS
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title"><i class="fa fa-info-circle"></i> Instrucciones de Uso - Libro de Ventas</h4>
             </div>
-            
+
             <div class="modal-body">
                 <div class="box-body">
-                    
+
                     <h4><i class="fa fa-calendar"></i> 1. Filtrar por Rango de Fechas</h4>
                     <p>
-                        Utilice el botón <strong>"Rango de fecha"</strong> para seleccionar un período específico. Puede elegir rangos predefinidos como "Este mes" o seleccionar fechas personalizadas en el calendario. La tabla y los totales se actualizarán automáticamente.
+                        Utilice el botón <strong>"Rango de fecha"</strong> para seleccionar un período específico. Puede
+                        elegir rangos predefinidos como "Este mes" o seleccionar fechas personalizadas en el calendario.
+                        La tabla y los totales se actualizarán automáticamente.
                     </p>
                     <hr>
-                    
+
                     <h4><i class="fa fa-cogs"></i> 2. Gestionar Facturas</h4>
                     <ul>
-                        <li><strong>Ver Detalle:</strong> Haga clic en el <strong>número de factura</strong> para abrir una ventana con todos los detalles de la venta, incluyendo los productos.</li>
-                        <li><strong>Cambiar Estado:</strong> Haga clic en la insignia de estado (ej. <span class="btn btn-success btn-xs">Pagada</span>) para cambiar cíclicamente el estado de una factura (Pagada → Anulada → Pendiente). Los totales se recalcularán al instante.</li>
+                        <li><strong>Ver Detalle:</strong> Haga clic en el <strong>número de factura</strong> para abrir
+                            una ventana con todos los detalles de la venta, incluyendo los productos.</li>
+                        <li><strong>Cambiar Estado:</strong> Haga clic en la insignia de estado (ej. <span
+                                class="btn btn-success btn-xs">Pagada</span>) para cambiar cíclicamente el estado de una
+                            factura (Pagada → Anulada → Pendiente). Los totales se recalcularán al instante.</li>
                     </ul>
                     <hr>
 
                     <h4><i class="fa fa-file-text-o"></i> 3. Generar Reportes</h4>
                     <ul>
-                        <li><strong>Exportar a TXT (SENIAT):</strong> Después de seleccionar un rango de fechas, puede pulsar el boton del ícono <span class="btn btn-primary btn-xs"><i class="fa fa-file-text-o"></i> TXT</span>. para descargar el archivo de texto plano listo para el portal del SENIAT.</li>
-                        <li><strong>Exportar a Excel/Imprimir:</strong> Use los botones de <span class="btn btn-success btn-xs"><i class="fa fa-file-excel-o"></i> Excel</span> o <span class="btn btn-warning btn-xs"><i class="fa fa-print"></i> Imprimir</span> para descargar una copia del reporte que está viendo en pantalla.</li>
+                        <li><strong>Exportar a TXT (SENIAT):</strong> Después de seleccionar un rango de fechas, puede
+                            pulsar el boton del ícono <span class="btn btn-primary btn-xs"><i
+                                    class="fa fa-file-text-o"></i> TXT</span>. para descargar el archivo de texto plano
+                            listo para el portal del SENIAT.</li>
+                        <li><strong>Exportar a Excel/Imprimir:</strong> Use los botones de <span
+                                class="btn btn-success btn-xs"><i class="fa fa-file-excel-o"></i> Excel</span> o <span
+                                class="btn btn-warning btn-xs"><i class="fa fa-print"></i> Imprimir</span> para
+                            descargar una copia del reporte que está viendo en pantalla.</li>
                     </ul>
                     <hr>
-                    
+
                     <h4><i class="fa fa-search"></i> 4. Búsqueda y Ordenamiento</h4>
                     <p>
-                        Utilice el campo de <strong>"Buscar"</strong> para filtrar rápidamente por número de factura, cliente o cualquier otro dato. También puede hacer clic en los encabezados de las columnas para ordenar la tabla.
+                        Utilice el campo de <strong>"Buscar"</strong> para filtrar rápidamente por número de factura,
+                        cliente o cualquier otro dato. También puede hacer clic en los encabezados de las columnas para
+                        ordenar la tabla.
                     </p>
 
                 </div>
             </div>
-            
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Entendido</button>
             </div>
