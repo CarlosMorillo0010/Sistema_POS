@@ -98,8 +98,8 @@ if(isset($_GET["idOrden"])){
                                             <tr data-idproducto="<?php echo $item['id_producto']; ?>">
                                                 <td><button type="button" class="btn btn-danger btn-xs quitar-producto-oc"><i class="fa fa-times"></i></button></td>
                                                 <td><?php echo $item['descripcion']; ?></td>
-                                                <td><input type="number" class="form-control cantidad-oc" value="<?php echo $item['cantidad']; ?>" min="1"></td>
-                                                <td><input type="number" class="form-control precio-oc" value="<?php echo $item['precio_compra']; ?>" min="0"></td>
+                                                <td><input type="number" class="form-control cantidad-oc" value="<?php echo $item['cantidad']; ?>" min="1" step="any"></td>
+                                                <td><input type="number" class="form-control precio-oc" value="<?php echo $item['precio_compra']; ?>" min="0" step="any"></td>
                                                 <td class="subtotal-oc-celda" style="font-weight:bold; text-align:right;"><?php echo $item['subtotal']; ?></td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -143,21 +143,16 @@ if(isset($_GET["idOrden"])){
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Descuento ($):</label>
+                                <label>Porcentaje de Ganancia (%):</label>
                                 <div class="input-group">
-                                    <input style="margin-bottom: 20px;" type="number" class="form-control input-lg" name="descuentoOrden" id="descuentoOrden" min="0" value="<?php echo $esEditar ? $orden['descuento'] : '0.00'; ?>">
+                                    <input style="margin-bottom: 20px;" type="number" class="form-control input-lg" name="porcentajeGananciaOrden" id="porcentajeGananciaOrden" min="0" value="0.00">
                                 </div>
                             </div>
-                             <div class="form-group">
-                                <label>Costo de Envío ($):</label>
-                                <div class="input-group">
-                                    <input style="margin-bottom: 20px;" type="number" class="form-control input-lg" name="envioOrden" id="envioOrden" min="0" value="<?php echo $esEditar ? $orden['costo_envio'] : '0.00'; ?>">
-                                </div>
-                            </div>
+                            
                             <hr>
                             <h4>
                                 <strong>Total a Pagar:</strong>
-                                <strong class="pull-right" id="totalFinalOrden">$ <?php echo $esEditar ? number_format($orden['total'], 2) : '0.00'; ?></strong>
+                                <strong class="pull-right" id="totalFinalOrden"><?php echo $monedaPrincipal; ?> <?php echo $esEditar ? number_format($orden['total'], 2) : '0.00'; ?></strong>
                                 <input type="hidden" name="totalOrden" id="totalOrdenInput" value="<?php echo $esEditar ? $orden['total'] : '0.00'; ?>">
                             </h4>
                         </div>
@@ -224,9 +219,9 @@ $(document).ready(function() {
                     <tr data-idproducto="${respuesta.id_producto}">
                         <td><button type="button" class="btn btn-danger btn-xs quitar-producto-oc"><i class="fa fa-times"></i></button></td>
                         <td>${respuesta.descripcion}</td>
-                        <td><input type="number" class="form-control cantidad-oc" value="1" min="1"></td>
-                        <td><input type="number" class="form-control precio-oc" value="${respuesta.precio_costo}" min="0"></td>
-                        <td class="subtotal-oc-celda" style="font-weight:bold; text-align:right;">${respuesta.precio_costo}</td>
+                                                <td><input type="number" class="form-control cantidad-oc" value="1" min="1" step="any"></td>
+                        <td><input type="number" class="form-control precio-oc" value="${respuesta.costo_referencia}" min="0" step="any"></td>
+                        <td class="subtotal-oc-celda" style="font-weight:bold; text-align:right;">${respuesta.costo_referencia}</td>
                     </tr>`;
                 $(".productos-orden").append(newRow);
                 actualizarCalculos();
@@ -242,7 +237,7 @@ $(document).ready(function() {
     });
 
     // Actualizar cálculos al cambiar valores
-    $(".formulario-orden-compra").on("change keyup", ".cantidad-oc, .precio-oc, #porcentajeImpuestos, #descuentoOrden, #envioOrden", function(){
+    $(".formulario-orden-compra").on("change keyup", ".cantidad-oc, .precio-oc, #porcentajeImpuestos, #porcentajeGananciaOrden", function(){
         actualizarCalcululosFila(this);
         actualizarCalculos();
     });
@@ -261,15 +256,15 @@ $(document).ready(function() {
         });
         $("#subtotalOrden").val(subtotal.toFixed(2));
 
+        var porcentajeGanancia = parseFloat($("#porcentajeGananciaOrden").val()) || 0;
+        var subtotalConGanancia = subtotal * (1 + (porcentajeGanancia / 100));
+
         var porcentajeImpuestos = parseFloat($("#porcentajeImpuestos").val()) || 0;
-        var totalImpuestos = subtotal * (porcentajeImpuestos / 100);
+        var totalImpuestos = subtotalConGanancia * (porcentajeImpuestos / 100);
         $("#totalImpuestos").val(totalImpuestos.toFixed(2));
 
-        var descuento = parseFloat($("#descuentoOrden").val()) || 0;
-        var envio = parseFloat($("#envioOrden").val()) || 0;
-
-        var totalFinal = subtotal + totalImpuestos - descuento + envio;
-        $("#totalFinalOrden").text("$ " + totalFinal.toFixed(2));
+        var totalFinal = subtotalConGanancia + totalImpuestos;
+        $("#totalFinalOrden").text(APP_CONFIG.get('moneda_principal') + " " + totalFinal.toFixed(2));
         $("#totalOrdenInput").val(totalFinal.toFixed(2));
 
         // Actualizar lista de productos para el POST
