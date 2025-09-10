@@ -128,6 +128,7 @@ $(document).ready(function() {
         "deferRender": true, 
         "retrieve": true, 
         "processing": true, 
+        "stateSave": true,
         "order": [[0, "desc"]],
         "language": { "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json" }
     });
